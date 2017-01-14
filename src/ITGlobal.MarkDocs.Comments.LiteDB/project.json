@@ -9,8 +9,8 @@
   },
   "dependencies": {
     "NETStandard.Library": "1.6.0",
-    "MarkDocs.Core": "*",
-    "MarkDocs.Comments": "*",
+    "ITGlobal.MarkDocs.Core": "*",
+    "ITGlobal.MarkDocs.Comments": "*",
     "LiteDB": "3.0.0-beta3"
   },
   "frameworks": {

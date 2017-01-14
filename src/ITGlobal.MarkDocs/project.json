@@ -1,7 +1,7 @@
 {
   "version": "0.0.0-dev",
   "packOptions": {
-    "summary": "MarkDocs Comments extension",
+    "summary": "MarkDocs meta-package",
     "projectUrl": ""
   },
   "buildOptions": {
@@ -9,7 +9,10 @@
   },
   "dependencies": {
     "NETStandard.Library": "1.6.0",
-    "MarkDocs.Core": "*"
+    "ITGlobal.MarkDocs.Core": "*",
+    "ITGlobal.MarkDocs.Markdown": "*",
+    "ITGlobal.MarkDocs.Git": "*",
+    "ITGlobal.MarkDocs.Tags": "*"
   },
   "frameworks": {
     "netstandard1.6": {}

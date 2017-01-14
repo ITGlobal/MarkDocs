@@ -92,9 +92,7 @@ DoInDirectory(solutionDir, () =>
   Task("default")
     .IsDependentOn("pack")
     .Does(() =>
-  {
-    Information("Hello World!");
-  });
+  { });
 
   var target = Argument("target", "default");
   RunTarget(target);
