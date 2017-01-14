@@ -1,10 +1,11 @@
 {
   "title": "MarkDocs.Comments.LiteDB",
-  "version": "0.0.0-dev",
+  "version": "0.1.0",
   "copyright": "IT Global LLC",
-  "authors": [ "IT Global LLC" ],
+  "authors": [
+    "IT Global LLC"
+  ],
   "description": "ASP.NET Core extensible and embeddable documentation engine",
-
   "packOptions": {
     "summary": "MarkDocs comments extension (LitDB-based storage)",
     "projectUrl": "https://github.com/ITGlobal/MarkDocs",
@@ -20,20 +21,19 @@
       "url": "https://github.com/ITGlobal/MarkDocs.git"
     },
     "licenseUrl": "https://raw.githubusercontent.com/ITGlobal/MarkDocs/master/LICENSE",
-    "owners": [ "IT Global LLC" ]
+    "owners": [
+      "IT Global LLC"
+    ]
   },
-
   "buildOptions": {
     "xmlDoc": true
   },
-
   "dependencies": {
     "NETStandard.Library": "1.6.0",
-    "ITGlobal.MarkDocs.Core": "*",
-    "ITGlobal.MarkDocs.Comments": "*",
+    "ITGlobal.MarkDocs.Core": "0.1.0",
+    "ITGlobal.MarkDocs.Comments": "0.1.0",
     "LiteDB": "3.0.0-beta3"
   },
-
   "frameworks": {
     "netstandard1.6": {
       "imports": "dnxcore50"

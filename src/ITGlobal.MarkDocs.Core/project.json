@@ -1,10 +1,11 @@
 {
   "title": "MarkDocs.Core",
-  "version": "0.0.0-dev",
+  "version": "0.1.0",
   "copyright": "IT Global LLC",
-  "authors": [ "IT Global LLC" ],
+  "authors": [
+    "IT Global LLC"
+  ],
   "description": "ASP.NET Core extensible and embeddable documentation engine",
-
   "packOptions": {
     "summary": "MarkDocs core package",
     "projectUrl": "https://github.com/ITGlobal/MarkDocs",
@@ -20,13 +21,13 @@
       "url": "https://github.com/ITGlobal/MarkDocs.git"
     },
     "licenseUrl": "https://raw.githubusercontent.com/ITGlobal/MarkDocs/master/LICENSE",
-    "owners": [ "IT Global LLC" ]
+    "owners": [
+      "IT Global LLC"
+    ]
   },
-
   "buildOptions": {
     "xmlDoc": true
   },
-
   "dependencies": {
     "NETStandard.Library": "1.6.0",
     "System.IO.FileSystem.Watcher": "4.0.0",
@@ -37,7 +38,6 @@
     "System.Collections.Immutable": "1.2.0",
     "Microsoft.Extensions.FileSystemGlobbing": "1.1.0"
   },
-
   "frameworks": {
     "netstandard1.6": {}
   }
