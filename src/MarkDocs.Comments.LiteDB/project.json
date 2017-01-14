@@ -1,0 +1,21 @@
+{
+  "version": "0.0.0-dev",
+  "packOptions": {
+    "summary": "MarkDocs LiteDB Comments storage",
+    "projectUrl": ""
+  },
+  "buildOptions": {
+    "xmlDoc": true
+  },
+  "dependencies": {
+    "NETStandard.Library": "1.6.0",
+    "MarkDocs.Core": "*",
+    "MarkDocs.Comments": "*",
+    "LiteDB": "3.0.0-beta3"
+  },
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "dnxcore50"
+    }
+  }
+}

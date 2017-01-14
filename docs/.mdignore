@@ -1,0 +1,5 @@
+# Ignore
+ignored/**/*
+
+# Don't ignore
+!**/not-ignored.md

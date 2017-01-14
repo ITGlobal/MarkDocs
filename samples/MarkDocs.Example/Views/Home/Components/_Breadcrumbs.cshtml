@@ -1,0 +1,28 @@
+﻿@using ITGlobal.MarkDocs
+@model ITGlobal.MarkDocs.IPage
+
+@{
+    var nodes = new Stack<IPageTreeNode>();
+
+    var n = Model.PageTreeNode;
+    while (n != null)
+    {
+        nodes.Push(n);
+        n = n.Parent;
+    }
+}
+
+<ol class="breadcrumb">
+    @while (nodes.Count > 0)
+    {
+        var node = nodes.Pop();
+        var url = node.IsHyperlink ?
+            string.Format("/{0}/{1}", Uri.EscapeDataString(Model.Documentation.Id), node.Id)
+            : null;
+        var isActive = node.Id == Model.Id;
+
+        <li class="@(isActive ? "active" : "")">
+            <a href="@url">@node.Title</a>
+        </li>
+    }
+</ol>

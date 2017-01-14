@@ -1,0 +1,22 @@
+﻿@model ITGlobal.MarkDocs.IPage
+
+<ul class="list-group">
+    @if (!string.IsNullOrEmpty(Model.Metadata.Title))
+    {
+        <li class="list-group-item">
+            <samp>title=@Model.Metadata.Title</samp>
+        </li>
+    }
+    @if (Model.Metadata.Order != 0)
+    {
+        <li class="list-group-item">
+            <samp>order=@Model.Metadata.Order</samp>
+        </li>
+    }
+    @if (Model.Metadata.Tags?.Any() == true)
+    {
+        <li class="list-group-item">
+            <samp>tags=@(string.Join(", ", Model.Metadata.Tags))</samp>
+        </li>
+    }
+</ul>

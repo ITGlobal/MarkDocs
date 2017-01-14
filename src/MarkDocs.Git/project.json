@@ -1,0 +1,21 @@
+{
+  "version": "0.0.0-dev",
+  "packOptions": {
+    "summary": "MarkDocs Git Storage",
+    "projectUrl": ""
+  },
+  "buildOptions": {
+    "xmlDoc": true
+  },
+  "dependencies": {
+    "NETStandard.Library": "1.6.0",
+    "Microsoft.Extensions.Logging": "1.0.0",
+    "Microsoft.Extensions.DependencyInjection": "1.0.0",
+    "MarkDocs.Core": "*",
+    "System.Diagnostics.Process": "4.3.0",
+    "Newtonsoft.Json": "9.0.1"
+  },
+  "frameworks": {
+    "netstandard1.6": {}
+  }
+}

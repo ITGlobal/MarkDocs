@@ -1,0 +1,21 @@
+{
+  "version": "0.0.0-dev",
+  "packOptions": {
+    "summary": "MarkDocs Markdown format",
+    "projectUrl": ""
+  },
+  "buildOptions": {
+    "xmlDoc": true
+  },
+  "dependencies": {
+    "NETStandard.Library": "1.6.0",
+    "Microsoft.Extensions.Logging": "1.0.0",
+    "Microsoft.Extensions.DependencyInjection": "1.0.0",
+    "MarkDocs.Core": "*",
+    "Markdig": "0.10",
+    "SharpYaml.NetStandard": "1.5.4"
+  },
+  "frameworks": {
+     "netstandard1.6": {}
+  }
+}

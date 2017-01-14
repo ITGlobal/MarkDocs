@@ -1,0 +1,21 @@
+﻿@using ITGlobal.MarkDocs.Example.Model
+@model PageTreeModel
+
+@{
+    var url = string.Format("/{0}", Uri.EscapeDataString(Model.Documentation.Id));
+    var isActive = string.IsNullOrEmpty(Model.Page.Id);
+}
+
+<ul class="page-tree">
+    <li data-id="" class="@(isActive?"active":"")">
+        <a href="@url">
+            <i class="fa fa-fw fa-home"></i>
+            <span>@Model.Documentation.Title</span>
+        </a>
+    </li>
+
+    @foreach (var node in Model.Tree.Nodes)
+    {
+        @Html.Partial("Components/_PageTreeNode", new PageTreeNodeModel(node, Model.Page));
+    }
+</ul>

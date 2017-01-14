@@ -1,0 +1,24 @@
+﻿@using ITGlobal.MarkDocs.Tags
+@model ITGlobal.MarkDocs.IDocumentation
+
+@{
+    var tags = Model.GetTags();
+}
+
+@if (tags.Count > 0)
+{
+    <div class="list-group">
+        @foreach (var tag in tags)
+        {
+            <a href="~/@Uri.EscapeDataString(Model.Id)/by-tag/@tag" class="list-group-item">
+                <samp>@tag</samp>
+            </a>
+        }
+    </div>
+}
+else
+{
+    <p class="alert alert-warning">
+        No tags found
+    </p>
+}

@@ -1,0 +1,76 @@
+﻿hr {
+    border-color: black;
+}
+
+.list-group * {
+    word-break: break-all;
+}
+
+.page-tree {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+    .page-tree a {
+        display: block;
+    }
+
+    .page-tree ul {
+        list-style-type: none;
+    }
+
+    .page-tree li {
+        color: #337ab7;
+    }
+
+        .page-tree li.active > a {
+            color: #fff;
+            background-color: #337ab7;
+        }
+
+.comment-list {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+    .comment-list ul {
+        list-style-type: none;
+    }
+
+
+
+
+/*** Layout ***/
+.page-layout-root {
+    position: absolute;
+    left: 0;
+    top: 60px;
+    right: 0;
+    bottom: 0;
+}
+
+    .page-layout-root > .page-breadcrumbs {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        height: 30px;
+    }
+
+    .page-layout-root > .page-sidebar {
+        position: absolute;
+        left: 0;
+        top: 30px;
+        width: 350px;
+        bottom: 0;
+        overflow-y: scroll;
+    }
+
+    .page-layout-root > .page-content {
+        position: absolute;
+        left: 360px;
+        top: 30px;
+        right: 0;
+        bottom: 0;
+        overflow-y: scroll;
+    }

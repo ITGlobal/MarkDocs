@@ -1,0 +1,18 @@
+﻿@model IReadOnlyList<ITGlobal.MarkDocs.IDocumentation>
+@{
+    ViewData["Title"] = "List of documentations";
+}
+
+<div class="page-header">
+  <h1>MarkDocs <small>List of documentations</small></h1>
+</div>
+
+<div class="list-group">
+  @foreach (var doc in Model)
+  {
+    <a href="@Url.Action("Resource", new { branch = doc.Id })" class="list-group-item">
+      <h4 class="list-group-item-heading"> <samp> @doc.Id</samp></h4>
+      <p class="list-group-item-text">@doc.Title</p>
+    </a>
+  }
+</div>

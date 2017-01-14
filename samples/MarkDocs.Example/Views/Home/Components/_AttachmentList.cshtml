@@ -1,0 +1,23 @@
+﻿@model ITGlobal.MarkDocs.IDocumentation
+
+@{
+    var attachments = Model.Attachments;
+}
+
+@if (attachments.Count > 0)
+{
+    <div class="list-group">
+        @foreach (var attachment in attachments)
+        {
+            <a href="/@Model.Id/@attachment.Id" class="list-group-item">
+                <samp>@attachment.Id</samp>
+            </a>
+        }
+    </div>
+}
+else
+{
+    <p class="alert alert-warning">
+        No attachments found
+    </p>
+}

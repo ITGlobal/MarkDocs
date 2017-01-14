@@ -1,0 +1,15 @@
+﻿@model ITGlobal.MarkDocs.Example.Model.PagesByTagModel
+<div class="page-header">
+    <h1>
+        All pages with <samp>@Model.Tag</samp> tag
+    </h1>
+</div>
+
+<div class="list-group">
+    @foreach (var page in Model.Pages)
+    {
+        <a href="~/@Uri.EscapeDataString(Model.Documentation.Id)/@page.Id" class="list-group-item">
+            @page.Title
+        </a>
+    }
+</div>

@@ -1,0 +1,74 @@
+﻿@using ITGlobal.MarkDocs.Comments
+@model ITGlobal.MarkDocs.IPage
+@{
+    var comments = Model.GetComments().Comments;
+}
+<ul class="comment-list">
+    @foreach (var comment in comments)
+    {
+        @Html.Partial("Components/_Comment", comment);
+    }
+    
+    <li>
+        <hr />
+        <form action="~/_/comment/add" type="hidden" method="post" class="form-horizontal">
+            <input name="branch" type="hidden" value="@Model.Documentation.Id"/>
+            <input name="page" type="hidden" value="@Model.Id"/>
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <input type="email" class="form-control" placeholder="User name" name="user" value="user@@server.com">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <textarea class="form-control" name="text"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <button type="submit" class="btn btn-default">
+                        <i class="fa fa-fw fa-comment"></i> Leave a comment
+                    </button>
+                </div>
+            </div>
+        </form>
+    </li>
+</ul>
+
+<script>
+    function editComment(id) {
+        $('#editCommentId').val(id);
+        var markup = $('#comment-text-' + id).html();
+        $('#editCommentModal textarea').val(markup);
+        $('#editCommentModal').modal('show');
+    }
+</script>
+
+<div class="modal fade" id="editCommentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <form id="reply_@Model.Id" action="~/_/comment/edit" type="hidden" method="post">
+        <input name="branch" type="hidden" value="@Model.Documentation.Id" />
+        <input name="page" type="hidden" value="@Model.Id" />
+        <input id="editCommentId" name="id" type="hidden" />
+
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Edit comment</h4>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control" name="text"></textarea>
+                </div>
+                <div class="modal-footer">
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-fw fa-check"></i> OK
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <i class="fa fa-fw fa-times"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

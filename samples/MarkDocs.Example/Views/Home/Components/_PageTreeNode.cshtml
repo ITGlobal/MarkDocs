@@ -1,0 +1,38 @@
+﻿@using System.Threading.Tasks
+@using ITGlobal.MarkDocs.Example.Model
+@model ITGlobal.MarkDocs.Example.Model.PageTreeNodeModel
+
+@{
+    var url = Model.Node.IsHyperlink ?
+        string.Format("/{0}/{1}", Uri.EscapeDataString(Model.Documentation.Id), Model.Node.Id)
+        : null;
+
+    var isFolder = Model.Node.Nodes != null;
+    var icon = isFolder ? "<i class=\"fa fa-fw fa-folder-o\"></i>" : "<i class=\"fa fa-fw fa-file-o\"></i>";
+
+    var isActive = Model.Page.Id == Model.Node.Id;
+}
+
+<li data-id="@Html.Encode(Model.Node)" class="@(isActive?"active":"")">
+    @if (url != null)
+    {
+        <a href="@url">
+            @Html.Raw(icon)
+            <span>@Model.Node.Title</span>
+        </a>
+    }
+    else
+    {
+        @Html.Raw(icon)
+        <span>@Model.Node.Title</span>
+    }
+    @if (isFolder)
+    {
+        <ul>
+            @foreach (var node in Model.Node.Nodes)
+            {
+                @Html.Partial("Components/_PageTreeNode", new PageTreeNodeModel(node, Model.Page));
+            }
+        </ul>
+    }
+</li>

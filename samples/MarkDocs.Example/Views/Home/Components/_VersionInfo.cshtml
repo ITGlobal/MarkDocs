@@ -1,0 +1,22 @@
+﻿@model ITGlobal.MarkDocs.IDocumentation
+
+<ul class="list-group">
+    <li class="list-group-item">
+        <samp>source_url=@Model.ContentVersion.SourceUrl</samp>
+    </li>
+    <li class="list-group-item">
+        <samp>version=@Model.ContentVersion.Version</samp>
+    </li>
+    <li class="list-group-item">
+        <samp>last_change_time=@Model.ContentVersion.LastChangeTime</samp>
+    </li>
+    <li class="list-group-item">
+        <samp>last_change_id=@Model.ContentVersion.LastChangeId</samp>
+    </li>
+    <li class="list-group-item">
+        <samp>last_change_descr=@Model.ContentVersion.LastChangeDescription</samp>
+    </li>
+    <li class="list-group-item">
+        <samp>last_change_by=@Model.ContentVersion.LastChangeAuthor</samp>
+    </li>
+</ul>

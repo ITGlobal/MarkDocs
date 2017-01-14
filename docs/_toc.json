@@ -1,0 +1,12 @@
+{
+    "pages":{
+        "todo":{
+            "order":10000,
+            "title":"TODO items",
+            "tags" : [
+                "todo",
+                "markdocs"
+            ]
+        }
+    }
+}

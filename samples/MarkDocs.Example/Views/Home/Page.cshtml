@@ -1,0 +1,95 @@
+﻿@using System.Threading.Tasks
+@using ITGlobal.MarkDocs
+@using ITGlobal.MarkDocs.Example.Model
+@model PageModel
+@{
+    ViewData["Title"] = Model.Page.Title;
+}
+
+<div class="page-layout-root">
+    <div class="page-breadcrumbs">
+        @Html.Partial("Components/_Breadcrumbs", Model.Page)
+    </div>
+
+    <div class="page-sidebar">
+        <div>
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#catalog" data-toggle="tab" title="Page tree">
+                        <i class="fa fa-code-fork"></i>
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="#attachments" data-toggle="tab" title="Attachments">
+                        <i class="fa fa-files-o"></i>
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="#version" data-toggle="tab" title="Version">
+                        <i class="fa fa-history"></i>
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="#tags" data-toggle="tab" title="Tags">
+                        <i class="fa fa-hashtag"></i>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane active" id="catalog">
+                    @Html.Partial("Components/_PageTree", new PageTreeModel(Model.Documentation.PageTree, Model.Page))
+                </div>
+                <div class="tab-pane" id="attachments">
+                    @Html.Partial("Components/_AttachmentList", Model.Documentation)
+                </div>
+                <div class="tab-pane" id="version">
+                    @Html.Partial("Components/_VersionInfo", Model.Documentation)
+                </div>
+                <div class="tab-pane" id="tags">
+                    @Html.Partial("Components/_TagList", Model.Documentation)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#content" data-toggle="tab">
+                    <i class="fa fa-file-text-o"></i> Content
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#metadata" data-toggle="tab">
+                    <i class="fa fa-info-circle"></i> Metadata
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#pagetags" data-toggle="tab">
+                    <i class="fa fa-hashtag"></i> Tags
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#comments" data-toggle="tab">
+                    <i class="fa fa-comments"></i> Comments
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane active" id="content">
+                @Html.Raw(Model.Page.ReadHtmlString())
+            </div>
+            <div class="tab-pane" id="metadata">
+                @Html.Partial("Components/_PageMetadata", Model.Page)
+            </div>
+            <div class="tab-pane" id="pagetags">
+                @Html.Partial("Components/_PageTags", Model.Page)
+            </div>
+            <div class="tab-pane" id="comments">
+                @Html.Partial("Components/_CommentList", Model.Page)
+            </div>
+        </div>
+    </div>
+</div>
