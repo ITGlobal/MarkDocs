@@ -1,12 +1,32 @@
 {
+  "title": "MarkDocs",
   "version": "0.0.0-dev",
+  "copyright": "IT Global LLC",
+  "authors": [ "IT Global LLC" ],
+  "description": "ASP.NET Core extensible and embeddable documentation engine",
+
   "packOptions": {
-    "summary": "MarkDocs meta-package",
-    "projectUrl": ""
+    "summary": "MarkDocs meta-package. Contains only references to other packages",
+    "projectUrl": "https://github.com/ITGlobal/MarkDocs",
+    "tags": [
+      "markdocs",
+      "markdown",
+      "documentation",
+      "aspnet",
+      "aspnetcore"
+    ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/ITGlobal/MarkDocs.git"
+    },
+    "licenseUrl": "https://raw.githubusercontent.com/ITGlobal/MarkDocs/master/LICENSE",
+    "owners": [ "IT Global LLC" ]
   },
+
   "buildOptions": {
     "xmlDoc": true
   },
+
   "dependencies": {
     "NETStandard.Library": "1.6.0",
     "ITGlobal.MarkDocs.Core": "*",
@@ -14,6 +34,7 @@
     "ITGlobal.MarkDocs.Git": "*",
     "ITGlobal.MarkDocs.Tags": "*"
   },
+
   "frameworks": {
     "netstandard1.6": {}
   }

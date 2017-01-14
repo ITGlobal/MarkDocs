@@ -82,10 +82,6 @@ DoInDirectory(solutionDir, () =>
         foreach(var artifact in GetFiles(artifactsDir + "/*.nupkg"))
         {
             Information("\t{0}", artifact.GetFilename());
-            if(AppVeyor.IsRunningOnAppVeyor)
-            {
-                AppVeyor.UploadArtifact(artifact);
-            }
         }
     });    
 
