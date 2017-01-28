@@ -21,7 +21,7 @@ namespace ITGlobal.MarkDocs.Comments
         ///     Configuration builder
         /// </param>
         /// <param name="repositoryFactory">
-        ///     Comment data repository
+        ///     Comment data repository factory
         /// </param>
         [PublicAPI]
         public static void AddComments(
@@ -44,15 +44,15 @@ namespace ITGlobal.MarkDocs.Comments
         /// <param name="configuration">
         ///     Configuration builder
         /// </param>
-        /// <param name="repositoryFactory">
+        /// <param name="repository">
         ///     Comment data repository
         /// </param>
         [PublicAPI]
         public static void AddComments(
             [NotNull] this MarkDocsExtensionConfigurationBuilder configuration,
-            [NotNull] ICommentDataRepository repositoryFactory)
+            [NotNull] ICommentDataRepository repository)
         {
-            AddComments(configuration, _ => repositoryFactory);
+            AddComments(configuration, _ => repository);
         }
     }
 }

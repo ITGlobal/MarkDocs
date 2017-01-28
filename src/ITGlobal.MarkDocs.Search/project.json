@@ -1,5 +1,5 @@
 {
-  "title": "MarkDocs.Git",
+  "title": "MarkDocs.Search",
   "version": "0.1.0",
   "copyright": "IT Global LLC",
   "authors": [
@@ -7,7 +7,7 @@
   ],
   "description": "ASP.NET Core extensible and embeddable documentation engine",
   "packOptions": {
-    "summary": "MarkDocs git content provider",
+    "summary": "MarkDocs text search extension (base package)",
     "projectUrl": "https://github.com/ITGlobal/MarkDocs",
     "tags": [
       "markdocs",
@@ -30,17 +30,10 @@
   },
   "dependencies": {
     "NETStandard.Library": "1.6.0",
-    "Microsoft.Extensions.Logging": "1.0.0",
-    "Microsoft.Extensions.DependencyInjection": "1.0.0",
-    "ITGlobal.MarkDocs.Core": "0.1.0",
-    "Newtonsoft.Json": "9.0.1"
+    "ITGlobal.MarkDocs.Core": "0.1.0"
   },
   "frameworks": {
-    "netstandard1.6": {
-      "dependencies": {
-        "System.Diagnostics.Process": "4.3.0"
-      }
-    },
+    "netstandard1.6": {},
     "net451": {
       "buildOptions": {
         "define": [

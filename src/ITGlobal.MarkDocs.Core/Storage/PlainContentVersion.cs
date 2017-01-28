@@ -12,6 +12,7 @@ namespace ITGlobal.MarkDocs.Storage
         {
             SourceUrl = "file:///" + path;
             LastChangeTime = Directory.GetLastWriteTime(path);
+            LastChangeId = HashUtils.HashDirectory(path);
         }
         
         /// <summary>
@@ -32,7 +33,7 @@ namespace ITGlobal.MarkDocs.Storage
         /// <summary>
         ///     Version hash
         /// </summary>
-        public string LastChangeId => null;
+        public string LastChangeId { get; }
 
         /// <summary>
         ///     Last commit message

@@ -1,0 +1,27 @@
+﻿@model ITGlobal.MarkDocs.Example.Model.SearchResultsModel
+@{
+    ViewData["Title"] = "Search results";
+}
+
+<div class="page-header">
+    <h1>
+        Search results for <samp>@Model.Query</samp>
+    </h1>
+</div>
+
+<div class="list-group">
+    @foreach (var item in Model.Items)
+    {
+        <a href="@Url.Action("Resource", new { branch = Model.Documentation.Id })/@item.Page.Id" class="list-group-item">
+            <h4 class="list-group-item-heading">@item.Page.Title</h4>
+            <p class="list-group-item-text">@Html.Raw(item.Preview)</p>
+        </a>
+    }
+</div>
+
+<hr/>
+
+<p>
+    Total results: <samp>@Model.Items.Count</samp>
+</p>
+

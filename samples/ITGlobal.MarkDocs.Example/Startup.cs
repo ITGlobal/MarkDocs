@@ -10,6 +10,7 @@ using ITGlobal.MarkDocs.Cache;
 using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Comments;
 using ITGlobal.MarkDocs.Git;
+using ITGlobal.MarkDocs.Search;
 using ITGlobal.MarkDocs.Storage;
 using ITGlobal.MarkDocs.Tags;
 using Serilog;
@@ -46,6 +47,9 @@ namespace ITGlobal.MarkDocs.Example
                 config.Storage.UseStaticDirectory(Path.GetFullPath(Path.Combine(Env.ContentRootPath, "../../docs")), enableWatch: true);
                 config.Extensions.AddLiteDbComments(Path.Combine(Env.ContentRootPath, "Data", "comments.dat"));
                 config.Extensions.AddTags();
+#if NET45
+                config.Extensions.AddLuceneSearch(Path.Combine(Env.ContentRootPath, "Data", "search-index"));
+#endif
             });
         }
         

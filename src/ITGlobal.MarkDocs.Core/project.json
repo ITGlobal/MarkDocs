@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "NETStandard.Library": "1.6.0",
-    "System.IO.FileSystem.Watcher": "4.0.0",
     "Microsoft.Extensions.Logging": "1.0.0",
     "Microsoft.Extensions.DependencyInjection": "1.0.0",
     "Microsoft.AspNetCore.StaticFiles": "1.0.0",
@@ -39,6 +38,18 @@
     "Microsoft.Extensions.FileSystemGlobbing": "1.1.0"
   },
   "frameworks": {
-    "netstandard1.6": {}
+    "netstandard1.6": {
+      "dependencies": {
+        "System.IO.FileSystem.Watcher": "4.0.0",
+        "System.Security.Cryptography.Algorithms": "4.3.0"
+      }
+    },
+    "net451": {
+      "buildOptions": {
+        "define": [
+          "NET45"
+        ]
+      }
+    }
   }
 }
