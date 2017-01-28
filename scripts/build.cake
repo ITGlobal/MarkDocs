@@ -66,6 +66,7 @@ DoInDirectory(solutionDir, () =>
         Debug("Detecting branch name");
         var branchName = gitVersion.BranchName;
         
+        branchName = branchName.Replace('/', '-');
         var sv = branchName != "master" 
           ? CreateSemVer(gitVersion.Major, gitVersion.Minor, buildNumber, gitVersion.BranchName)
           : CreateSemVer(gitVersion.Major, gitVersion.Minor, buildNumber);
