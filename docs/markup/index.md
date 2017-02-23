@@ -1,9 +1,12 @@
 ---
-title: Common Markup
-order: 1
+title: Markdown Markup
 ---
 
-Common markdown markup
-======================
+Supported Markdown Markup
+=========================
 
-:::children:::
+[Common markdown markup](common.md)
+-----------------------------------
+
+[Supported markdown extensions](extensions.md)
+----------------------------------------------

@@ -7,14 +7,8 @@ namespace ITGlobal.MarkDocs
     ///     A attachment
     /// </summary>
     [PublicAPI]
-    public interface IAttachment
+    public interface IAttachment : IResource
     {
-        /// <summary>
-        ///     Attachment ID
-        /// </summary>
-        [PublicAPI, NotNull]
-        string Id { get; }
-
         /// <summary>
         ///     Attachment file name
         /// </summary>

@@ -11,7 +11,6 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Resolves an actual URL for specified resource
         /// </summary>
-        [PublicAPI, NotNull]
-        string ResolveUrl([NotNull] IPage page, [NotNull] string resourceId);
+        string ResolveUrl([NotNull] IResource resource);
     }
 }

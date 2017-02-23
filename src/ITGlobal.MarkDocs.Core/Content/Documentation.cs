@@ -49,6 +49,9 @@ namespace ITGlobal.MarkDocs.Content
                 }
             });
 
+            // Link nodes to documentation
+            pageTree.LinkToDocumentation(this);
+
             // Build attachment dictionary
             foreach (var path in pageTree.Attachments)
             {
@@ -60,7 +63,7 @@ namespace ITGlobal.MarkDocs.Content
                     contentType = Attachment.DEFAULT_MIME_TYPE;
                 }
 
-                var attachment = new Attachment(this, _service.Cache, relativePath, path, contentType);
+                var attachment = new FileAttachment(this, _service.Cache, relativePath, path, contentType);
                 _attachmentsById[attachment.Id] = attachment;
                 _attachments.Add(attachment);
             }
@@ -111,7 +114,7 @@ namespace ITGlobal.MarkDocs.Content
         /// </returns>
         public IPage GetPage(string id)
         {
-            Page.NormalizeId(ref id);
+            ResourceId.Normalize(ref id);
 
             Page page;
             if (!_pages.TryGetValue(id, out page))
@@ -133,8 +136,8 @@ namespace ITGlobal.MarkDocs.Content
         /// </returns>
         public IAttachment GetAttachment(string id)
         {
-            Attachment.NormalizeId(ref id);
-            
+            ResourceId.Normalize(ref id);
+
             Attachment attachment;
             if (!_attachmentsById.TryGetValue(id, out attachment))
             {
@@ -177,6 +180,43 @@ namespace ITGlobal.MarkDocs.Content
                     _service.Log.LogDebug("Cached file {0}:{1}", Id, attachment.FileName);
                 }
             }
+        }
+
+        /// <summary>
+        ///   Add a generated attachment
+        /// </summary>
+        public IAttachment CreateAttachment(string name, byte[] content)
+        {
+            if (name == null)
+            {
+                name = Guid.NewGuid().ToString("N");
+            }
+            name = name.ToLowerInvariant();
+
+            var id = "/" + name;
+            while (_attachmentsById.ContainsKey(name))
+            {
+                id = $"/{name}_{Guid.NewGuid():N}";
+            }
+
+            string contentType;
+            if (!_service.ContentTypeProvider.TryGetContentType(name, out contentType))
+            {
+                contentType = Attachment.DEFAULT_MIME_TYPE;
+            }
+
+            var attachment = new GeneratedAttachment(
+                this,
+                _service.Cache,
+                id,
+                name,
+                contentType,
+                content);
+
+            _attachmentsById[attachment.Id] = attachment;
+            _attachments.Add(attachment);
+
+            return attachment;
         }
 
         /// <summary>

@@ -19,7 +19,7 @@ namespace ITGlobal.MarkDocs.Content
         /// </summary>
         protected PageTreeNode(string id, Metadata metadata)
         {
-            Page.NormalizeId(ref id);
+            ResourceId.Normalize(ref id);
 
             Id = id;
             Metadata = metadata;
@@ -33,6 +33,11 @@ namespace ITGlobal.MarkDocs.Content
         ///     Node ID
         /// </summary>
         public string Id { get; }
+
+        /// <summary>
+        ///     A reference to a documentation
+        /// </summary>
+        public IDocumentation Documentation { get; private set; }
 
         /// <summary>
         ///     Node title
@@ -105,6 +110,14 @@ namespace ITGlobal.MarkDocs.Content
             }
         }
 
+        /// <summary>
+        ///     Links a node and all its chilren to documentation object
+        /// </summary>
+        public void LinkToDocumentation(IDocumentation documentation)
+        {
+            ScanNodes((node, _) => node.Documentation = documentation);
+        }
+        
         #endregion
     }
 }

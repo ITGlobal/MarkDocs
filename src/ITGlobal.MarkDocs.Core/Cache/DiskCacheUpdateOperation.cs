@@ -17,6 +17,7 @@ namespace ITGlobal.MarkDocs.Cache
         private readonly DiskCache _cache;
         private readonly DiskCacheDescriptor _descriptor = new DiskCacheDescriptor();
 
+        private readonly object _contentWriteTasksLock = new object();
         private readonly List<Task> _contentWriteTasks = new List<Task>();
 
         private DiskCacheDescriptor _oldDescriptor;
@@ -80,7 +81,10 @@ namespace ITGlobal.MarkDocs.Cache
 
             if (_cache.Options.EnableConcurrentWrites)
             {
-                _contentWriteTasks.Add(contentWriteTask);
+                lock (_contentWriteTasksLock)
+                {
+                    _contentWriteTasks.Add(contentWriteTask);
+                }
             }
             else
             {
@@ -93,9 +97,12 @@ namespace ITGlobal.MarkDocs.Cache
         /// </summary>
         void ICacheUpdateOperation.Flush()
         {
-            if (_contentWriteTasks.Count > 0)
+            lock (_contentWriteTasksLock)
             {
-                Task.WaitAll(_contentWriteTasks.ToArray());
+                if (_contentWriteTasks.Count > 0)
+                {
+                    Task.WaitAll(_contentWriteTasks.ToArray());
+                }
             }
 
             _descriptor.LastUpdateTime = DateTime.UtcNow;

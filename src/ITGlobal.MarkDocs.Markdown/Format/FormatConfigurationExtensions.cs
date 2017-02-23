@@ -16,14 +16,17 @@ namespace ITGlobal.MarkDocs.Format
         [PublicAPI, NotNull]
         public static MarkDocsFormatConfigurationBuilder UseMarkdown(
             [NotNull] this MarkDocsFormatConfigurationBuilder config,
+            [CanBeNull] MarkdownOptions options = null,
             [CanBeNull] Func<IServiceProvider, IResourceUrlResolver> resourceUrlResolverFactory = null
 
             )
         {
+            options = options ?? new MarkdownOptions();
             resourceUrlResolverFactory = resourceUrlResolverFactory ?? (_ => new DefaultResourceUrlResolver());
 
             config.Use(services =>
             {
+                services.AddSingleton(options);
                 services.AddSingleton(resourceUrlResolverFactory);
                 services.AddSingleton<IFormat, MarkdownFormat>();
             });

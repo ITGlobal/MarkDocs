@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
+using ITGlobal.MarkDocs.Format.Mathematics;
 using JetBrains.Annotations;
 using Markdig;
-using Markdig.Extensions.MediaLinks;
 using Markdig.Extensions.Tables;
 using Markdig.Renderers;
 using Markdig.Syntax;
@@ -21,11 +20,10 @@ namespace ITGlobal.MarkDocs.Format
     [PublicAPI]
     public sealed class MarkdownFormat : IFormat
     {
-        private static readonly ThreadLocal<IPage> CurrentPageHolder = new ThreadLocal<IPage>();
-
-        internal static IPage CurrentPage => CurrentPageHolder.Value;
+        #region fields
 
         private readonly ILogger _log;
+        private readonly MarkdownOptions _options;
         private readonly IResourceUrlResolver _resourceUrlResolver;
         private readonly MarkdownPipeline _pipeline;
 
@@ -41,18 +39,28 @@ namespace ITGlobal.MarkDocs.Format
             ".markdown"
         };
 
+        #endregion
+
+        #region .ctor
+
         /// <summary>
         ///     .ctor
         /// </summary>
         [PublicAPI]
         public MarkdownFormat(
+            [NotNull] MarkdownOptions options,
             [NotNull] ILoggerFactory loggerFactory,
             [NotNull] IResourceUrlResolver resourceUrlResolver)
         {
             _log = loggerFactory.CreateLogger(typeof(MarkdownFormat));
+            _options = options;
             _resourceUrlResolver = resourceUrlResolver;
-            _pipeline = CreateMarkdownPipeline(resourceUrlResolver);
+            _pipeline = CreateMarkdownPipeline(options);
         }
+
+        #endregion
+
+        #region IFormat
 
         /// <summary>
         ///     Get a list of page file filters
@@ -63,6 +71,11 @@ namespace ITGlobal.MarkDocs.Format
         ///     Get a list of index page file filters
         /// </summary>
         public string[] IndexFileNames { get; } = { "index.md", "README.md" };
+
+        /// <summary>
+        ///     Encoding for source files
+        /// </summary>
+        public Encoding SourceEncoding => Encoding.UTF8;
 
         /// <summary>
         ///     Reads a page file <paramref name="filename"/> and parses it's metadata (see <see cref="Metadata"/>)
@@ -83,15 +96,19 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Renders content of <paramref name="markup"/> into HTML
         /// </summary>
-        public string Render(IPage page, string markup)
+        public string Render(IRenderContext ctx, string markup)
         {
-            try
+            using (MarkdownRenderingContext.SetCurrentRenderingContext(
+                _log,
+                ctx,
+                _options.UmlRenderer,
+                _options.MathRenderer,
+                _resourceUrlResolver
+                ))
             {
-                CurrentPageHolder.Value = page;
-
                 var ast = Markdown.Parse(markup, _pipeline);
 
-                RewriteLinkUrls(page, ast);
+                RewriteLinkUrls(ctx.Page, ast);
 
                 using (var writer = new StringWriter())
                 {
@@ -102,34 +119,11 @@ namespace ITGlobal.MarkDocs.Format
                     return writer.ToString();
                 }
             }
-            catch (Exception)
-            {
-                // TODO
-                throw;
-            }
-            finally
-            {
-                CurrentPageHolder.Value = null;
-            }
         }
 
-        /// <summary>
-        ///     Reads a page file <paramref name="filename"/> and renders it's content into HTML
-        /// </summary>
-        public string RenderFile(IPage page, string filename)
-        {
-            try
-            {
-                var markdown = File.ReadAllText(filename, Encoding.UTF8);
-                var html = Render(page, markdown);
-                return html;
-            }
-            catch (Exception)
-            {
-                // TODO
-                throw;
-            }
-        }
+        #endregion
+
+        #region helpers
 
         private void RewriteLinkUrls(IPage page, MarkdownDocument ast)
         {
@@ -163,7 +157,7 @@ namespace ITGlobal.MarkDocs.Format
                     url = Path.ChangeExtension(url, null);
                 }
 
-                url = _resourceUrlResolver.ResolveUrl(page, url);
+                url = _resourceUrlResolver.ResolveUrl(GetResourceFromUrl(page, url));
 
                 if (!string.IsNullOrEmpty(hash))
                 {
@@ -174,41 +168,159 @@ namespace ITGlobal.MarkDocs.Format
             }
         }
 
-        private static MarkdownPipeline CreateMarkdownPipeline(IResourceUrlResolver resourceUrlResolver)
+        private static IResource GetResourceFromUrl(IPage page, string url)
+        {
+            try
+            {
+                if (!url.StartsWith("/"))
+                {
+                    url = NormalizeResourcePath(page.Id, url);
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                throw new InvalidOperationException($"Href \"{url}\" is not a valid relative reference for page \"{page.Id}\"");
+            }
+            
+            return PseudoResource.Get(page.Documentation, url);
+        }
+
+        private static string NormalizeResourcePath(string basePath, string resourceUrl)
+        {
+            var basePathSegments = basePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var basePathLen = basePathSegments.Length;
+
+            var resourcePathSegments = resourceUrl.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var resourcePathLen = 0;
+            for (var i = 0; i < resourcePathSegments.Length; i++)
+            {
+                if (resourcePathSegments[i] == "..")
+                {
+                    basePathLen--;
+                    if (basePathLen < 0)
+                    {
+                        throw new InvalidOperationException("Invalid relative resource path");
+                    }
+                }
+                else
+                {
+                    resourcePathLen++;
+                }
+            }
+
+            var normalizedUrlSegments = new string[basePathLen + resourcePathLen];
+            var index = 0;
+            for (var i = 0; i < basePathLen; i++)
+            {
+                normalizedUrlSegments[index] = basePathSegments[i];
+                index++;
+            }
+            for (var i = 0; i < resourcePathSegments.Length; i++)
+            {
+                if (resourcePathSegments[i] != "..")
+                {
+                    normalizedUrlSegments[index] = resourcePathSegments[i];
+                    index++;
+                }
+            }
+
+            var normalizedUrl = "/" + string.Join("/", normalizedUrlSegments);
+            return normalizedUrl;
+        }
+
+        private static MarkdownPipeline CreateMarkdownPipeline(MarkdownOptions options)
         {
             var builder = new MarkdownPipelineBuilder();
 
-            builder.UseAbbreviations();
-            builder.UseAutoIdentifiers();
-            builder.UseCitations();
-            builder.UseCustomContainers();
-            builder.UseDefinitionLists();
-            builder.UseDiagrams();
-            builder.UseEmphasisExtras();
-            builder.UseGridTables();
-            builder.UseGenericAttributes();
-            builder.UseFigures();
-            builder.UseFooters();
-            builder.UseFootnotes();
-
-            builder.UseMathematics();
-            builder.UseMediaLinks();
-            builder.UsePipeTables(new PipeTableOptions
+            if (options.UseAbbreviations)
             {
-                RequireHeaderSeparator = false
-            });
-            builder.UseListExtras();
-            builder.UseTaskLists();
+                builder.UseAbbreviations();
+            }
+            if (options.UseAutoIdentifiers)
+            {
+                builder.UseAutoIdentifiers();
+            }
+            if (options.UseCitations)
+            {
+                builder.UseCitations();
+            }
+            if (options.UseCustomContainers)
+            {
+                builder.UseCustomContainers();
+            }
+            if (options.UseDefinitionLists)
+            {
+                builder.UseDefinitionLists();
+            }
+            if (options.UseEmphasisExtras)
+            {
+                builder.UseEmphasisExtras();
+            }
+            if (options.UseGridTables)
+            {
+                builder.UseGridTables();
+            }
+            if (options.UseGenericAttributes)
+            {
+                builder.UseGenericAttributes();
+            }
+            if (options.UseFigures)
+            {
+                builder.UseFigures();
+            }
 
-            builder.UseBootstrap();
-            builder.UseAdvancedExtensions();
-            builder.UseIcons();
-            builder.UseEmojiAndSmiley();
-            builder.UseSmartyPants();
+            if (options.UseFooters)
+            {
+                builder.UseFooters();
+            }
+            if (options.UseFootnotes)
+            {
+                builder.UseFootnotes();
+            }
+            if (options.UseMediaLinks)
+            {
+                builder.UseMediaLinks();
+            }
+            if (options.UsePipeTables)
+            {
+                builder.UsePipeTables(new PipeTableOptions { RequireHeaderSeparator = true });
+            }
+            if (options.UseListExtras)
+            {
+                builder.UseListExtras();
+            }
+            if (options.UseTaskLists)
+            {
+                builder.UseTaskLists();
+            }
+            if (options.UseBootstrap)
+            {
+                builder.UseBootstrap();
+            }
+            if (options.UseEmojiAndSmiley)
+            {
+                builder.UseEmojiAndSmiley();
+            }
+            if (options.UseSmartyPants)
+            {
+                builder.UseSmartyPants();
+            }
+
+            if (options.UseIcons)
+            {
+                builder.UseIcons();
+            }
+
             builder.UseYamlFrontMatter();
             builder.UseTableOfContents();
-            builder.UseChildrenList(resourceUrlResolver);
+            builder.UseChildrenList();
             builder.UseCustomHeading();
+            builder.UseCustomCodeBlockRendering(options);
+
+            if (options.MathRenderer != null)
+            {
+                builder.Extensions.Add(new MathematicsExtension());
+            }
 
             return builder.Build();
         }
@@ -219,5 +331,7 @@ namespace ITGlobal.MarkDocs.Format
             var document = Markdown.Parse(markdown, _pipeline);
             return document;
         }
+
+        #endregion
     }
 }

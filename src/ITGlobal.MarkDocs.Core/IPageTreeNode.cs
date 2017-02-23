@@ -7,14 +7,8 @@ namespace ITGlobal.MarkDocs
     ///     Page tree node
     /// </summary>
     [PublicAPI]
-    public interface IPageTreeNode
+    public interface IPageTreeNode : IResource
     {
-        /// <summary>
-        ///     Node ID
-        /// </summary>
-        [PublicAPI, NotNull]
-        string Id { get; }
-
         /// <summary>
         ///     Node title
         /// </summary>

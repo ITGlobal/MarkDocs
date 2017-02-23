@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Text;
+using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Format
 {
@@ -21,6 +22,12 @@ namespace ITGlobal.MarkDocs.Format
         string[] IndexFileNames { get; }
 
         /// <summary>
+        ///     Encoding for source files
+        /// </summary>
+        [NotNull]
+        Encoding SourceEncoding { get; }
+
+        /// <summary>
         ///     Reads a page file <paramref name="filename"/> and parses it's metadata (see <see cref="Metadata"/>)
         /// </summary>
         [NotNull]
@@ -30,12 +37,6 @@ namespace ITGlobal.MarkDocs.Format
         ///     Renders content of <paramref name="markup"/> into HTML
         /// </summary>
         [NotNull]
-        string Render([NotNull] IPage page, [NotNull] string markup);
-
-        /// <summary>
-        ///     Reads a page file <paramref name="filename"/> and renders it's content into HTML
-        /// </summary>
-        [NotNull]
-        string RenderFile([NotNull] IPage page, [NotNull] string filename);
+        string Render([NotNull] IRenderContext ctx, [NotNull] string markup);
     }
 }

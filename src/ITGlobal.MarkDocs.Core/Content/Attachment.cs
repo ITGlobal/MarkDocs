@@ -4,9 +4,9 @@ using ITGlobal.MarkDocs.Cache;
 namespace ITGlobal.MarkDocs.Content
 {
     /// <summary>
-    ///     A attachment
+    ///     An attachment base class
     /// </summary>
-    internal sealed class Attachment : IAttachment, ICacheItem, ICacheItemContent
+    internal abstract class Attachment : IAttachment, ICacheItem, ICacheItemContent
     {
         #region consts
 
@@ -20,7 +20,6 @@ namespace ITGlobal.MarkDocs.Content
         #region fields
 
         private readonly Documentation _documentation;
-        private readonly string _path;
         private readonly ICache _cache;
 
         #endregion
@@ -30,16 +29,15 @@ namespace ITGlobal.MarkDocs.Content
         /// <summary>
         ///     .ctor
         /// </summary>
-        public Attachment(Documentation documentation, ICache cache, string id, string path, string contentType)
+        protected Attachment(Documentation documentation, ICache cache, string id, string filename, string contentType)
         {
-            NormalizeId(ref id);
+            ResourceId.Normalize(ref id);
 
             _documentation = documentation;
             _cache = cache;
             Id = id;
-            _path = path;
+            FileName = filename;
             ContentType = contentType;
-            FileName = System.IO.Path.GetFileName(path);
         }
 
         #endregion
@@ -50,6 +48,11 @@ namespace ITGlobal.MarkDocs.Content
         ///     Attachment path
         /// </summary>
         public string Id { get; }
+
+        /// <summary>
+        ///     A reference to a documentation
+        /// </summary>
+        public IDocumentation Documentation => _documentation;
 
         /// <summary>
         ///     Attachment file name
@@ -93,7 +96,7 @@ namespace ITGlobal.MarkDocs.Content
         /// <summary>
         ///     Cache item type
         /// </summary>
-        CacheItemType ICacheItem.Type => CacheItemType.Attachment;
+        public abstract CacheItemType Type { get; }
 
         #endregion
 
@@ -102,27 +105,11 @@ namespace ITGlobal.MarkDocs.Content
         /// <summary>
         ///     Gets a content
         /// </summary>
-        Stream ICacheItemContent.GetContent() => File.OpenRead(_path);
+        public abstract Stream GetContent();
 
         #endregion
 
         #region methods
-
-        /// <summary>
-        ///     Normalizes attachment ID
-        /// </summary>
-        public static void NormalizeId(ref string id)
-        {
-            if (string.IsNullOrEmpty(id))
-            {
-                return;
-            }
-
-            id = Path.Combine(Path.GetDirectoryName(id), Path.GetFileName(id));
-            id = id.Replace(Path.DirectorySeparatorChar, '/');
-            id = id.Replace(Path.AltDirectorySeparatorChar, '/');
-            id = id.ToLowerInvariant();
-        }
 
         internal void PutIntoCache(ICacheUpdateOperation operation)
         {
