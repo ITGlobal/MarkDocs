@@ -1,4 +1,5 @@
 ﻿using ITGlobal.MarkDocs.Format.ChildrenList;
+using ITGlobal.MarkDocs.Format.CodeBlockRenderers;
 using ITGlobal.MarkDocs.Format.CustomHeading;
 using ITGlobal.MarkDocs.Format.Icons;
 using ITGlobal.MarkDocs.Format.TableOfContents;
@@ -20,17 +21,23 @@ namespace ITGlobal.MarkDocs.Format
             return pipeline;
         }
 
-        public static MarkdownPipelineBuilder UseChildrenList(
-            this MarkdownPipelineBuilder pipeline,
-            IResourceUrlResolver resourceUrlResolver)
+        public static MarkdownPipelineBuilder UseChildrenList(this MarkdownPipelineBuilder pipeline)
         {
-            pipeline.Extensions.Add(new ChildrenListExtension(resourceUrlResolver));
+            pipeline.Extensions.Add(new ChildrenListExtension());
             return pipeline;
         }
 
         public static MarkdownPipelineBuilder UseCustomHeading(this MarkdownPipelineBuilder pipeline)
         {
             pipeline.Extensions.AddIfNotAlready<CustomHeadingExtension>();
+            return pipeline;
+        }
+
+        public static MarkdownPipelineBuilder UseCustomCodeBlockRendering(
+            this MarkdownPipelineBuilder pipeline,
+            MarkdownOptions options)
+        {
+            pipeline.Extensions.Add(new CustomCodeBlockRenderingExtension(options));
             return pipeline;
         }
     }

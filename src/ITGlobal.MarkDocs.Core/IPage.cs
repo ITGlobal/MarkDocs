@@ -8,20 +8,8 @@ namespace ITGlobal.MarkDocs
     ///     A documentation page
     /// </summary>
     [PublicAPI]
-    public interface IPage
+    public interface IPage : IResource
     {
-        /// <summary>
-        ///     A reference to a documentation
-        /// </summary>
-        [PublicAPI, NotNull]
-        IDocumentation Documentation { get; }
-
-        /// <summary>
-        ///     Page ID
-        /// </summary>
-        [PublicAPI, NotNull]
-        string Id { get; }
-
         /// <summary>
         ///     Page title
         /// </summary>

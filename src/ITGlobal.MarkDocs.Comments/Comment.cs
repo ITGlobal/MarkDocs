@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ITGlobal.MarkDocs.Cache;
 using ITGlobal.MarkDocs.Comments.Data;
 using ITGlobal.MarkDocs.Format;
 
@@ -9,7 +10,7 @@ namespace ITGlobal.MarkDocs.Comments
     /// <summary>
     ///     A comment
     /// </summary>
-    internal class Comment : IComment, ICommentParent
+    internal class Comment : IComment, ICommentParent, IRenderContext
     {
         #region fields
 
@@ -24,7 +25,7 @@ namespace ITGlobal.MarkDocs.Comments
         #endregion
 
         #region .ctor
-        
+
         public Comment(ICommentParent parent, ICommentData data)
         {
             _parent = parent;
@@ -158,7 +159,7 @@ namespace ITGlobal.MarkDocs.Comments
         #endregion
 
         #region internal methods
-        
+
         internal ReplyComment PreloadReply(ICommentData data)
         {
             lock (_repliesLock)
@@ -167,6 +168,23 @@ namespace ITGlobal.MarkDocs.Comments
                 _replies.Add(reply);
                 return reply;
             }
+        }
+
+        #endregion
+
+        #region IRenderContext
+
+        /// <summary>
+        ///    A page reference
+        /// </summary>
+        IPage IRenderContext.Page => _parent.Page;
+
+        /// <summary>
+        ///   Add a generated attachment
+        /// </summary>
+        IAttachment IRenderContext.CreateAttachment(string name, byte[] content)
+        {
+            return new CommentAttachment(Page.Documentation, name, content);
         }
 
         #endregion
@@ -183,10 +201,9 @@ namespace ITGlobal.MarkDocs.Comments
 
         private string RenderMarkup(string markup)
         {
-            var html = _parent.Format.Render(_parent.Page, markup);
+            var html = _parent.Format.Render(this, markup);
             return html;
         }
-
         #endregion
     }
 }

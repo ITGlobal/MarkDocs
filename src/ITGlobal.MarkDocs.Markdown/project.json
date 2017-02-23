@@ -33,8 +33,8 @@
     "Microsoft.Extensions.Logging": "1.0.0",
     "Microsoft.Extensions.DependencyInjection": "1.0.0",
     "ITGlobal.MarkDocs.Core": "0.1.0",
-    "Markdig": "0.10",
-    "SharpYaml.NetStandard": "1.5.4"
+    "SharpYaml.NetStandard": "1.5.4",
+    "Markdig": "0.10.5"
   },
   "frameworks": {
     "netstandard1.6": {}

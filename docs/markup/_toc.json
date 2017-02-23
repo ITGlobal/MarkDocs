@@ -1,0 +1,25 @@
+{
+    "pages": {
+        "common": {
+            "order": 1
+        },
+        "extensions": {
+            "order": 2
+        },
+        "code": {
+            "order": 3
+        },
+        "icons": {
+            "order": 4
+        },
+        "emoji": {
+            "order": 5
+        },
+        "properties": {
+            "order": 6
+        },
+        "diagrams": {
+            "order": 7
+        }
+    }
+}

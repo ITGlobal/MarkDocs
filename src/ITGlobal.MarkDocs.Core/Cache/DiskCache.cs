@@ -198,6 +198,8 @@ namespace ITGlobal.MarkDocs.Cache
                     return "pages";
                 case CacheItemType.Attachment:
                     return "files";
+                case CacheItemType.Illustration:
+                    return "illustrations";
                 default:
                     throw new ArgumentOutOfRangeException();
             }

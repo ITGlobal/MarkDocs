@@ -128,7 +128,7 @@ namespace ITGlobal.MarkDocs.Content
             }
 
             id = GetRelativePath(rootDirectory, path);
-            Page.NormalizeId(ref id);
+            ResourceId.Normalize(ref id);
 
             metadata = null;
             if (indexPageFileName != null)
