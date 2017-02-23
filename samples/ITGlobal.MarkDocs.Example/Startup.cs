@@ -76,7 +76,6 @@ namespace ITGlobal.MarkDocs.Example
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-
             Task.Factory.StartNew(markDocs.Initialize);
         }
 

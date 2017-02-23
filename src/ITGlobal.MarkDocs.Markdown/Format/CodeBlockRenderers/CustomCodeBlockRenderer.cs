@@ -25,6 +25,7 @@ namespace ITGlobal.MarkDocs.Format.CodeBlockRenderers
             }
 
             Register("plantuml", new PlantUmlRenderer());
+            Register("mermaid", new MermaidRenderer());
         }
 
         private void Register(string lang, ICodeBlockRenderer renderer)
