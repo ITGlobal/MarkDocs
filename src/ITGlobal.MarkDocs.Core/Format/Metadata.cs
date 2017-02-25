@@ -10,6 +10,7 @@ namespace ITGlobal.MarkDocs.Format
     public sealed class Metadata
     {
         private static readonly string[] EmptyTags = new string[0];
+        private static readonly MetaTag[] EmptyMetaTags = new MetaTag[0];
         
         /// <summary>
         ///     Page title
@@ -30,6 +31,12 @@ namespace ITGlobal.MarkDocs.Format
         public string[] Tags { get; set; } = EmptyTags;
 
         /// <summary>
+        ///     Page meta tags
+        /// </summary>
+        [PublicAPI]
+        public MetaTag[] MetaTags { get; set; } = EmptyMetaTags;
+
+        /// <summary>
         ///     Copies page metadata from <paramref name="source"/>
         /// </summary>
         internal void CopyFrom([NotNull] Metadata source)
@@ -37,6 +44,7 @@ namespace ITGlobal.MarkDocs.Format
             Title = !string.IsNullOrEmpty(source.Title) ? source.Title : Title;
             Order = source.Order != 0 ? source.Order : Order;
             Tags = (source.Tags ?? EmptyTags).Concat(Tags ?? EmptyTags).Distinct().OrderBy(_ => _).ToArray();
+            MetaTags = (source.MetaTags ?? EmptyMetaTags).Concat(MetaTags ?? EmptyMetaTags).Distinct().OrderBy(_ => _.Name).ToArray();
         }
     }
 }
