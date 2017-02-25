@@ -14,6 +14,10 @@ Libraries
 * [`LiteDB`](https://github.com/mbdavid/LiteDB)
 * [`SharpYaml`](https://github.com/xoofx/SharpYaml)
 * [`Newtonsoft.Json`](http://www.newtonsoft.com/json)
+* [`Jint`](https://github.com/sebastienros/jint)
+* [`AngleSharp`](https://github.com/AngleSharp/AngleSharp)
+* [`highlight.js`](https://github.com/isagalaev/highlight.js) (is used on server-side)
+* [`ColorCode`](https://github.com/ITGlobal/ColorCodePortable)
 
 Web services
 ------------

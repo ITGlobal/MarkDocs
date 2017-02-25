@@ -41,7 +41,10 @@ namespace ITGlobal.MarkDocs.Example
             // Add MarkDocs services
             services.AddMarkDocs(config =>
             {
-                config.Format.UseMarkdown(resourceUrlResolverFactory: _ => new ResourceUrlResolver());
+                config.Format.UseMarkdown(new MarkdownOptions
+                {
+                    ResourceUrlResolver = new ResourceUrlResolver()
+                });
                 config.Cache.UseDisk(Path.Combine(Env.ContentRootPath, "Data", "cached-content"), enableConcurrentWrites: false);
                 config.Storage.UseStaticDirectory(Path.GetFullPath(Path.Combine(Env.ContentRootPath, "../../docs")), enableWatch: true);
                 config.Extensions.AddLiteDbComments(Path.Combine(Env.ContentRootPath, "Data", "comments.dat"));

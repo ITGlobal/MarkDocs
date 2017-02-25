@@ -15,6 +15,12 @@ namespace ITGlobal.MarkDocs.Format
         string[] SupportedLanguages { get; }
 
         /// <summary>
+        ///     Initializes syntax colorizer
+        /// </summary>
+        [PublicAPI]
+        void Initialize();
+
+        /// <summary>
         ///     Render a source code into an HTML
         /// </summary>
         [PublicAPI, NotNull]

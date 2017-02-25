@@ -26,7 +26,11 @@
     ]
   },
   "buildOptions": {
-    "xmlDoc": true
+    "xmlDoc": true,
+    "embed": [
+      "Resources/**/*.js",
+      "Resources/**/*.css"
+    ]
   },
   "dependencies": {
     "NETStandard.Library": "1.6.0",
@@ -35,7 +39,10 @@
     "ITGlobal.MarkDocs.Core": "0.1.0",
     "SharpYaml.NetStandard": "1.5.4",
     "Markdig": "0.10.5",
-    "ColorCode.Netstandard": "1.0.4.3"
+    "ColorCode.Netstandard": "1.0.4.3",
+    "Jint": "2.10.3",
+    "AngleSharp": "0.9.9",
+    "System.Text.Encoding.CodePages": "4.3.0"
   },
   "frameworks": {
     "netstandard1.6": {}
