@@ -11,6 +11,6 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Resolves an actual URL for specified resource
         /// </summary>
-        string ResolveUrl([NotNull] IResource resource);
+        string ResolveUrl([NotNull] IResource resource, [CanBeNull] IResource relativeTo = null);
     }
 }

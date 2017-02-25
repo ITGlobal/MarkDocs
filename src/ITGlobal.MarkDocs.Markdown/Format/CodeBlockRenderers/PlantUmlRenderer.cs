@@ -20,7 +20,7 @@ namespace ITGlobal.MarkDocs.Format.CodeBlockRenderers
             
             var illustration = RenderContext.CreateAttachment(filename, image.Content);
 
-            var resourceUrl = ResourceUrlResolver.ResolveUrl(illustration);
+            var resourceUrl = ResourceUrlResolver.ResolveUrl(illustration, RenderContext.Page);
 
             renderer.Write("<img src=\"");
             renderer.WriteEscapeUrl(resourceUrl);

@@ -7,7 +7,7 @@ namespace ITGlobal.MarkDocs.Cache
     ///     Cache item content
     /// </summary>
     [PublicAPI]
-    public interface ICacheItemContent
+    public interface IResourceContent
     {
         /// <summary>
         ///     Gets a content

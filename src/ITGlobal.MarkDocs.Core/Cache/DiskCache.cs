@@ -127,7 +127,7 @@ namespace ITGlobal.MarkDocs.Cache
         /// <returns>
         ///     Cached content or null
         /// </returns>
-        Stream ICache.Read(ICacheItem item)
+        Stream ICache.Read(IResource item)
         {
             var rootDirectory = TryGetDocumentationCacheRootDirectory(item.Documentation.Id);
             if (rootDirectory == null)
@@ -190,15 +190,15 @@ namespace ITGlobal.MarkDocs.Cache
             }
         }
 
-        internal static string GetPathPrefix(ICacheItem item)
+        internal static string GetPathPrefix(IResource item)
         {
             switch (item.Type)
             {
-                case CacheItemType.Page:
+                case ResourceType.Page:
                     return "pages";
-                case CacheItemType.Attachment:
+                case ResourceType.Attachment:
                     return "files";
-                case CacheItemType.Illustration:
+                case ResourceType.Illustration:
                     return "illustrations";
                 default:
                     throw new ArgumentOutOfRangeException();

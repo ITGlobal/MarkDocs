@@ -167,15 +167,23 @@ namespace ITGlobal.MarkDocs.Content
                 operation.Clear(this);
 
                 // Compile pages and put them into cache
+                var i = 0;
                 foreach (var page in _pages.Values)
                 {
+                    i++;
+                    _service.Callback.CompilingPage(Id, page.Id, i, _pages.Count);
+
                     page.Compile(operation);
                     _service.Log.LogDebug("Compiled page {0}:{1}", Id, page.RelativeFileName);
                 }
 
                 // Put each non-page file into cache
+                i = 0;
                 foreach (var attachment in _attachmentsById.Values)
                 {
+                    i++;
+                    _service.Callback.CachingAttachment(Id, attachment.Id, i, _pages.Count);
+
                     attachment.PutIntoCache(operation);
                     _service.Log.LogDebug("Cached file {0}:{1}", Id, attachment.FileName);
                 }

@@ -88,6 +88,11 @@ namespace ITGlobal.MarkDocs.Content
         /// </summary>
         public abstract int NodeKindOrder { get; }
 
+        /// <summary>
+        ///     Resource type
+        /// </summary>
+        public ResourceType Type => ResourceType.Page;
+
         #endregion
 
         #region methods
@@ -117,7 +122,7 @@ namespace ITGlobal.MarkDocs.Content
         {
             ScanNodes((node, _) => node.Documentation = documentation);
         }
-        
+
         #endregion
     }
 }

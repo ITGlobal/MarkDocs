@@ -6,7 +6,7 @@ namespace ITGlobal.MarkDocs.Content
     /// <summary>
     ///     An attachment base class
     /// </summary>
-    internal abstract class Attachment : IAttachment, ICacheItem, ICacheItemContent
+    internal abstract class Attachment : IAttachment, IResourceContent
     {
         #region consts
 
@@ -63,6 +63,11 @@ namespace ITGlobal.MarkDocs.Content
         ///     Attachment MIME type
         /// </summary>
         public string ContentType { get; }
+        
+        /// <summary>
+        ///     Resource type
+        /// </summary>
+        public abstract ResourceType Type { get; }
 
         /// <summary>
         ///     Opens a read-only content stream
@@ -81,26 +86,7 @@ namespace ITGlobal.MarkDocs.Content
 
         #endregion
 
-        #region ICacheItem
-
-        /// <summary>
-        ///     Cache item ID
-        /// </summary>
-        string ICacheItem.Id => Id;
-
-        /// <summary>
-        ///     A reference to a documentation
-        /// </summary>
-        IDocumentation ICacheItem.Documentation => _documentation;
-
-        /// <summary>
-        ///     Cache item type
-        /// </summary>
-        public abstract CacheItemType Type { get; }
-
-        #endregion
-
-        #region ICacheItemContent
+        #region IResourceContent
 
         /// <summary>
         ///     Gets a content
@@ -115,7 +101,7 @@ namespace ITGlobal.MarkDocs.Content
         {
             operation.Write(this, this);
         }
-
+        
         #endregion
     }
 }

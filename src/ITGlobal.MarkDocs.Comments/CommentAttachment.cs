@@ -39,5 +39,10 @@ namespace ITGlobal.MarkDocs.Comments
         ///     Opens a read-only content stream
         /// </summary>
         public Stream Read() => new MemoryStream(_content);
+
+        /// <summary>
+        ///     Resource type
+        /// </summary>
+        public ResourceType Type => ResourceType.Attachment;
     }
 }

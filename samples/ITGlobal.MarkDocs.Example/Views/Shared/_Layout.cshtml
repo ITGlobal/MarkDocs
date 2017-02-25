@@ -19,17 +19,6 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-    @*<script type="text/x-mathjax-config">
-            MathJax.Hub.Config({
-              tex2jax: {
-                inlineMath: [['$','$'], ['\\(','\\)']],'
-                ignoreClass: "[a-zA-Z1-9]*",
-                processClass: "math"
-              }
-            });
-          </script>
-        <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>*@
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/highlight.min.js"></script>
@@ -37,31 +26,27 @@
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/6.0.0/mermaid.min.js"></script>
     <script>
-$(document).load(function () { mermaid.initialize(); });
+        $(document).load(function () { mermaid.initialize(); });
     </script>
 
-<div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-        <div class="navbar-header">
-            <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">MarkDocs</a>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">MarkDocs</a>
+            </div>
         </div>
     </div>
-</div>
-<div class="container body-content" style="margin-top: 60px;">
-    @RenderBody()
-</div>
+    <div class="container body-content" style="margin-top: 60px;">
+        @RenderBody()
+    </div>
 
+    <environment names="Development">
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
 
-
-
-
-<environment names="Development">
-    <script src="~/js/site.js" asp-append-version="true"></script>
-</environment>
-<environment names="Staging,Production">
-    <script src="~/js/site.min.js" asp-append-version="true"></script>
-</environment>
-
-@RenderSection("scripts", required: false)
+    @RenderSection("scripts", required: false)
 </body>
 </html>

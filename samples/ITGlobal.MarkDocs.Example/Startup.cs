@@ -81,7 +81,8 @@ namespace ITGlobal.MarkDocs.Example
 
         private sealed class ResourceUrlResolver : IResourceUrlResolver
         {
-            public string ResolveUrl(IResource resource) => $"/{resource.Documentation.Id}{resource.Id}";
+            public string ResolveUrl(IResource resource, IResource relativeTo)
+                 => $"/{resource.Documentation.Id}{resource.Id}";
         }
     }
 }

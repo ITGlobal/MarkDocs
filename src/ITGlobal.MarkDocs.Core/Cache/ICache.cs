@@ -28,6 +28,6 @@ namespace ITGlobal.MarkDocs.Cache
         ///     Cached content or null
         /// </returns>
         [PublicAPI, CanBeNull]
-        Stream Read([NotNull] ICacheItem item);
+        Stream Read([NotNull] IResource item);
     }
 }

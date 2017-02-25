@@ -61,7 +61,7 @@ namespace ITGlobal.MarkDocs.Cache
         /// <param name="content">
         ///     Item content
         /// </param>
-        void ICacheUpdateOperation.Write(ICacheItem item, ICacheItemContent content)
+        void ICacheUpdateOperation.Write(IResource item, IResourceContent content)
         {
             var filename = GetCachedPageFileName(item);
             var directory = Path.GetDirectoryName(filename);
@@ -135,7 +135,7 @@ namespace ITGlobal.MarkDocs.Cache
 
         #region private methods
 
-        private string GetCachedPageFileName(ICacheItem item)
+        private string GetCachedPageFileName(IResource item)
         {
             DiskCacheDocumentationDescriptor descriptor;
             if (!_descriptor.Items.TryGetValue(item.Documentation.Id, out descriptor))

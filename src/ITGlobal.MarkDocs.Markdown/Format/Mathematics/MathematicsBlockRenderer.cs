@@ -24,7 +24,7 @@ namespace ITGlobal.MarkDocs.Format.Mathematics
 
                 var illustration = RenderContext.CreateAttachment(filename, image.Content);
 
-                var resourceUrl = ResourceUrlResolver.ResolveUrl(illustration);
+                var resourceUrl = ResourceUrlResolver.ResolveUrl(illustration, RenderContext.Page);
 
                 renderer.EnsureLine();
                 renderer.Write("<img src=\"");

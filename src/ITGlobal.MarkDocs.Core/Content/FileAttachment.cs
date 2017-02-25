@@ -34,7 +34,7 @@ namespace ITGlobal.MarkDocs.Content
         /// <summary>
         ///     Cache item type
         /// </summary>
-        public override CacheItemType Type => CacheItemType.Attachment;
+        public override ResourceType Type => ResourceType.Attachment;
 
         /// <summary>
         ///     Gets a content

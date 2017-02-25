@@ -11,7 +11,7 @@ namespace ITGlobal.MarkDocs.Cache
         #region fields
 
         private readonly NullCache _cache;
-        private readonly Dictionary<string, Dictionary<string, ICacheItemContent>> _contentProviders;
+        private readonly Dictionary<string, Dictionary<string, IResourceContent>> _contentProviders;
 
         #endregion
 
@@ -47,12 +47,12 @@ namespace ITGlobal.MarkDocs.Cache
         /// <param name="content">
         ///     Item content
         /// </param>
-        void ICacheUpdateOperation.Write(ICacheItem item, ICacheItemContent content)
+        void ICacheUpdateOperation.Write(IResource item, IResourceContent content)
         {
-            Dictionary<string, ICacheItemContent> dict;
+            Dictionary<string, IResourceContent> dict;
             if (!_contentProviders.TryGetValue(item.Documentation.Id, out dict))
             {
-                dict = new Dictionary<string, ICacheItemContent>(StringComparer.OrdinalIgnoreCase);
+                dict = new Dictionary<string, IResourceContent>(StringComparer.OrdinalIgnoreCase);
                 _contentProviders.Add(item.Documentation.Id, dict);
             }
 

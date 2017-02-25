@@ -32,7 +32,7 @@ namespace ITGlobal.MarkDocs.Content
         /// <summary>
         ///     Cache item type
         /// </summary>
-        public override CacheItemType Type => CacheItemType.Illustration;
+        public override ResourceType Type => ResourceType.Illustration;
 
         /// <summary>
         ///     Gets a content

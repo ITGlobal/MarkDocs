@@ -28,7 +28,7 @@ namespace ITGlobal.MarkDocs.Cache
         ///     Item content
         /// </param>
         [PublicAPI]
-        void Write([NotNull] ICacheItem item, [NotNull] ICacheItemContent content);
+        void Write([NotNull] IResource item, [NotNull] IResourceContent content);
 
         /// <summary>
         ///     Flushes all cached content changes

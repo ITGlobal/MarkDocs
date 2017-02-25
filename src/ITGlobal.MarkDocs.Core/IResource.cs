@@ -19,5 +19,17 @@ namespace ITGlobal.MarkDocs
         /// </summary>
         [PublicAPI, NotNull]
         IDocumentation Documentation { get; }
+
+        /// <summary>
+        ///     Name of resource file with extension (only name, not a full path)
+        /// </summary>
+        [PublicAPI, NotNull]
+        string FileName { get; }
+
+        /// <summary>
+        ///     Resource type
+        /// </summary>
+        [PublicAPI]
+        ResourceType Type { get; }
     }
 }
