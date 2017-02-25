@@ -38,6 +38,13 @@
     "ColorCode.Netstandard": "1.0.4.3"
   },
   "frameworks": {
-    "netstandard1.6": {}
+    "netstandard1.6": {},
+    "net451": {
+      "buildOptions": {
+        "define": [
+          "NET45"
+        ]
+      }
+    }
   }
 }

@@ -34,6 +34,11 @@
                         <i class="fa fa-hashtag"></i>
                     </a>
                 </li>
+                <li role="presentation">
+                    <a href="#search" data-toggle="tab" title="Search">
+                        <i class="fa fa-search"></i>
+                    </a>
+                </li>
             </ul>
 
             <div class="tab-content">
@@ -48,6 +53,16 @@
                 </div>
                 <div class="tab-pane" id="tags">
                     @Html.Partial("Components/_TagList", Model.Documentation)
+                </div>
+                <div class="tab-pane" id="search">
+                    <form class="form-inline" action="/_/search/@Model.Documentation.Id" method="get">
+                        <div class="form-group">
+                            <input type="search" class="form-control" placeholder="Search" name="q">
+                        </div>
+                        <button type="submit" class="btn btn-default">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

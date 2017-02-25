@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MarkDocs.Core")]
+[assembly: AssemblyProduct("ITGlobal.MarkDocs.Search.Lucene")]
 [assembly: AssemblyTrademark("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -16,16 +16,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("ff02bbf2-575f-43a4-a51e-62a553ce0d59")]
-
-
-[assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Markdown")]
-[assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Comments")]
-[assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Git")]
-[assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Search")]
-[assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Compiler")]
-[assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Comments")]
-[assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Comments.LiteDB")]
-[assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Tags")]
-[assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Search")]
-[assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Search.Lucene")]
+[assembly: Guid("801b7a77-102e-4993-9331-4d16a7a1cd01")]

@@ -66,8 +66,9 @@ DoInDirectory(solutionDir, () =>
         Debug("Detecting branch name");
         var branchName = gitVersion.BranchName;
         
+        branchName = branchName.Replace('/', '-');
         var sv = branchName != "master" 
-          ? CreateSemVer(gitVersion.Major, gitVersion.Minor, buildNumber, gitVersion.BranchName)
+          ? CreateSemVer(gitVersion.Major, gitVersion.Minor, buildNumber, branchName)
           : CreateSemVer(gitVersion.Major, gitVersion.Minor, buildNumber);
         var version = sv.ToString();
         if(AppVeyor.IsRunningOnAppVeyor)
@@ -82,21 +83,28 @@ DoInDirectory(solutionDir, () =>
 
         Information("Version = {0}", version);
 
-        foreach(var project in projects) 
+        if(AppVeyor.IsRunningOnAppVeyor)
         {
-          Debug("Patching project {0}", project.GetDirectory().GetDirectoryName());
-          var raw = FileReadText(proje​ct);
-          var json = JToken.Parse(raw);
-          json["version"] = version;
-          foreach(JProperty p in json["dependencies"])
+          foreach(var project in projects) 
           {
-            if(p.Name.StartsWith("ITGlobal.MarkDocs"))
+            Debug("Patching project {0}", project.GetDirectory().GetDirectoryName());
+            var raw = FileReadText(proje​ct);
+            var json = JToken.Parse(raw);
+            json["version"] = version;
+            foreach(JProperty p in json["dependencies"])
             {
-              p.Value = version;
-            }            
+              if(p.Name.StartsWith("ITGlobal.MarkDocs"))
+              {
+                p.Value = version;
+              }            
+            }
+            FileWriteText(project, json.ToString());
           }
-          FileWriteText(project, json.ToString());
-       }  
+        }
+        else
+        {
+          Warning("Will not patch project files - build is not running under a CI server");
+        }
     });
 
   Task("restore")

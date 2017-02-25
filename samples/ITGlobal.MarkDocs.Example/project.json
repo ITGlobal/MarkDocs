@@ -1,9 +1,5 @@
 {
   "dependencies": {
-    "Microsoft.NETCore.App": {
-      "version": "1.0.1",
-      "type": "platform"
-    },
     "Microsoft.AspNetCore.Diagnostics": "1.0.0",
     "Microsoft.AspNetCore.Mvc": "1.0.1",
     "Microsoft.AspNetCore.Razor.Tools": {
@@ -20,6 +16,7 @@
     "Microsoft.Extensions.Logging.Debug": "1.0.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
     "ITGlobal.MarkDocs": "0.1.0",
+    "ITGlobal.MarkDocs.Search": "0.1.0",
     "ITGlobal.MarkDocs.Comments.LiteDB": "0.1.0",
     "Serilog.Extensions.Logging": "*",
     "Serilog.Sinks.Literate": "*"
@@ -30,7 +27,23 @@
   },
   "frameworks": {
     "netcoreapp1.6": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.0.1",
+          "type": "platform"
+        }
+      },
       "imports": []
+    },
+    "net451": {
+      "dependencies": {
+        "ITGlobal.MarkDocs.Search.Lucene": "0.1.0"
+      },
+      "buildOptions": {
+        "define": [
+          "NET45"
+        ]
+      }
     }
   },
   "buildOptions": {
