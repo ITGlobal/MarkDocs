@@ -21,7 +21,7 @@ namespace ITGlobal.MarkDocs
         #region fields
 
         private readonly ExtensionCollection _extensions;
-
+        
         private readonly ManualResetEventSlim _initialized = new ManualResetEventSlim(false);
 
         private readonly object _stateLock = new object();
@@ -39,6 +39,7 @@ namespace ITGlobal.MarkDocs
             [NotNull] IStorage storage,
             [NotNull] IFormat format,
             [NotNull] ICache cache,
+            [NotNull] IMarkDocsEventCallback callback,
             [NotNull] IEnumerable<IExtensionFactory> extensionFactories)
         {
             Log = loggerFactory.CreateLogger(typeof(MarkDocService));
@@ -46,6 +47,7 @@ namespace ITGlobal.MarkDocs
             Storage = storage;
             Format = format;
             Cache = cache;
+            Callback = callback;
             _extensions = new ExtensionCollection(extensionFactories);
 
             storage.Changed += OnStorageChanged;
@@ -74,6 +76,7 @@ namespace ITGlobal.MarkDocs
         internal IStorage Storage { get; }
         internal IFormat Format { get; }
         internal ICache Cache { get; }
+        internal IMarkDocsEventCallback Callback { get; }
 
         #endregion
 
@@ -158,8 +161,13 @@ namespace ITGlobal.MarkDocs
 
             using (Log.BeginScope("Refresh({0})", id))
             {
+                Callback.StorageRefreshStarted(id);
                 Storage.Refresh(id);
+                Callback.StorageRefreshCompleted(id);
+
+                
                 RebuildDocumentation(id);
+                Callback.CompilationCompleted(id);
             }
         }
 
@@ -167,8 +175,15 @@ namespace ITGlobal.MarkDocs
         {
             using (Log.BeginScope("RefreshAll()"))
             {
+                Callback.StorageRefreshAllStarted();
                 Storage.RefreshAll();
-                return RebuildDocumentations(originalState);
+                Callback.StorageRefreshAllCompleted();
+
+                Callback.CompilationStarted();
+                var state =  RebuildDocumentations(originalState);
+                Callback.CompilationCompleted();
+
+                return state;
             }
         }
 
@@ -250,10 +265,13 @@ namespace ITGlobal.MarkDocs
             ICacheUpdateOperation operation,
             IContentDirectory contentDirectory)
         {
+            Callback.CompilationStarted(contentDirectory.Id);
             var catalog = directoryScanner.ScanDirectory(contentDirectory.Path);
 
             var documentation = new Documentation(this, contentDirectory.Id, contentDirectory.ContentVersion, catalog);
             documentation.Compile(operation);
+
+            Callback.CompilationCompleted(contentDirectory.Id);
 
             return documentation;
         }
@@ -261,6 +279,8 @@ namespace ITGlobal.MarkDocs
         private void OnStorageChanged(object sender, StorageChangedEventArgs e)
         {
             Log.LogInformation("Documentation change detected");
+            Callback.StorageChanged(e.DocumentationId);
+
             if (!string.IsNullOrEmpty(e.DocumentationId))
             {
                 RebuildDocumentation(e.DocumentationId);

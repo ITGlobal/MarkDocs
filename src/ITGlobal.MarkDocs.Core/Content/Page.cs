@@ -12,17 +12,17 @@ namespace ITGlobal.MarkDocs.Content
     ///     A documentation page
     /// </summary>
     [DebuggerDisplay("{Id}")]
-    internal sealed class Page : IPage, ICacheItem
+    internal sealed class Page : IPage
     {
         #region nested classes
 
-        private sealed class CacheItemContent : ICacheItemContent, IRenderContext
+        private sealed class ResourceContent : IResourceContent, IRenderContext
         {
             private readonly Page _page;
             private readonly IFormat _format;
             private Stream _isCached;
 
-            public CacheItemContent(Page page, IFormat format)
+            public ResourceContent(Page page, IFormat format)
             {
                 _page = page;
                 _format = format;
@@ -49,6 +49,8 @@ namespace ITGlobal.MarkDocs.Content
                     var documentation = _page._documentation;
                     ((MarkDocService)documentation.Service).Log.LogError(0, e, "Failed to render page {0}!{1}", documentation.Id, _page.Id);
                     str = "<h1 style=\"color: red;\">Failed to render page</h1>";
+
+                    ((MarkDocService)_page._documentation.Service).Callback.Error(_page.Documentation.Id, _page.Id, e);
                 }
 
                 var bytes = Encoding.UTF8.GetBytes(str);
@@ -96,11 +98,6 @@ namespace ITGlobal.MarkDocs.Content
         #region internal properties
 
         /// <summary>
-        ///     Page file name
-        /// </summary>
-        internal string FileName => _node.FileName;
-
-        /// <summary>
         ///     Page file name relative to content root directory
         /// </summary>
         internal string RelativeFileName => _node.RelativeFileName;
@@ -120,6 +117,11 @@ namespace ITGlobal.MarkDocs.Content
         public string Id => _node.Id;
 
         /// <summary>
+        ///     Page file name
+        /// </summary>
+        public string FileName => _node.FileName;
+
+        /// <summary>
         ///     Page title
         /// </summary>
         public string Title => _node.Title;
@@ -128,6 +130,11 @@ namespace ITGlobal.MarkDocs.Content
         ///     Page tree node that refers to this page
         /// </summary>
         public IPageTreeNode PageTreeNode => _node;
+
+        /// <summary>
+        ///     Resource type
+        /// </summary>
+        public ResourceType Type => ResourceType.Page;
 
         /// <summary>
         ///     Page metadata
@@ -162,25 +169,6 @@ namespace ITGlobal.MarkDocs.Content
 
         #endregion
 
-        #region ICacheItem
-
-        /// <summary>
-        ///     Cache item ID
-        /// </summary>
-        string ICacheItem.Id => _cacheItemId;
-
-        /// <summary>
-        ///     A reference to a documentation
-        /// </summary>
-        IDocumentation ICacheItem.Documentation => _documentation;
-
-        /// <summary>
-        ///     Cache item type
-        /// </summary>
-        CacheItemType ICacheItem.Type => CacheItemType.Page;
-
-        #endregion
-
         #region methods
 
         /// <summary>
@@ -188,7 +176,7 @@ namespace ITGlobal.MarkDocs.Content
         /// </summary>
         internal void Compile(ICacheUpdateOperation operation)
         {
-            operation.Write(this, new CacheItemContent(this, _format));
+            operation.Write(this, new ResourceContent(this, _format));
         }
 
         #endregion

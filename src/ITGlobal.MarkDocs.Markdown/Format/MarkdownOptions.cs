@@ -25,7 +25,7 @@ namespace ITGlobal.MarkDocs.Format
         /// </summary>
         [PublicAPI]
         public IMathRenderer MathRenderer { get; set; } = new CodecogsMathRenderer();
-
+        
         /// <summary>
         ///     Enable abbreviations extension
         /// </summary>

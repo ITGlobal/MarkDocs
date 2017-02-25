@@ -13,8 +13,8 @@ namespace ITGlobal.MarkDocs.Cache
         #region fields
 
         private readonly object _contentProvidersLock = new object();
-        private Dictionary<string, Dictionary<string, ICacheItemContent>> _contentProviders =
-            new Dictionary<string, Dictionary<string, ICacheItemContent>>(StringComparer.OrdinalIgnoreCase);
+        private Dictionary<string, Dictionary<string, IResourceContent>> _contentProviders =
+            new Dictionary<string, Dictionary<string, IResourceContent>>(StringComparer.OrdinalIgnoreCase);
 
         #endregion
 
@@ -37,19 +37,19 @@ namespace ITGlobal.MarkDocs.Cache
         /// <returns>
         ///     Cached content or null
         /// </returns>
-        public Stream Read(ICacheItem item)
+        public Stream Read(IResource item)
         {
             var id = Path.Combine(item.Type.ToString(), item.Id);
            
             lock (_contentProvidersLock)
             {
-                Dictionary<string, ICacheItemContent> dict;
+                Dictionary<string, IResourceContent> dict;
                 if (!_contentProviders.TryGetValue(item.Documentation.Id, out dict))
                 {
                     return null;
                 }
 
-                ICacheItemContent provider;
+                IResourceContent provider;
                 if (!dict.TryGetValue(id, out provider))
                 {
                     return null;
@@ -63,11 +63,11 @@ namespace ITGlobal.MarkDocs.Cache
 
         #region internal methods
 
-        internal Dictionary<string, Dictionary<string, ICacheItemContent>> CloneContentProviders()
+        internal Dictionary<string, Dictionary<string, IResourceContent>> CloneContentProviders()
         {
             lock (_contentProvidersLock)
             {
-                var clone = new Dictionary<string, Dictionary<string, ICacheItemContent>>(StringComparer.OrdinalIgnoreCase);
+                var clone = new Dictionary<string, Dictionary<string, IResourceContent>>(StringComparer.OrdinalIgnoreCase);
                 foreach (var pair in _contentProviders)
                 {
                     var dict = pair.Value.ToDictionary(_ => _.Key, _ => _.Value, StringComparer.OrdinalIgnoreCase);
@@ -78,7 +78,7 @@ namespace ITGlobal.MarkDocs.Cache
             }
         }
 
-        internal void SetContentProviders(Dictionary<string, Dictionary<string, ICacheItemContent>> knownPages)
+        internal void SetContentProviders(Dictionary<string, Dictionary<string, IResourceContent>> knownPages)
         {
             lock (_contentProvidersLock)
             {

@@ -2,16 +2,9 @@
 {
     internal sealed class DefaultResourceUrlResolver : IResourceUrlResolver
     {
-        public string ResolveUrl(IPage page, string resourceId)
+        public string ResolveUrl(IResource resource, IResource relativeTo)
         {
-            var url = resourceId.StartsWith("/") ? $"/{resourceId}" : $"/{page.Id}/{resourceId}";
-            return url;
-        }
-
-        public string ResolveUrl(IResource resource)
-        {
-            var url = $"/{resource.Id}";
-            return url;
+            return $"/{resource.Id}";;
         }
     }
 }

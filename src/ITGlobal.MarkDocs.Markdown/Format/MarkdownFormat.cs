@@ -25,6 +25,7 @@ namespace ITGlobal.MarkDocs.Format
         private readonly ILogger _log;
         private readonly MarkdownOptions _options;
         private readonly IResourceUrlResolver _resourceUrlResolver;
+        private readonly IMarkDocsEventCallback _callback;
         private readonly MarkdownPipeline _pipeline;
 
         private static readonly IMetadataExtractor[] MetadataExtractors =
@@ -50,11 +51,13 @@ namespace ITGlobal.MarkDocs.Format
         public MarkdownFormat(
             [NotNull] MarkdownOptions options,
             [NotNull] ILoggerFactory loggerFactory,
-            [NotNull] IResourceUrlResolver resourceUrlResolver)
+            [NotNull] IResourceUrlResolver resourceUrlResolver,
+            [NotNull] IMarkDocsEventCallback callback)
         {
             _log = loggerFactory.CreateLogger(typeof(MarkdownFormat));
             _options = options;
             _resourceUrlResolver = resourceUrlResolver;
+            _callback = callback;
             _pipeline = CreateMarkdownPipeline(options);
         }
 
@@ -127,7 +130,7 @@ namespace ITGlobal.MarkDocs.Format
 
         private void RewriteLinkUrls(IPage page, MarkdownDocument ast)
         {
-            foreach (var link in ast.Descendants().OfType<LinkInline>())
+            foreach (LinkInline link in ast.Descendants().OfType<LinkInline>())
             {
                 var url = link.Url;
                 Uri uri;
@@ -157,7 +160,7 @@ namespace ITGlobal.MarkDocs.Format
                     url = Path.ChangeExtension(url, null);
                 }
 
-                url = _resourceUrlResolver.ResolveUrl(GetResourceFromUrl(page, url));
+                url = _resourceUrlResolver.ResolveUrl(GetResourceFromUrl(page, link, url), page);
 
                 if (!string.IsNullOrEmpty(hash))
                 {
@@ -168,7 +171,7 @@ namespace ITGlobal.MarkDocs.Format
             }
         }
 
-        private static IResource GetResourceFromUrl(IPage page, string url)
+        private IResource GetResourceFromUrl(IPage page, LinkInline link, string url)
         {
             try
             {
@@ -181,8 +184,23 @@ namespace ITGlobal.MarkDocs.Format
             {
                 throw new InvalidOperationException($"Href \"{url}\" is not a valid relative reference for page \"{page.Id}\"");
             }
-            
-            return PseudoResource.Get(page.Documentation, url);
+
+            ResourceType type;
+            if (page.Documentation.GetPage(url) != null)
+            {
+                type = ResourceType.Page;
+            }
+            else if (page.Documentation.GetAttachment(url) != null)
+            {
+                type = ResourceType.Attachment;
+            }
+            else
+            {
+                _callback.Warning(page.Documentation.Id, page.Id, $"Invalid hyperlink: \"{url}\"", $"({link.Line}, {link.Column})");
+                type = ResourceType.Attachment;
+            }
+
+            return PseudoResource.Get(page.Documentation, url, GetResourceFileName(url), type);
         }
 
         private static string NormalizeResourcePath(string basePath, string resourceUrl)
@@ -226,6 +244,19 @@ namespace ITGlobal.MarkDocs.Format
 
             var normalizedUrl = "/" + string.Join("/", normalizedUrlSegments);
             return normalizedUrl;
+        }
+
+        private static string GetResourceFileName(string url)
+        {
+            var filename = Path.GetFileName(url);
+
+            var ext = Path.GetExtension(filename);
+            if (ext == ".md" || ext == ".markdown")
+            {
+                filename = Path.ChangeExtension(filename, ".html");
+            }
+
+            return filename;
         }
 
         private static MarkdownPipeline CreateMarkdownPipeline(MarkdownOptions options)

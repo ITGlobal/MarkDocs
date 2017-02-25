@@ -41,7 +41,7 @@ namespace ITGlobal.MarkDocs.Format.ChildrenList
                     var url = "#";
                     if (node.IsHyperlink && ResourceUrlResolver != null)
                     {
-                        url = ResourceUrlResolver.ResolveUrl(node);
+                        url = ResourceUrlResolver.ResolveUrl(node, RenderContext.Page);
                     }
 
                     renderer.Write($"   <a href=\"{url}\" class=\"list-group-item\">{node.Title}</a>");
