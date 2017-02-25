@@ -51,13 +51,14 @@ namespace ITGlobal.MarkDocs.Format
         public MarkdownFormat(
             [NotNull] MarkdownOptions options,
             [NotNull] ILoggerFactory loggerFactory,
-            [NotNull] IResourceUrlResolver resourceUrlResolver,
             [NotNull] IMarkDocsEventCallback callback)
         {
             _log = loggerFactory.CreateLogger(typeof(MarkdownFormat));
             _options = options;
-            _resourceUrlResolver = resourceUrlResolver;
+            _resourceUrlResolver = options.ResourceUrlResolver;
             _callback = callback;
+
+            options.SyntaxColorizer.Initialize();
             _pipeline = CreateMarkdownPipeline(options);
         }
 
