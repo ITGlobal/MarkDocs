@@ -9,6 +9,8 @@ An ASP.NET Core markdown-based documentation engine.
 
 [Documentation](docs/index.md)
 
+[Download `markdocs-gen`](https://ci.appveyor.com/api/projects/itgloballlc/markdocs/artifacts/artifacts/markdocs-gen.zip)
+
 License
 -------
 
