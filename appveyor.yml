@@ -7,7 +7,7 @@ build:
 cache: 
 - 'C:\projects\MarkDocs\scripts\tools'
 build_script:
-- ps: '& ./build.ps1'
+- ps: '& ./build.ps1 -v'
 test: off
 artifacts:
 - path: artifacts\**\*.*
