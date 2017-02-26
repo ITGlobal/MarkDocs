@@ -178,7 +178,10 @@ namespace ITGlobal.MarkDocs.StaticGen
                 config.UseCallback(new EventCallback());
                 config.Storage.UseStaticDirectory(sourceDir, enableWatch: enableWatch);
                 config.Cache.Use(sp => sp.AddSingleton<ICache>(new OutputCache(targetDir, template)));
-                config.Format.UseMarkdown(resourceUrlResolverFactory: _ => new ResourceUrlResolver());
+                config.Format.UseMarkdown(new MarkdownOptions
+                {
+                    ResourceUrlResolver = new ResourceUrlResolver()
+                });
             });
 
             var provider = new ServiceProvider(services);

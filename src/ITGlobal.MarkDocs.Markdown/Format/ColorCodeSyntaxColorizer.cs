@@ -22,6 +22,11 @@ namespace ITGlobal.MarkDocs.Format
         public string[] SupportedLanguages { get; } = Languages.All.Select(_ => _.Id).ToArray();
 
         /// <summary>
+        ///     Initializes syntax colorizer
+        /// </summary>
+        public void Initialize() { }
+
+        /// <summary>
         ///     Render a source code into an HTML
         /// </summary>
         public string Render(string languageId, string sourceCode)

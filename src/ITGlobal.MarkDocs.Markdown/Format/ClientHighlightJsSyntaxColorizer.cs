@@ -6,7 +6,7 @@ namespace ITGlobal.MarkDocs.Format
     ///     A client-side syntax colorizer to be used with highlight.js
     /// </summary>
     [PublicAPI]
-    public sealed class HighlightJsSyntaxColorizer : ISyntaxColorizer
+    public sealed class ClientHighlightJsSyntaxColorizer : ISyntaxColorizer
     {
         /// <summary>
         ///     List of supported languages
@@ -183,6 +183,11 @@ namespace ITGlobal.MarkDocs.Format
             "xquery",
             "zephir",
         };
+
+        /// <summary>
+        ///     Initializes syntax colorizer
+        /// </summary>
+        public void Initialize() { }
 
         /// <summary>
         ///     Render a source code into an HTML

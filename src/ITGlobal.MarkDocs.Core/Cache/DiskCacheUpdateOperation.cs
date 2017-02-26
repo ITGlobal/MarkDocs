@@ -63,7 +63,7 @@ namespace ITGlobal.MarkDocs.Cache
         /// </param>
         void ICacheUpdateOperation.Write(IResource item, IResourceContent content)
         {
-            var filename = GetCachedPageFileName(item);
+            var filename = _cache.GetCachedFileName(_descriptor, item);
             var directory = Path.GetDirectoryName(filename);
             if (!Directory.Exists(directory))
             {
@@ -129,31 +129,6 @@ namespace ITGlobal.MarkDocs.Cache
 
                 _cache.ReleaseDescriptor(_oldDescriptor);
             }
-        }
-
-        #endregion
-
-        #region private methods
-
-        private string GetCachedPageFileName(IResource item)
-        {
-            DiskCacheDocumentationDescriptor descriptor;
-            if (!_descriptor.Items.TryGetValue(item.Documentation.Id, out descriptor))
-            {
-                descriptor = new DiskCacheDocumentationDescriptor
-                {
-                    Directory = Guid.NewGuid().ToString("N")
-                };
-                _descriptor.Items.Add(item.Documentation.Id, descriptor);
-            }
-
-            if (string.IsNullOrWhiteSpace(descriptor.Directory))
-            {
-                descriptor.Directory = Guid.NewGuid().ToString("N");
-            }
-
-            var path = Path.Combine(_cache.RootDirectory, descriptor.Directory, DiskCache.GetPathPrefix(item), item.Id);
-            return path;
         }
 
         #endregion

@@ -37,6 +37,20 @@ Place a language code after the fence start to enable syntax highlighting.
     var s = "JavaScript syntax highlighting";
     alert(s);
     ```
+:::
+
+:::col-md-6
+
+```javascript
+var s = "JavaScript syntax highlighting";
+alert(s);
+```
+
+:::
+
+***
+
+:::col-md-6
  
     ```python
     s = "Python syntax highlighting"
@@ -47,15 +61,96 @@ Place a language code after the fence start to enable syntax highlighting.
 
 :::col-md-6
 
-```javascript
-var s = "JavaScript syntax highlighting";
-alert(s);
-```
- 
 ```python
 s = "Python syntax highlighting"
 print s
 ```
+:::
+
+***
+
+:::col-md-6
+
+    ```go
+    package main
+
+    import "fmt"
+
+    func main() {
+        ch := make(chan float64)
+        ch <- 1.0e10    // magic number
+        x, ok := <- ch
+        defer fmt.Println(`exitting now\`)
+        go println(len("hello world!"))
+        return
+    }
+    ```
+
+:::
+
+:::col-md-6
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    ch := make(chan float64)
+    ch <- 1.0e10    // magic number
+    x, ok := <- ch
+    defer fmt.Println(`exitting now\`)
+    go println(len("hello world!"))
+    return
+}
+```
+
+:::
+
+***
+
+:::col-md-6
+
+```bash
+    #!/bin/bash
+
+    ###### CONFIG
+    ACCEPTED_HOSTS="/root/.hag_accepted.conf"
+    BE_VERBOSE=false
+
+    if [ "$UID" -ne 0 ]
+    then
+     echo "Superuser rights required"
+     exit 2
+    fi
+
+    genApacheConf(){
+     echo -e "# Host ${HOME_DIR}$1/$2 :"
+    }
+    ```
+
+:::
+
+:::col-md-6
+
+```bash
+#!/bin/bash
+
+###### CONFIG
+ACCEPTED_HOSTS="/root/.hag_accepted.conf"
+BE_VERBOSE=false
+
+if [ "$UID" -ne 0 ]
+then
+ echo "Superuser rights required"
+ exit 2
+fi
+
+genApacheConf(){
+ echo -e "# Host ${HOME_DIR}$1/$2 :"
+}
+```
+
 :::
 
 ***

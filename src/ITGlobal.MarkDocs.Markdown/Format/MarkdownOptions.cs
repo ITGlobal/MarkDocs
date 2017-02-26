@@ -9,10 +9,16 @@ namespace ITGlobal.MarkDocs.Format
     public sealed class MarkdownOptions
     {
         /// <summary>
+        ///     Resource URL resolver
+        /// </summary>
+        [PublicAPI]
+        public IResourceUrlResolver ResourceUrlResolver { get; set; } = new DefaultResourceUrlResolver();
+
+        /// <summary>
         ///     A syntax colorizer
         /// </summary>
         [PublicAPI]
-        public ISyntaxColorizer SyntaxColorizer { get; set; } = new HighlightJsSyntaxColorizer();
+        public ISyntaxColorizer SyntaxColorizer { get; set; } = new ServerHighlightJsSyntaxColorizer();
 
         /// <summary>
         ///     A PlantUML renderer
@@ -25,7 +31,7 @@ namespace ITGlobal.MarkDocs.Format
         /// </summary>
         [PublicAPI]
         public IMathRenderer MathRenderer { get; set; } = new CodecogsMathRenderer();
-        
+
         /// <summary>
         ///     Enable abbreviations extension
         /// </summary>
