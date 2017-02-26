@@ -73,8 +73,7 @@ DoInDirectory(solutionDir, () =>
         var version = sv.ToString();
         if(AppVeyor.IsRunningOnAppVeyor)
         {
-                    AppVeyor.UpdateBuildVersion(version);
-                    throw new Exception();
+          AppVeyor.UpdateBuildVersion(version);
         }
         
         if(TeamCity.IsRunningOnTeamCity)
