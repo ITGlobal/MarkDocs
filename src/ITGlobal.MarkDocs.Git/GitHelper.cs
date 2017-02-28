@@ -49,6 +49,11 @@ namespace ITGlobal.MarkDocs.Git
                 return false;
             }
 
+            if (!Directory.Exists(Path.Combine(directory, ".git")))
+            {
+                return false;
+            }
+
             using (var exec = Execute(directory, "status"))
             {
                 return exec.ExitCode != 128;
