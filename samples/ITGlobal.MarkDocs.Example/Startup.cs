@@ -41,14 +41,17 @@ namespace ITGlobal.MarkDocs.Example
             // Add MarkDocs services
             services.AddMarkDocs(config =>
             {
-                config.Format.UseMarkdown(_ => new ResourceUrlResolver());
+                config.Format.UseMarkdown(new MarkdownOptions
+                {
+                    ResourceUrlResolver = new ResourceUrlResolver()
+                });
                 config.Cache.UseDisk(Path.Combine(Env.ContentRootPath, "Data", "cached-content"), enableConcurrentWrites: false);
                 config.Storage.UseStaticDirectory(Path.GetFullPath(Path.Combine(Env.ContentRootPath, "../../docs")), enableWatch: true);
                 config.Extensions.AddLiteDbComments(Path.Combine(Env.ContentRootPath, "Data", "comments.dat"));
                 config.Extensions.AddTags();
             });
         }
-        
+
         public void Configure(
             IApplicationBuilder app,
             IHostingEnvironment env,
@@ -66,7 +69,7 @@ namespace ITGlobal.MarkDocs.Example
             loggerFactory.AddSerilog(Log.Logger);
             appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
             app.UseDeveloperExceptionPage();
-            
+
             app.UseStaticFiles();
 
             app.UseMvc(routes =>
@@ -76,28 +79,15 @@ namespace ITGlobal.MarkDocs.Example
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-
             Task.Factory.StartNew(markDocs.Initialize);
         }
 
-        private sealed class ResourceUrlResolver: IResourceUrlResolver
+        private sealed class ResourceUrlResolver : IResourceUrlResolver
         {
-            public string ResolveUrl(IPage page, string resourceId)
-            {
-                string url;
-
-                if (resourceId.StartsWith("/"))
-                {
-                    url = $"/{page.Documentation.Id}{resourceId}";
-                }
-                else
-                {
-                    url = $"/{page.Documentation.Id}/{page.Id}/{resourceId}";
-                }
-                
-                return url;
-            }
+            public string ResolveUrl(IResource resource, IResource relativeTo)
+                 => $"/{resource.Documentation.Id}{resource.Id}";
         }
     }
 }
+
 

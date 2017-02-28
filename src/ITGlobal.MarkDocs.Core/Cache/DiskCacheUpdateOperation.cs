@@ -17,6 +17,7 @@ namespace ITGlobal.MarkDocs.Cache
         private readonly DiskCache _cache;
         private readonly DiskCacheDescriptor _descriptor = new DiskCacheDescriptor();
 
+        private readonly object _contentWriteTasksLock = new object();
         private readonly List<Task> _contentWriteTasks = new List<Task>();
 
         private DiskCacheDescriptor _oldDescriptor;
@@ -60,9 +61,9 @@ namespace ITGlobal.MarkDocs.Cache
         /// <param name="content">
         ///     Item content
         /// </param>
-        void ICacheUpdateOperation.Write(ICacheItem item, ICacheItemContent content)
+        void ICacheUpdateOperation.Write(IResource item, IResourceContent content)
         {
-            var filename = GetCachedPageFileName(item);
+            var filename = _cache.GetCachedFileName(_descriptor, item);
             var directory = Path.GetDirectoryName(filename);
             if (!Directory.Exists(directory))
             {
@@ -80,7 +81,10 @@ namespace ITGlobal.MarkDocs.Cache
 
             if (_cache.Options.EnableConcurrentWrites)
             {
-                _contentWriteTasks.Add(contentWriteTask);
+                lock (_contentWriteTasksLock)
+                {
+                    _contentWriteTasks.Add(contentWriteTask);
+                }
             }
             else
             {
@@ -93,9 +97,12 @@ namespace ITGlobal.MarkDocs.Cache
         /// </summary>
         void ICacheUpdateOperation.Flush()
         {
-            if (_contentWriteTasks.Count > 0)
+            lock (_contentWriteTasksLock)
             {
-                Task.WaitAll(_contentWriteTasks.ToArray());
+                if (_contentWriteTasks.Count > 0)
+                {
+                    Task.WaitAll(_contentWriteTasks.ToArray());
+                }
             }
 
             _descriptor.LastUpdateTime = DateTime.UtcNow;
@@ -122,31 +129,6 @@ namespace ITGlobal.MarkDocs.Cache
 
                 _cache.ReleaseDescriptor(_oldDescriptor);
             }
-        }
-
-        #endregion
-
-        #region private methods
-
-        private string GetCachedPageFileName(ICacheItem item)
-        {
-            DiskCacheDocumentationDescriptor descriptor;
-            if (!_descriptor.Items.TryGetValue(item.Documentation.Id, out descriptor))
-            {
-                descriptor = new DiskCacheDocumentationDescriptor
-                {
-                    Directory = Guid.NewGuid().ToString("N")
-                };
-                _descriptor.Items.Add(item.Documentation.Id, descriptor);
-            }
-
-            if (string.IsNullOrWhiteSpace(descriptor.Directory))
-            {
-                descriptor.Directory = Guid.NewGuid().ToString("N");
-            }
-
-            var path = Path.Combine(_cache.RootDirectory, descriptor.Directory, DiskCache.GetPathPrefix(item), item.Id);
-            return path;
         }
 
         #endregion

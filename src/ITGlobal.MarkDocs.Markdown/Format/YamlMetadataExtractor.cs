@@ -65,6 +65,19 @@ namespace ITGlobal.MarkDocs.Format
                         metadata.Tags = tags;
                     }
                     break;
+
+                case "meta":
+                    var map = node as YamlMappingNode;
+                    if (map != null)
+                    {
+                        var metaTags = map.Children.Select(pair => new MetaTag
+                        {
+                            Name = (pair.Key as YamlScalarNode)?.Value,
+                            Content = (pair.Value as YamlScalarNode)?.Value
+                        }).ToArray();
+                        metadata.MetaTags = metaTags;
+                    }
+                    break;
             }
         }
     }

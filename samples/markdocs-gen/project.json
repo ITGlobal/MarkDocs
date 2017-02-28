@@ -1,0 +1,26 @@
+{
+  "version": "0.1.0",
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "outputName": "markdocs-gen"
+  },
+  "dependencies": {
+    "Microsoft.NETCore.App": {
+      "version": "1.0.1"
+    },
+    "ITGlobal.MarkDocs": "0.1.0-featurestaticgen",
+    "ITGlobal.MarkDocs.Comments.LiteDB": "0.1.0-featurestaticgen",
+    "Microsoft.AspNetCore.StaticFiles": "1.0.0",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.1",
+    "Serilog.Extensions.Logging": "*",
+    "Serilog.Sinks.Literate": "*",
+    "ITGlobal.CLI": "1.0.16"
+  },
+  "frameworks": {
+    "netcoreapp1.6": {}
+  },
+  "runtimes": {
+    "win7-x64": {},
+    "ubuntu.14.04-x64": {}
+  }
+}

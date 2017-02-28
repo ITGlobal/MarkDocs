@@ -12,8 +12,60 @@ namespace ITGlobal.MarkDocs.Content
     ///     A documentation page
     /// </summary>
     [DebuggerDisplay("{Id}")]
-    internal sealed class Page : IPage, ICacheItem, ICacheItemContent
+    internal sealed class Page : IPage
     {
+        #region nested classes
+
+        private sealed class ResourceContent : IResourceContent, IRenderContext
+        {
+            private readonly Page _page;
+            private readonly IFormat _format;
+            private Stream _isCached;
+
+            public ResourceContent(Page page, IFormat format)
+            {
+                _page = page;
+                _format = format;
+            }
+
+            /// <summary>
+            ///    A page reference
+            /// </summary>
+            public IPage Page => _page;
+
+            /// <summary>
+            ///     Gets a content
+            /// </summary>
+            public Stream GetContent()
+            {
+                string str;
+                try
+                {
+                    var markup = File.ReadAllText(_page.FileName, _format.SourceEncoding);
+                    str = _format.Render(this, markup);
+                }
+                catch (Exception e)
+                {
+                    var documentation = _page._documentation;
+                    ((MarkDocService)documentation.Service).Log.LogError(0, e, "Failed to render page {0}!{1}", documentation.Id, _page.Id);
+                    str = "<h1 style=\"color: red;\">Failed to render page</h1>";
+
+                    ((MarkDocService)_page._documentation.Service).Callback.Error(_page.Documentation.Id, _page.Id, e);
+                }
+
+                var bytes = Encoding.UTF8.GetBytes(str);
+                return new MemoryStream(bytes);
+            }
+
+            /// <summary>
+            ///   Add a generated attachment
+            /// </summary>
+            public IAttachment CreateAttachment(string name, byte[] content)
+                => _page._documentation.CreateAttachment(name, content);
+        }
+
+        #endregion
+
         #region fields
 
         private readonly Documentation _documentation;
@@ -37,18 +89,13 @@ namespace ITGlobal.MarkDocs.Content
             _node = node;
 
             _cacheItemId = _node.RelativeFileName;
-            NormalizeId(ref _cacheItemId);
+            ResourceId.Normalize(ref _cacheItemId);
             _cacheItemId = Path.ChangeExtension(_node.RelativeFileName, ".html");
         }
 
         #endregion
 
         #region internal properties
-
-        /// <summary>
-        ///     Page file name
-        /// </summary>
-        internal string FileName => _node.FileName;
 
         /// <summary>
         ///     Page file name relative to content root directory
@@ -58,7 +105,7 @@ namespace ITGlobal.MarkDocs.Content
         #endregion
 
         #region IPage
-        
+
         /// <summary>
         ///     A reference to a documentation
         /// </summary>
@@ -70,6 +117,11 @@ namespace ITGlobal.MarkDocs.Content
         public string Id => _node.Id;
 
         /// <summary>
+        ///     Page file name
+        /// </summary>
+        public string FileName => _node.FileName;
+
+        /// <summary>
         ///     Page title
         /// </summary>
         public string Title => _node.Title;
@@ -78,6 +130,11 @@ namespace ITGlobal.MarkDocs.Content
         ///     Page tree node that refers to this page
         /// </summary>
         public IPageTreeNode PageTreeNode => _node;
+
+        /// <summary>
+        ///     Resource type
+        /// </summary>
+        public ResourceType Type => ResourceType.Page;
 
         /// <summary>
         ///     Page metadata
@@ -112,47 +169,6 @@ namespace ITGlobal.MarkDocs.Content
 
         #endregion
 
-        #region ICacheItem
-
-        /// <summary>
-        ///     Cache item ID
-        /// </summary>
-        string ICacheItem.Id => _cacheItemId;
-
-        /// <summary>
-        ///     A reference to a documentation
-        /// </summary>
-        IDocumentation ICacheItem.Documentation => _documentation;
-
-        /// <summary>
-        ///     Cache item type
-        /// </summary>
-        CacheItemType ICacheItem.Type => CacheItemType.Page;
-
-        #endregion
-
-        #region ICacheItemContent
-
-        /// <summary>
-        ///     Gets a content
-        /// </summary>
-        Stream ICacheItemContent.GetContent()
-        {
-            try
-            {
-                var str = _format.RenderFile(this, FileName);
-                var bytes = Encoding.UTF8.GetBytes(str);
-                return new MemoryStream(bytes);
-            }
-            catch (Exception e)
-            {
-                ((MarkDocService)_documentation.Service).Log.LogError(0, e, "Failed to render page {0}!{1}", _documentation.Id, Id);
-                return new MemoryStream();
-            }
-        }
-
-        #endregion
-
         #region methods
 
         /// <summary>
@@ -160,23 +176,7 @@ namespace ITGlobal.MarkDocs.Content
         /// </summary>
         internal void Compile(ICacheUpdateOperation operation)
         {
-            operation.Write(this, this);
-        }
-
-        /// <summary>
-        ///     Normalizes page ID
-        /// </summary>
-        public static void NormalizeId(ref string id)
-        {
-            if (string.IsNullOrEmpty(id))
-            {
-                return;
-            }
-
-            id = Path.Combine(Path.GetDirectoryName(id), Path.GetFileNameWithoutExtension(id));
-            id = id.Replace(Path.DirectorySeparatorChar, '/');
-            id = id.Replace(Path.AltDirectorySeparatorChar, '/');
-            id = id.ToLowerInvariant();
+            operation.Write(this, new ResourceContent(this, _format));
         }
 
         #endregion

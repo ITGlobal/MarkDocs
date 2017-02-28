@@ -127,7 +127,7 @@ namespace ITGlobal.MarkDocs.Cache
         /// <returns>
         ///     Cached content or null
         /// </returns>
-        Stream ICache.Read(ICacheItem item)
+        Stream ICache.Read(IResource item)
         {
             var rootDirectory = TryGetDocumentationCacheRootDirectory(item.Documentation.Id);
             if (rootDirectory == null)
@@ -136,7 +136,7 @@ namespace ITGlobal.MarkDocs.Cache
                 return null;
             }
 
-            var path = Path.Combine(rootDirectory, GetPathPrefix(item), item.Id);
+            var path = GetCachedFileName(item);
             if (!File.Exists(path))
             {
                 Log.LogWarning("Cache file '{0}' doesn't exist", path);
@@ -190,14 +190,45 @@ namespace ITGlobal.MarkDocs.Cache
             }
         }
 
-        internal static string GetPathPrefix(ICacheItem item)
+        internal string GetCachedFileName(DiskCacheDescriptor currentDescriptor, IResource item)
+        {
+            DiskCacheDocumentationDescriptor descriptor;
+            if (!currentDescriptor.Items.TryGetValue(item.Documentation.Id, out descriptor))
+            {
+                descriptor = new DiskCacheDocumentationDescriptor
+                {
+                    Directory = Guid.NewGuid().ToString("N")
+                };
+                currentDescriptor.Items.Add(item.Documentation.Id, descriptor);
+            }
+
+            if (string.IsNullOrWhiteSpace(descriptor.Directory))
+            {
+                descriptor.Directory = Guid.NewGuid().ToString("N");
+            }
+
+            var name = item.Id == "/" ? "index.html" : item.Id.Substring(1);
+            if (item.Type == ResourceType.Page)
+            {
+                name = name + ".html";
+            }
+
+            var path = Path.Combine(RootDirectory, descriptor.Directory, GetPathPrefix(item), name);
+            return path;
+        }
+
+        private string GetCachedFileName(IResource item) => GetCachedFileName(_descriptor, item);
+
+        private static string GetPathPrefix(IResource item)
         {
             switch (item.Type)
             {
-                case CacheItemType.Page:
+                case ResourceType.Page:
                     return "pages";
-                case CacheItemType.Attachment:
+                case ResourceType.Attachment:
                     return "files";
+                case ResourceType.Illustration:
+                    return "illustrations";
                 default:
                     throw new ArgumentOutOfRangeException();
             }

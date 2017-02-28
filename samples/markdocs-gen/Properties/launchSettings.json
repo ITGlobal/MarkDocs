@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ITGlobal.MarkDocs.StaticGen": {
+      "commandName": "Project",
+      "commandLineArgs": "build D:\\projects\\MarkDocs\\docs D:\\temp\\13421 -t preview"
+    }
+  }
+}

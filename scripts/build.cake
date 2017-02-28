@@ -65,9 +65,10 @@ DoInDirectory(solutionDir, () =>
 
         Debug("Detecting branch name");
         var branchName = gitVersion.BranchName;
+        branchName = branchName.Replace("/", "").Replace("-", "").Replace("\\", "");
         
         var sv = branchName != "master" 
-          ? CreateSemVer(gitVersion.Major, gitVersion.Minor, buildNumber, gitVersion.BranchName)
+          ? CreateSemVer(gitVersion.Major, gitVersion.Minor, buildNumber, branchName)
           : CreateSemVer(gitVersion.Major, gitVersion.Minor, buildNumber);
         var version = sv.ToString();
         if(AppVeyor.IsRunningOnAppVeyor)
@@ -82,21 +83,24 @@ DoInDirectory(solutionDir, () =>
 
         Information("Version = {0}", version);
 
-        foreach(var project in projects) 
+        if(AppVeyor.IsRunningOnAppVeyor || TeamCity.IsRunningOnTeamCity)
         {
-          Debug("Patching project {0}", project.GetDirectory().GetDirectoryName());
-          var raw = FileReadText(proje​ct);
-          var json = JToken.Parse(raw);
-          json["version"] = version;
-          foreach(JProperty p in json["dependencies"])
+          foreach(var project in projects) 
           {
-            if(p.Name.StartsWith("ITGlobal.MarkDocs"))
+            Debug("Patching project {0}", project.GetDirectory().GetDirectoryName());
+            var raw = FileReadText(proje​ct);
+            var json = JToken.Parse(raw);
+            json["version"] = version;
+            foreach(JProperty p in json["dependencies"])
             {
-              p.Value = version;
-            }            
+              if(p.Name.StartsWith("ITGlobal.MarkDocs"))
+              {
+                p.Value = version;
+              }            
+            }
+            FileWriteText(project, json.ToString());
           }
-          FileWriteText(project, json.ToString());
-       }  
+        }
     });
 
   Task("restore")
@@ -135,8 +139,21 @@ DoInDirectory(solutionDir, () =>
           Exec("dotnet", "pack", project.FullPath, "-o" , artifactsDir.FullPath);
         }
 
+        var dirName = System.IO.Path.Combine(artifactsDir.FullPath, "markdocs-gen");        
+        Exec("dotnet", "publish", "./samples/markdocs-gen", "-c", "Release", "-r" ,"win7-x64", "-o", dirName);
+        var zipFileName = System.IO.Path.Combine(artifactsDir.FullPath, "markdocs-gen.zip");
+        Zip(dirName, zipFileName);
+        if(AppVeyor.IsRunningOnAppVeyor)
+        {
+          AppVeyor.UploadArtifact(System.IO.Path.GetFullPath(zipFileName));
+        }
+
         Information("Produced artifacts:");
         foreach(var artifact in GetFiles(artifactsDir + "/*.nupkg"))
+        {
+            Information("\t{0}", artifact.GetFilename());
+        }
+        foreach(var artifact in GetFiles(artifactsDir + "/*.zip"))
         {
             Information("\t{0}", artifact.GetFilename());
         }

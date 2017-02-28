@@ -1,5 +1,6 @@
 ﻿using Markdig.Parsers;
 using Markdig.Syntax;
+using static ITGlobal.MarkDocs.Format.MarkdownRenderingContext;
 
 namespace ITGlobal.MarkDocs.Format.ChildrenList
 {
@@ -12,7 +13,7 @@ namespace ITGlobal.MarkDocs.Format.ChildrenList
 
         public override BlockState TryOpen(BlockProcessor processor)
         {
-            if (MarkdownFormat.CurrentPage == null)
+            if (!IsMarkdownRenderingContextPresent)
             {
                 return BlockState.None;
             }
@@ -30,7 +31,7 @@ namespace ITGlobal.MarkDocs.Format.ChildrenList
             }
 
             var sourcePosition = processor.Start;
-            processor.NewBlocks.Push(new ChildrenListBlock(this, processor.Document, MarkdownFormat.CurrentPage)
+            processor.NewBlocks.Push(new ChildrenListBlock(this, processor.Document, RenderContext.Page)
             {
                 Column = processor.Column,
                 Span = new SourceSpan(sourcePosition, processor.Line.End)

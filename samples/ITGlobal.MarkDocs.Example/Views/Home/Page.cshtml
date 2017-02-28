@@ -6,6 +6,14 @@
     ViewData["Title"] = Model.Page.Title;
 }
 
+@section head
+{
+    @foreach (var metaTag in Model.Page.Metadata.MetaTags)
+    {
+        <meta name="@metaTag.Name" content="@metaTag.Content" />
+    }
+}
+
 <div class="page-layout-root">
     <div class="page-breadcrumbs">
         @Html.Partial("Components/_Breadcrumbs", Model.Page)
