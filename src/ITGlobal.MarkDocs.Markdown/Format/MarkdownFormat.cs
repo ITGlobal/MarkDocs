@@ -156,11 +156,26 @@ namespace ITGlobal.MarkDocs.Format
                     url = url.Substring(0, i);
                 }
 
-                // Remove .md extension if specified
-                var ext = Path.GetExtension(url);
-                if (_extensions.Contains(ext))
+                var isIndexFileLink = false;
+                var filename = Path.GetFileName(url);
+                foreach(var name in IndexFileNames) 
                 {
-                    url = Path.ChangeExtension(url, null);
+                    if(filename == name) 
+                    {
+                        url = Path.GetDirectoryName(url);
+                        isIndexFileLink = true;
+                        break;
+                    }
+                }
+
+                // Remove .md extension if specified
+                if(!isIndexFileLink)
+                {
+                    var ext = Path.GetExtension(url);                
+                    if (_extensions.Contains(ext))
+                    {
+                        url = Path.ChangeExtension(url, null);
+                    }
                 }
 
                 url = _resourceUrlResolver.ResolveUrl(page, url);
