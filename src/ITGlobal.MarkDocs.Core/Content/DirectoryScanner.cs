@@ -318,7 +318,7 @@ namespace ITGlobal.MarkDocs.Content
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException($"GetRelativePath(\"{rootDirectory}\", \"{path}\") failed", e)
+                throw new InvalidOperationException($"GetRelativePath(\"{rootDirectory}\", \"{path}\") failed", e);
             }
         }
 
