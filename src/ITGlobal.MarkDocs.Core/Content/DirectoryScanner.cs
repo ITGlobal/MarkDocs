@@ -181,8 +181,8 @@ namespace ITGlobal.MarkDocs.Content
             var ignoreRules = GetIgnoreRulesForDirectory(rootDirectory, directory);
 
             var files = from filter in _format.FileFilters
-                from filename in Directory.EnumerateFiles(directory, filter)
-                select filename;
+                        from filename in Directory.EnumerateFiles(directory, filter)
+                        select filename;
 
             var pages = new List<string>();
             var possibleIndexPages = new Dictionary<int, string>();
@@ -285,34 +285,41 @@ namespace ITGlobal.MarkDocs.Content
 
         internal static string GetRelativePath(string rootDirectory, string path)
         {
-            if (string.Equals(rootDirectory, path, StringComparison.OrdinalIgnoreCase))
+            try
             {
-                return string.Empty;
-            }
+                if (string.Equals(rootDirectory, path, StringComparison.OrdinalIgnoreCase))
+                {
+                    return string.Empty;
+                }
 
-            rootDirectory = rootDirectory.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            if (rootDirectory[rootDirectory.Length - 1] != Path.DirectorySeparatorChar)
+                rootDirectory = rootDirectory.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                if (rootDirectory[rootDirectory.Length - 1] != Path.DirectorySeparatorChar)
+                {
+                    rootDirectory += Path.DirectorySeparatorChar;
+                }
+
+                var rootDirectoryUri = new Uri(rootDirectory);
+                var pathUri = new Uri(path);
+
+                if (rootDirectoryUri.Scheme != pathUri.Scheme)
+                {
+                    return path;
+                }
+
+                var relativeUri = rootDirectoryUri.MakeRelativeUri(pathUri);
+                var relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+
+                if (pathUri.Scheme.Equals("file", StringComparison.OrdinalIgnoreCase))
+                {
+                    relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                }
+
+                return relativePath;
+            }
+            catch (Exception e)
             {
-                rootDirectory += Path.DirectorySeparatorChar;
+                throw new InvalidOperationException($"GetRelativePath(\"{rootDirectory}\", \"{path}\") failed", e)
             }
-
-            var rootDirectoryUri = new Uri(rootDirectory);
-            var pathUri = new Uri(path);
-
-            if (rootDirectoryUri.Scheme != pathUri.Scheme)
-            {
-                return path;
-            }
-
-            var relativeUri = rootDirectoryUri.MakeRelativeUri(pathUri);
-            var relativePath = Uri.UnescapeDataString(relativeUri.ToString());
-
-            if (pathUri.Scheme.Equals("file", StringComparison.OrdinalIgnoreCase))
-            {
-                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            }
-
-            return relativePath;
         }
 
         private Metadata GetMetadata(string filename, HashSet<string> consumedFiles)
@@ -382,7 +389,7 @@ namespace ITGlobal.MarkDocs.Content
             {
                 yield return new SingleIgnoreRule(rootDirectory, storageIgnorePatterns);
             }
-            
+
             foreach (var directory in WalkDirectoriesUp(rootDirectory, path))
             {
                 var mdIgnoreFileName = Path.Combine(directory, MdIgnoreFileRule.FileName);
@@ -390,7 +397,7 @@ namespace ITGlobal.MarkDocs.Content
                 {
                     yield return new MdIgnoreFileRule(directory, mdIgnoreFileName);
                 }
-            } 
+            }
         }
 
         private static IEnumerable<string> WalkDirectoriesUp(string rootDirectory, string path)
@@ -398,7 +405,7 @@ namespace ITGlobal.MarkDocs.Content
             var directory = path;
             directory = Path.GetFullPath(directory);
 
-            while (directory !=null && directory!=rootDirectory)
+            while (directory != null && directory != rootDirectory)
             {
                 yield return directory;
                 directory = Path.GetDirectoryName(directory);
