@@ -1,4 +1,5 @@
 ﻿using System;
+using ITGlobal.MarkDocs.Format;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Storage
@@ -52,5 +53,11 @@ namespace ITGlobal.MarkDocs.Storage
         /// </summary>
         [PublicAPI]
         void RefreshAll();
+
+        /// <summary>
+        ///     Retreives a value for <see cref="Metadata.ContentId"/> from a file path
+        /// </summary>
+        [PublicAPI, CanBeNull]
+        string GetContentId([NotNull] string rootDirectory, [NotNull] string path);
     }
 }

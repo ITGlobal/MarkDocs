@@ -11,7 +11,13 @@ namespace ITGlobal.MarkDocs.Format
     {
         private static readonly string[] EmptyTags = new string[0];
         private static readonly MetaTag[] EmptyMetaTags = new MetaTag[0];
-        
+
+        /// <summary>
+        ///     Page permanent identifier
+        /// </summary>
+        [PublicAPI]
+        public string ContentId { get; set; }
+
         /// <summary>
         ///     Page title
         /// </summary>
@@ -41,6 +47,7 @@ namespace ITGlobal.MarkDocs.Format
         /// </summary>
         internal void CopyFrom([NotNull] Metadata source)
         {
+            ContentId = !string.IsNullOrEmpty(source.ContentId) ? source.ContentId : ContentId;
             Title = !string.IsNullOrEmpty(source.Title) ? source.Title : Title;
             Order = source.Order != 0 ? source.Order : Order;
             Tags = (source.Tags ?? EmptyTags).Concat(Tags ?? EmptyTags).Distinct().OrderBy(_ => _).ToArray();

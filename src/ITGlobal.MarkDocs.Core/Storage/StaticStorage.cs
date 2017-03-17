@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using ITGlobal.MarkDocs.Format;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Storage
@@ -122,11 +123,16 @@ namespace ITGlobal.MarkDocs.Storage
         {
             Refresh(MASTER);
         }
+        
+        /// <summary>
+        ///     Retreives a value for <see cref="Metadata.ContentId"/> from a file path
+        /// </summary>
+        public string GetContentId(string rootDirectory, string path) => FileHasher.ComputeFileHash(path);
 
         #endregion
 
         #region methods
-        
+
         private void TimerCallback(object state)
         {
             _watchTimer.Change(-1, -1);

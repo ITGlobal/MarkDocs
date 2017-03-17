@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ITGlobal.MarkDocs.Format;
+using ITGlobal.MarkDocs.Storage;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Content
@@ -13,6 +14,9 @@ namespace ITGlobal.MarkDocs.Content
         /// <summary>
         ///     Gets a metadata for a specified page
         /// </summary>
+        /// <param name="rootDirectory">
+        ///     Content root directory
+        /// </param>
         /// <param name="filename">
         ///     Page file name
         /// </param>
@@ -23,6 +27,9 @@ namespace ITGlobal.MarkDocs.Content
         ///     Page metadata if available, null otherwise
         /// </returns>
         [CanBeNull]
-        Metadata GetMetadata([NotNull] string filename, [NotNull] HashSet<string> consumedFiles);
+        Metadata GetMetadata(
+            [NotNull] string rootDirectory,
+            [NotNull] string filename, 
+            [NotNull] HashSet<string> consumedFiles);
     }
 }

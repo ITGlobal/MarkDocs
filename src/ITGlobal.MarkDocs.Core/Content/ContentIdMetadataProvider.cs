@@ -1,21 +1,22 @@
 ﻿using System.Collections.Generic;
 using ITGlobal.MarkDocs.Format;
+using ITGlobal.MarkDocs.Storage;
 
 namespace ITGlobal.MarkDocs.Content
 {
     /// <summary>
-    ///     Provides page metadata from page content
+    ///     Provides page Content ID from storage driver
     /// </summary>
-    internal sealed class ContentMetadataProvider : IMetadataProvider
+    internal sealed class ContentIdMetadataProvider : IMetadataProvider
     {
-        private readonly IFormat _format;
+        private readonly IStorage _storage;
 
         /// <summary>
         ///     .ctor
         /// </summary>
-        public ContentMetadataProvider(IFormat format)
+        public ContentIdMetadataProvider(IStorage storage)
         {
-            _format = format;
+            _storage = storage;
         }
 
         /// <summary>
@@ -34,7 +35,16 @@ namespace ITGlobal.MarkDocs.Content
         ///     Page metadata if available, null otherwise
         /// </returns>
         public Metadata GetMetadata(string rootDirectory, string filename, HashSet<string> consumedFiles)
-            => _format.ParseProperties(filename);
+        {
+            var contentId = _storage.GetContentId(rootDirectory, filename);
+            if (string.IsNullOrEmpty(contentId))
+            {
+                return null;
+            }
+
+            var properties = new Metadata { ContentId = contentId };
+            return properties;
+        }
 
         /// <inheritdoc />
         public void Dispose() { }
