@@ -44,6 +44,9 @@ namespace ITGlobal.MarkDocs.Content
         /// <summary>
         ///     Gets a metadata for a specified page
         /// </summary>
+        /// <param name="rootDirectory">
+        ///     Content root directory
+        /// </param>
         /// <param name="filename">
         ///     Page file name
         /// </param>
@@ -53,16 +56,16 @@ namespace ITGlobal.MarkDocs.Content
         /// <returns>
         ///     Page metadata if available, null otherwise
         /// </returns>
-        public Metadata GetMetadata(string filename, HashSet<string> consumedFiles)
+        public Metadata GetMetadata(string rootDirectory, string filename, HashSet<string> consumedFiles)
         {
             var tocFileName = Path.Combine(Path.GetDirectoryName(filename), TOC_FILE_NAME);
 
-            var tocFile = _entries.GetOrAdd(tocFileName, path=>TryReadTocFile(path, consumedFiles));
+            var tocFile = _entries.GetOrAdd(tocFileName, path => TryReadTocFile(path, consumedFiles));
             if (tocFile == null)
             {
                 return null;
             }
-            
+
             var properties = tocFile.TryGetMetadata(Path.GetFileNameWithoutExtension(filename));
             return properties;
         }

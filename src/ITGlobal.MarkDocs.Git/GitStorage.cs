@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Storage;
 using Microsoft.Extensions.Logging;
 
@@ -51,7 +52,7 @@ namespace ITGlobal.MarkDocs.Git
         /// <summary>
         ///     Glob patterns to ignore (e.g. ".git" directory)
         /// </summary>
-        public string[] IgnorePatterns { get; } = { ".git/**/*" };
+        public string[] IgnorePatterns { get; } = {".git/**/*"};
 
         /// <summary>
         ///     This event is raised when documentation source is changed.
@@ -160,6 +161,30 @@ namespace ITGlobal.MarkDocs.Git
         {
             _initialized.Wait();
             Refresh();
+        }
+
+        /// <summary>
+        ///     Retreives a value for <see cref="Metadata.ContentId"/> from a file path
+        /// </summary>
+        public string GetContentId(string rootDirectory, string path)
+        {
+            try
+            {
+                string commit, name;
+
+                if (!_git.FindOriginalFileInfo(rootDirectory, path, out commit, out name))
+                {
+                    return null;
+                }
+
+                var hash = _git.GetBlobHash(rootDirectory, commit, name);
+                return hash;
+            }
+            catch (Exception e)
+            {
+                _log.LogWarning(0, e, "Failed to retreive content ID for \"{0}\"", path);
+                return null;
+            }
         }
 
         public void Dispose()

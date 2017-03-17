@@ -1,6 +1,12 @@
 ﻿@model ITGlobal.MarkDocs.IPage
 
 <ul class="list-group">
+    @if (!string.IsNullOrEmpty(Model.Metadata.ContentId))
+    {
+        <li class="list-group-item">
+            <samp>content_id=@Model.Metadata.ContentId</samp>
+        </li>
+    }
     @if (!string.IsNullOrEmpty(Model.Metadata.Title))
     {
         <li class="list-group-item">

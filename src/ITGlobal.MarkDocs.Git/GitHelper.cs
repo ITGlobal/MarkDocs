@@ -236,7 +236,7 @@ namespace ITGlobal.MarkDocs.Git
                     {
                         continue;
                     }
-                    
+
                     var hash = match.Groups[1].Value;
                     var name = match.Groups[2].Value;
 
@@ -292,6 +292,91 @@ namespace ITGlobal.MarkDocs.Git
             using (var exec = Execute(directory, "pull", "--quiet"))
             {
                 exec.ThrowIfFailed();
+            }
+        }
+
+        public bool FindOriginalFileInfo(
+            string directory,
+            string filename,
+            out string commit,
+            out string name
+            )
+        {
+            // $ git log --pretty="%H" --name-only --follow {filename}
+
+            var args = new[]
+            {
+                "log",
+                "--pretty=\"%H\"",
+                "--name-only",
+                "--follow",
+                filename
+            };
+
+            using (var exec = ExecuteNonVerbose(directory, args))
+            {
+                exec.ThrowIfFailed();
+
+                try
+                {
+                    var lines = exec.StandardOutput.ToArray();
+                    if (lines.Length < 2)
+                    {
+                        commit = null;
+                        name = null;
+                        return false;
+                    }
+
+                    commit = lines[lines.Length - 2];
+                    name = lines[lines.Length - 1];
+
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    _log.LogWarning(0, e, "Unable to parse output of \"git log\"");
+
+                    commit = null;
+                    name = null;
+                    return false;
+                }
+            }
+        }
+
+        public string GetBlobHash(string directory, string commit, string name)
+        {
+            // $ git ls-tree -r {commit} {name}
+
+            var args = new[]
+            {
+                "ls-tree",
+                "-r",
+                commit,
+                name
+            };
+
+            using (var exec = ExecuteNonVerbose(directory, args))
+            {
+                exec.ThrowIfFailed();
+
+                try
+                {
+                    var lines = exec.StandardOutput.ToArray();
+
+                    var match = Regex.Match(lines[0], @"^[0-9]+\s+[a-zA-Z0-9]+\s+([a-zA-Z0-9]+)\s+.*$");
+                    if (!match.Success)
+                    {
+                        throw new Exception($"Failed to parse line \"{lines[0]}\"");
+                    }
+
+                    var hash = match.Groups[1].Value;
+                    return hash;
+                }
+                catch (Exception e)
+                {
+                    _log.LogWarning(0, e, "Unable to parse output of \"git ls-tree\"");
+                    return null;
+                }
             }
         }
 

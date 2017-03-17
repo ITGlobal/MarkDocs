@@ -41,6 +41,13 @@ namespace ITGlobal.MarkDocs.Format
         {
             switch (key)
             {
+                case "id":
+                    var id = (node as YamlScalarNode)?.Value ?? "";
+                    if (!string.IsNullOrEmpty(id))
+                    {
+                        metadata.ContentId = id;
+                    }
+                    break;
                 case "title":
                     var title = (node as YamlScalarNode)?.Value ?? "";
                     if (!string.IsNullOrEmpty(title))

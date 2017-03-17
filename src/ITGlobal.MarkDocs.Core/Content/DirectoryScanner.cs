@@ -38,7 +38,8 @@ namespace ITGlobal.MarkDocs.Content
             _metadataProviders = new IMetadataProvider[]
             {
                 new TocMetadataProvider(_log),
-                new ContentMetadataProvider(format)
+                new ContentMetadataProvider(format),
+                new ContentIdMetadataProvider(storage)
             };
         }
 
@@ -133,7 +134,7 @@ namespace ITGlobal.MarkDocs.Content
             metadata = null;
             if (indexPageFileName != null)
             {
-                metadata = GetMetadata(indexPageFileName, consumedFiles);
+                metadata = GetMetadata(rootDirectory, indexPageFileName, consumedFiles);
             }
             metadata = metadata ?? new Metadata();
             if (string.IsNullOrEmpty(metadata.Title))
@@ -274,7 +275,7 @@ namespace ITGlobal.MarkDocs.Content
             var id = GetRelativePath(rootDirectory, path);
             id = Path.Combine(Path.GetDirectoryName(id), Path.GetFileNameWithoutExtension(id));
 
-            var properties = GetMetadata(path, consumedFiles);
+            var properties = GetMetadata(rootDirectory, path, consumedFiles);
             if (string.IsNullOrEmpty(properties.Title))
             {
                 properties.Title = Path.GetFileNameWithoutExtension(path);
@@ -322,13 +323,13 @@ namespace ITGlobal.MarkDocs.Content
             }
         }
 
-        private Metadata GetMetadata(string filename, HashSet<string> consumedFiles)
+        private Metadata GetMetadata(string rootDirectory, string filename, HashSet<string> consumedFiles)
         {
             var properties = new Metadata();
 
             foreach (var provider in _metadataProviders)
             {
-                var p = provider.GetMetadata(filename, consumedFiles);
+                var p = provider.GetMetadata(rootDirectory, filename, consumedFiles);
                 if (p != null)
                 {
                     properties.CopyFrom(p);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using ITGlobal.MarkDocs.Format;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Storage
@@ -140,6 +141,11 @@ namespace ITGlobal.MarkDocs.Storage
                 }
             }
         }
+
+        /// <summary>
+        ///     Retreives a value for <see cref="Metadata.ContentId"/> from a file path
+        /// </summary>
+        public string GetContentId(string rootDirectory, string path) => FileHasher.ComputeFileHash(path);
 
         #endregion
 
