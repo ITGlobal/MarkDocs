@@ -15,8 +15,7 @@ namespace ITGlobal.MarkDocs.Format.ChildrenList
             try
             {
                 IEnumerable<IPageTreeNode> nodes = null;
-
-                var refPage = block.Page;
+                
                 var pageNode = block.Page.PageTreeNode;
                 if (pageNode.Nodes != null)
                 {
@@ -24,7 +23,6 @@ namespace ITGlobal.MarkDocs.Format.ChildrenList
                 }
                 else if (pageNode.Parent != null)
                 {
-                    refPage = refPage.Documentation.GetPage(pageNode.Parent.Id);
                     nodes = pageNode.Parent.Nodes?.Where(_ => _.Id == pageNode.Id);
                 }
 
@@ -33,9 +31,8 @@ namespace ITGlobal.MarkDocs.Format.ChildrenList
                     return;
                 }
 
-                renderer.WriteLine("<div class=\"panel panel-primary\">");
-                renderer.WriteLine("  <div class=\"panel-heading\">Child pages</div>");
-                renderer.WriteLine("  <div class=\"list-group\">");
+                renderer.WriteLine("<ul>");
+                
                 foreach (var node in nodes)
                 {
                     var url = "#";
@@ -44,10 +41,11 @@ namespace ITGlobal.MarkDocs.Format.ChildrenList
                         url = ResourceUrlResolver.ResolveUrl(node, RenderContext.Page);
                     }
 
-                    renderer.Write($"   <a href=\"{url}\" class=\"list-group-item\">{node.Title}</a>");
+                    renderer.WriteLine("<li>");
+                    renderer.Write($"<a href=\"{url}\">{node.Title}</a>");
+                    renderer.WriteLine("</li>");
                 }
-                renderer.WriteLine("  </div>");
-                renderer.WriteLine("</div>");
+                renderer.WriteLine("</ul>");
             }
             catch (Exception exception)
             {

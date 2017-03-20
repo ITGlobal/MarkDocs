@@ -10,7 +10,6 @@ namespace ITGlobal.MarkDocs.Format
         {
             HeadingBlock header = null;
             string title = null;
-            int order = 0;
 
             for (var level = 1; level <= 2; level++)
             {
@@ -29,7 +28,6 @@ namespace ITGlobal.MarkDocs.Format
             CustomHeadingRenderer.DontRender(header);
 
             metadata.Title = title;
-            metadata.Order = order;
         }
 
         private static bool TryParseTitleFromHeader(
