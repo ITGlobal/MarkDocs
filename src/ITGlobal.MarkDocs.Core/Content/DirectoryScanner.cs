@@ -288,33 +288,22 @@ namespace ITGlobal.MarkDocs.Content
         {
             try
             {
-                if (string.Equals(rootDirectory, path, StringComparison.OrdinalIgnoreCase))
+                var normalizedRootPath = Path.GetFullPath(rootDirectory);
+                var normalizedPath = Path.GetFullPath(path);
+                
+                if (!normalizedPath.StartsWith(normalizedRootPath))
                 {
-                    return string.Empty;
+                    throw new Exception($"\"{normalizedRootPath}\" is not a valid root for \"{normalizedPath}\"");
                 }
 
-                rootDirectory = rootDirectory.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-                if (rootDirectory[rootDirectory.Length - 1] != Path.DirectorySeparatorChar)
+                var relativePath = normalizedPath.Substring(normalizedRootPath.Length);
+                relativePath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, '/');
+                while (relativePath.Length > 0 && relativePath[0] == '/')
                 {
-                    rootDirectory += Path.DirectorySeparatorChar;
+                    relativePath = relativePath.Substring(0);
                 }
-
-                var rootDirectoryUri = new Uri(rootDirectory);
-                var pathUri = new Uri(path);
-
-                if (rootDirectoryUri.Scheme != pathUri.Scheme)
-                {
-                    return path;
-                }
-
-                var relativeUri = rootDirectoryUri.MakeRelativeUri(pathUri);
-                var relativePath = Uri.UnescapeDataString(relativeUri.ToString());
-
-                if (pathUri.Scheme.Equals("file", StringComparison.OrdinalIgnoreCase))
-                {
-                    relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-                }
-
+                
                 return relativePath;
             }
             catch (Exception e)
