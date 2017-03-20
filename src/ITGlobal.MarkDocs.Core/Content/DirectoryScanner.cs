@@ -301,7 +301,7 @@ namespace ITGlobal.MarkDocs.Content
                 relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, '/');
                 while (relativePath.Length > 0 && relativePath[0] == '/')
                 {
-                    relativePath = relativePath.Substring(0);
+                    relativePath = relativePath.Substring(1);
                 }
                 
                 return relativePath;
