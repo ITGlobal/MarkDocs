@@ -23,6 +23,9 @@ namespace ITGlobal.MarkDocs.Content
         /// <param name="consumedFiles">
         ///     Consumed content files
         /// </param>
+        /// <param name="isIndexFile">
+        ///     true is <paramref name="filename"/> is an index page file.
+        /// </param>
         /// <returns>
         ///     Page metadata if available, null otherwise
         /// </returns>
@@ -30,6 +33,8 @@ namespace ITGlobal.MarkDocs.Content
         Metadata GetMetadata(
             [NotNull] string rootDirectory,
             [NotNull] string filename, 
-            [NotNull] HashSet<string> consumedFiles);
+            [NotNull] HashSet<string> consumedFiles,
+            bool isIndexFile
+            );
     }
 }

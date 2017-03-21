@@ -53,10 +53,60 @@ namespace ITGlobal.MarkDocs.Content
         /// <param name="consumedFiles">
         ///     Consumed content files
         /// </param>
+        /// <param name="isIndexFile">
+        ///     true is <paramref name="filename"/> is an index page file.
+        /// </param>
         /// <returns>
         ///     Page metadata if available, null otherwise
         /// </returns>
-        public Metadata GetMetadata(string rootDirectory, string filename, HashSet<string> consumedFiles)
+        public Metadata GetMetadata(string rootDirectory, string filename, HashSet<string> consumedFiles, bool isIndexFile)
+        {
+            if (isIndexFile)
+            {
+                var indexMetadata = GetIndexLevelMetadata(filename, consumedFiles);
+                var plainMetadata = GetPlainLevelMetadata(filename, consumedFiles);
+
+                if (indexMetadata != null)
+                {
+                    if (plainMetadata != null)
+                    {
+                        indexMetadata.CopyFrom(indexMetadata);
+                    }
+
+                    return indexMetadata;
+                }
+
+                return plainMetadata;
+            }
+            else
+            {
+                return GetPlainLevelMetadata(filename, consumedFiles);
+            }
+        }
+
+        /// <inheritdoc />
+        public void Dispose() { }
+        
+        #endregion
+
+        #region private methods
+
+        private Metadata GetIndexLevelMetadata(string filename, HashSet<string> consumedFiles)
+        {
+            var directory = Path.GetDirectoryName(filename);
+            var tocFileName = Path.Combine(Path.GetDirectoryName(directory), TOC_FILE_NAME);
+
+            var tocFile = _entries.GetOrAdd(tocFileName, path => TryReadTocFile(path, consumedFiles));
+            if (tocFile == null)
+            {
+                return null;
+            }
+
+            var properties = tocFile.TryGetMetadata(Path.GetFileName(directory));
+            return properties;
+        }
+
+        private Metadata GetPlainLevelMetadata(string filename, HashSet<string> consumedFiles)
         {
             var tocFileName = Path.Combine(Path.GetDirectoryName(filename), TOC_FILE_NAME);
 
@@ -69,14 +119,7 @@ namespace ITGlobal.MarkDocs.Content
             var properties = tocFile.TryGetMetadata(Path.GetFileNameWithoutExtension(filename));
             return properties;
         }
-
-        /// <inheritdoc />
-        public void Dispose() { }
-
-        #endregion
-
-        #region private methods
-
+        
         private TocFile TryReadTocFile(string path, HashSet<string> consumedFiles)
         {
             if (!File.Exists(path))

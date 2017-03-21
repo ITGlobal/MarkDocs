@@ -31,10 +31,13 @@ namespace ITGlobal.MarkDocs.Content
         /// <param name="consumedFiles">
         ///     Consumed content files
         /// </param>
+        /// <param name="isIndexFile">
+        ///     true is <paramref name="filename"/> is an index page file.
+        /// </param>
         /// <returns>
         ///     Page metadata if available, null otherwise
         /// </returns>
-        public Metadata GetMetadata(string rootDirectory, string filename, HashSet<string> consumedFiles)
+        public Metadata GetMetadata(string rootDirectory, string filename, HashSet<string> consumedFiles, bool isIndexFile)
         {
             var contentId = _storage.GetContentId(rootDirectory, filename);
             if (string.IsNullOrEmpty(contentId))
