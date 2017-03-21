@@ -1,34 +1,29 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26114.2
+MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2E2F3543-25DB-43BD-A8A9-9691F4D6B957}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9604AC13-CB29-4D85-9C57-F35053711E20}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{82B0859E-A87A-46BA-9054-B5BC558C423B}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ITGlobal.MarkDocs", "src\ITGlobal.MarkDocs\ITGlobal.MarkDocs.xproj", "{03D26BF3-F55D-427F-9730-A334E915EB10}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITGlobal.MarkDocs", "src\ITGlobal.MarkDocs\ITGlobal.MarkDocs.csproj", "{03D26BF3-F55D-427F-9730-A334E915EB10}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ITGlobal.MarkDocs.Core", "src\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.xproj", "{FF02BBF2-575F-43A4-A51E-62A553CE0D59}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITGlobal.MarkDocs.Core", "src\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.csproj", "{FF02BBF2-575F-43A4-A51E-62A553CE0D59}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ITGlobal.MarkDocs.Git", "src\ITGlobal.MarkDocs.Git\ITGlobal.MarkDocs.Git.xproj", "{5C449B73-09DC-476C-80D9-7FFECF6C4FD8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITGlobal.MarkDocs.Git", "src\ITGlobal.MarkDocs.Git\ITGlobal.MarkDocs.Git.csproj", "{5C449B73-09DC-476C-80D9-7FFECF6C4FD8}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ITGlobal.MarkDocs.Markdown", "src\ITGlobal.MarkDocs.Markdown\ITGlobal.MarkDocs.Markdown.xproj", "{88339E7A-5CB8-4134-AD2B-EAA3CBB3F3B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITGlobal.MarkDocs.Markdown", "src\ITGlobal.MarkDocs.Markdown\ITGlobal.MarkDocs.Markdown.csproj", "{88339E7A-5CB8-4134-AD2B-EAA3CBB3F3B5}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ITGlobal.MarkDocs.Tags", "src\ITGlobal.MarkDocs.Tags\ITGlobal.MarkDocs.Tags.xproj", "{774FDDB5-E880-4C77-B813-73AC2A681D36}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITGlobal.MarkDocs.Tags", "src\ITGlobal.MarkDocs.Tags\ITGlobal.MarkDocs.Tags.csproj", "{774FDDB5-E880-4C77-B813-73AC2A681D36}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ITGlobal.MarkDocs.Example", "samples\ITGlobal.MarkDocs.Example\ITGlobal.MarkDocs.Example.xproj", "{F797F9C6-22F1-4265-9B88-0E0B71F1B014}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITGlobal.MarkDocs.Example", "samples\ITGlobal.MarkDocs.Example\ITGlobal.MarkDocs.Example.csproj", "{F797F9C6-22F1-4265-9B88-0E0B71F1B014}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ITGlobal.MarkDocs.Comments", "src\ITGlobal.MarkDocs.Comments\ITGlobal.MarkDocs.Comments.xproj", "{B7D6E066-8639-4384-9D25-5877752886FA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITGlobal.MarkDocs.Comments", "src\ITGlobal.MarkDocs.Comments\ITGlobal.MarkDocs.Comments.csproj", "{B7D6E066-8639-4384-9D25-5877752886FA}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ITGlobal.MarkDocs.Comments.LiteDB", "src\ITGlobal.MarkDocs.Comments.LiteDB\ITGlobal.MarkDocs.Comments.LiteDB.xproj", "{A0A12882-112E-4EDC-9E7B-A3039E8606CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITGlobal.MarkDocs.Comments.LiteDB", "src\ITGlobal.MarkDocs.Comments.LiteDB\ITGlobal.MarkDocs.Comments.LiteDB.csproj", "{A0A12882-112E-4EDC-9E7B-A3039E8606CA}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "markdocs-gen", "samples\markdocs-gen\markdocs-gen.xproj", "{AB3591F5-B14A-46F0-931E-BAE73B3BF7B0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "markdocs-gen", "samples\markdocs-gen\markdocs-gen.csproj", "{AB3591F5-B14A-46F0-931E-BAE73B3BF7B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
