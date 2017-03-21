@@ -26,6 +26,14 @@ DoInDirectory(SOLUTION_DIR, () =>
     .Does(() => 
     {
         CleanDirectory(DIR_ARTIFACTS);
+
+        foreach(var dir in GetDirectories("**/bin")) {
+          CleanDirectory(dir);
+        }
+
+        foreach(var dir in GetDirectories("**/obj")) {
+          CleanDirectory(dir);
+        }
     });
 
   Task("version")
@@ -81,9 +89,10 @@ DoInDirectory(SOLUTION_DIR, () =>
   Task("restore")
     .IsDependentOn("init")
     .IsDependentOn("clean")
+    .IsDependentOn("version")
     .Does(() => 
     {
-        Exec("dotnet", "restore");
+        Exec("dotnet", "restore", "/v:q", "/nologo", $"/p:Version=\"{VERSION}\"");
     });
 
   Task("compile")
