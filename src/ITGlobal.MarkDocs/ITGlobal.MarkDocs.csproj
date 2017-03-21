@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <Import Project="../common.props" />
+
+  <PropertyGroup>
+    <AssemblyTitle>MarkDocs</AssemblyTitle>
+    <AssemblyName>ITGlobal.MarkDocs</AssemblyName>
+    <PackageId>ITGlobal.MarkDocs</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.csproj" />
+    <ProjectReference Include="..\ITGlobal.MarkDocs.Markdown\ITGlobal.MarkDocs.Markdown.csproj" />
+    <ProjectReference Include="..\ITGlobal.MarkDocs.Git\ITGlobal.MarkDocs.Git.csproj" />
+    <ProjectReference Include="..\ITGlobal.MarkDocs.Tags\ITGlobal.MarkDocs.Tags.csproj" />
+  </ItemGroup>
+
+</Project>

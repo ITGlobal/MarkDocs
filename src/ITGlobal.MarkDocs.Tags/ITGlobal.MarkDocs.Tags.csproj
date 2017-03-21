@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../common.props" />
+
+  <PropertyGroup>
+    <AssemblyTitle>MarkDocs.Tags</AssemblyTitle>
+    <AssemblyName>ITGlobal.MarkDocs.Tags</AssemblyName>
+    <PackageId>ITGlobal.MarkDocs.Tags</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.csproj" />
+  </ItemGroup>
+
+</Project>
