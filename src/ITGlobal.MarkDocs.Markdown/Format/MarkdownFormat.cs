@@ -193,7 +193,7 @@ namespace ITGlobal.MarkDocs.Format
             {
                 if (!url.StartsWith("/"))
                 {
-                    url = NormalizeResourcePath(page.Id, url);
+                    url = NormalizeResourcePath(page, url);
                 }
             }
             catch (InvalidOperationException)
@@ -219,10 +219,16 @@ namespace ITGlobal.MarkDocs.Format
             return PseudoResource.Get(page.Documentation, url, GetResourceFileName(url), type);
         }
 
-        private static string NormalizeResourcePath(string basePath, string resourceUrl)
+        private static string NormalizeResourcePath(IPage page, string resourceUrl)
         {
+            var basePath = page.Id;
+            
             var basePathSegments = basePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             var basePathLen = basePathSegments.Length;
+            if(page.PageTreeNode.Nodes == null)
+            {
+                basePathLen--;
+            }
 
             var resourcePathSegments = resourceUrl.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             var resourcePathLen = 0;
