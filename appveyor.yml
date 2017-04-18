@@ -10,7 +10,8 @@ build_script:
 - ps: '& ./build.ps1 -v'
 test: off
 artifacts:
-- path: artifacts\**\*.*
+- path: artifacts\**\*.nupkg
+- path: artifacts\**\*.zip
 deploy:
 - provider: NuGet
   api_key:

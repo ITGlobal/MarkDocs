@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <Import Project="../common.props" />
-
   <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+  </PropertyGroup>
+  <Import Project="../common.props" />
+  <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
     <AssemblyTitle>MarkDocs.Core</AssemblyTitle>
     <AssemblyName>ITGlobal.MarkDocs.Core</AssemblyName>
-    <PackageId>ITGlobal.MarkDocs.Core</PackageId>    
+    <PackageId>ITGlobal.MarkDocs.Core</PackageId>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="System.IO.FileSystem.Watcher" Version="4.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.0.1" />
@@ -17,5 +18,4 @@
     <PackageReference Include="System.Collections.Immutable" Version="1.2.0" />
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="1.1.0" />
   </ItemGroup>
-
 </Project>

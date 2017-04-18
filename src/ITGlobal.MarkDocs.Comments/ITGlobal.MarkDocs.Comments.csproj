@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+  </PropertyGroup>
   <Import Project="../common.props" />
-
   <PropertyGroup>
     <AssemblyTitle>MarkDocs.Comments</AssemblyTitle>
     <AssemblyName>ITGlobal.MarkDocs.Comments</AssemblyName>
     <PackageId>ITGlobal.MarkDocs.Comments</PackageId>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.csproj" />
   </ItemGroup>
-
 </Project>
