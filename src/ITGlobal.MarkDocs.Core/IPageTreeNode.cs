@@ -22,6 +22,12 @@ namespace ITGlobal.MarkDocs
         bool IsHyperlink { get; }
 
         /// <summary>
+        ///     true if this node refers to an index page
+        /// </summary>
+        [PublicAPI]
+        bool IsIndexPage { get; }
+
+        /// <summary>
         ///     A reference to a parent node. Null for root nodes
         /// </summary>
         [PublicAPI, CanBeNull]

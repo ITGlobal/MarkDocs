@@ -258,8 +258,7 @@ namespace ITGlobal.MarkDocs.Content
                     return null;
                 }
 
-                return new LeafPageTreeNode(id, metadata, indexPageFileName,
-                    GetRelativePath(rootDirectory, indexPageFileName));
+                return new LeafDirectoryPageTreeNode(id, metadata, indexPageFileName, GetRelativePath(rootDirectory, indexPageFileName));
             }
 
             return new DirectoryPageTreeNode(

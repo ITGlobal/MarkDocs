@@ -214,6 +214,11 @@ namespace ITGlobal.MarkDocs.Cache
             }
 
             var path = Path.Combine(RootDirectory, descriptor.Directory, GetPathPrefix(item), name);
+
+            if (Directory.Exists(path))
+            {
+                
+            }
             return path;
         }
 

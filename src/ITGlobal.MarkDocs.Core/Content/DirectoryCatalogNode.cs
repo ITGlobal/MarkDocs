@@ -47,6 +47,11 @@ namespace ITGlobal.MarkDocs.Content
         public override bool IsHyperlink => FileName != null;
 
         /// <summary>
+        ///     true if this node refers to an index page
+        /// </summary>
+        public override bool IsIndexPage => true;
+
+        /// <summary>
         ///     Child nodes. Null for leaf nodes.
         /// </summary>
         public override IReadOnlyList<IPageTreeNode> Nodes { get; }

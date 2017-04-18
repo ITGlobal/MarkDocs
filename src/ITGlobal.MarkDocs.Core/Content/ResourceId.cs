@@ -15,7 +15,7 @@ namespace ITGlobal.MarkDocs.Content
                 return;
             }
 
-            id = Path.Combine(Path.GetDirectoryName(id), Path.GetFileNameWithoutExtension(id));
+            id = Path.Combine(Path.GetDirectoryName(id), Path.GetFileName(id));
             id = id.Replace(Path.DirectorySeparatorChar, '/');
             id = id.Replace(Path.AltDirectorySeparatorChar, '/');
             id = id.ToLowerInvariant();

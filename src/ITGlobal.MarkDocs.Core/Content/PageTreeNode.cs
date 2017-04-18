@@ -24,7 +24,7 @@ namespace ITGlobal.MarkDocs.Content
             Id = id;
             Metadata = metadata;
         }
-        
+
         #endregion
 
         #region IPageTreeNode
@@ -48,6 +48,11 @@ namespace ITGlobal.MarkDocs.Content
         ///     true if this node refers to a page
         /// </summary>
         public abstract bool IsHyperlink { get; }
+
+        /// <summary>
+        ///     true if this node refers to an index page
+        /// </summary>
+        public abstract bool IsIndexPage { get; }
 
         /// <summary>
         ///     A reference to a parent node. Null for root nodes

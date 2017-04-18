@@ -6,7 +6,7 @@ namespace ITGlobal.MarkDocs.Content
     /// <summary>
     ///     Leaf page tree node
     /// </summary>
-    internal sealed class LeafPageTreeNode : PageTreeNode
+    internal class LeafPageTreeNode : PageTreeNode
     {
         /// <summary>
         ///     .ctor
@@ -32,6 +32,11 @@ namespace ITGlobal.MarkDocs.Content
         ///     true if this node refers to a page
         /// </summary>
         public override bool IsHyperlink => true;
+
+        /// <summary>
+        ///     true if this node refers to an index page
+        /// </summary>
+        public override bool IsIndexPage => false;
 
         /// <summary>
         ///     Child nodes. Null for leaf nodes.

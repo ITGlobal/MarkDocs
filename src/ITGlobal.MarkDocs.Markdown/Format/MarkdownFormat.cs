@@ -169,7 +169,7 @@ namespace ITGlobal.MarkDocs.Format
                 // Remove .md extension if specified
                 if(!isIndexFileLink)
                 {
-                    var ext = Path.GetExtension(url);                
+                    var ext = Path.GetExtension(url);
                     if (_extensions.Contains(ext))
                     {
                         url = Path.ChangeExtension(url, null);
@@ -191,7 +191,7 @@ namespace ITGlobal.MarkDocs.Format
         {
             try
             {
-                if (!url.StartsWith("/"))
+                if (!url.StartsWith("/") && !url.StartsWith("\\"))
                 {
                     url = NormalizeResourcePath(page, url);
                 }
@@ -216,21 +216,22 @@ namespace ITGlobal.MarkDocs.Format
                 type = ResourceType.Attachment;
             }
 
-            return PseudoResource.Get(page.Documentation, url, GetResourceFileName(url), type);
+            var resource = PseudoResource.Get(page.Documentation, url, GetResourceFileName(url), type);
+            return resource;
         }
 
         private static string NormalizeResourcePath(IPage page, string resourceUrl)
         {
             var basePath = page.Id;
             
-            var basePathSegments = basePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var basePathSegments = basePath.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
             var basePathLen = basePathSegments.Length;
-            if(page.PageTreeNode.Nodes == null)
+            if(!page.PageTreeNode.IsIndexPage)
             {
                 basePathLen--;
             }
 
-            var resourcePathSegments = resourceUrl.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var resourcePathSegments = resourceUrl.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
             var resourcePathLen = 0;
             for (var i = 0; i < resourcePathSegments.Length; i++)
             {
