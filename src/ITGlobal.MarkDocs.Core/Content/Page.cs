@@ -160,8 +160,7 @@ namespace ITGlobal.MarkDocs.Content
             var stream = _cache.Read(this);
             if (stream == null)
             {
-                _documentation.ForceRefresh();
-                stream = _cache.Read(this);
+                throw new InvalidOperationException($"Unable to read cached item '{_documentation.Id}:{Id}'");
             }
 
             return stream;

@@ -8,10 +8,12 @@ namespace ITGlobal.MarkDocs.Storage
     /// </summary>
     internal sealed class PlainContentVersion : IContentVersion
     {
-        public PlainContentVersion(string path)
+        public PlainContentVersion(string version,string path)
         {
             SourceUrl = "file:///" + path;
+            Version = version;
             LastChangeTime = Directory.GetLastWriteTime(path);
+            LastChangeId = Guid.NewGuid().ToString("N");
         }
         
         /// <summary>
@@ -22,8 +24,8 @@ namespace ITGlobal.MarkDocs.Storage
         /// <summary>
         ///     Source branch
         /// </summary>
-        public string Version => null;
-        
+        public string Version { get; }
+
         /// <summary>
         ///     Last content change time
         /// </summary>
@@ -32,7 +34,7 @@ namespace ITGlobal.MarkDocs.Storage
         /// <summary>
         ///     Version hash
         /// </summary>
-        public string LastChangeId => null;
+        public string LastChangeId { get; }
 
         /// <summary>
         ///     Last commit message

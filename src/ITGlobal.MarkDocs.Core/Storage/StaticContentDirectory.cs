@@ -9,7 +9,7 @@
         {
             Id = id;
             Path = path;
-            ContentVersion = new PlainContentVersion(path);
+            ContentVersion = new PlainContentVersion(id, path);
         }
 
         /// <summary>

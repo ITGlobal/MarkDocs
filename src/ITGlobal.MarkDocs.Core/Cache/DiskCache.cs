@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
+using ITGlobal.MarkDocs.Storage;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 
@@ -102,6 +104,26 @@ namespace ITGlobal.MarkDocs.Cache
         #endregion
 
         #region ICache
+
+        /// <summary>
+        ///     Checks whether cache is up to date
+        /// </summary>
+        CacheVerifyResult ICache.Verify(IReadOnlyList<IContentDirectory> contentDirectories)
+        {
+            lock (_descriptorLock)
+            {
+                foreach (var contentDirectory in contentDirectories)
+                {
+                    if (!_descriptor.Items.TryGetValue(contentDirectory.Id, out var item) ||
+                        item.Version != contentDirectory.ContentVersion.LastChangeId)
+                    {
+                        return CacheVerifyResult.OutOfDate;
+                    }
+                }
+
+                return CacheVerifyResult.UpToDate;
+            }
+        }
 
         /// <summary>
         ///     Starts update operation
@@ -207,6 +229,8 @@ namespace ITGlobal.MarkDocs.Cache
                 descriptor.Directory = Guid.NewGuid().ToString("N");
             }
 
+            descriptor.Version = item.Documentation.ContentVersion.LastChangeId;
+
             var name = item.Id == "/" ? "index.html" : item.Id.Substring(1);
             if (item.Type == ResourceType.Page)
             {
@@ -214,11 +238,6 @@ namespace ITGlobal.MarkDocs.Cache
             }
 
             var path = Path.Combine(RootDirectory, descriptor.Directory, GetPathPrefix(item), name);
-
-            if (Directory.Exists(path))
-            {
-                
-            }
             return path;
         }
 

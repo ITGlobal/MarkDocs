@@ -8,6 +8,7 @@
     <AssemblyTitle>MarkDocs.Core</AssemblyTitle>
     <AssemblyName>ITGlobal.MarkDocs.Core</AssemblyName>
     <PackageId>ITGlobal.MarkDocs.Core</PackageId>
+    <RootNamespace>ITGlobal.MarkDocs</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.IO.FileSystem.Watcher" Version="4.0.0" />

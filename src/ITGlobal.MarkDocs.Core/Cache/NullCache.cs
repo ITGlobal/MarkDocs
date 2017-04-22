@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ITGlobal.MarkDocs.Storage;
 
 namespace ITGlobal.MarkDocs.Cache
 {
@@ -19,6 +20,14 @@ namespace ITGlobal.MarkDocs.Cache
         #endregion
 
         #region ICache
+
+        /// <summary>
+        ///     Checks whether cache is up to date
+        /// </summary>
+        public CacheVerifyResult Verify(IReadOnlyList<IContentDirectory> contentDirectories)
+        {
+            return CacheVerifyResult.OutOfDate;
+        }
 
         /// <summary>
         ///     Starts update operation

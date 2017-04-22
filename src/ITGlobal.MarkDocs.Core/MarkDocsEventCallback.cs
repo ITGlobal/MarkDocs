@@ -9,45 +9,25 @@ namespace ITGlobal.MarkDocs
     [PublicAPI]
     public class MarkDocsEventCallback : IMarkDocsEventCallback
     {
+        private sealed class EmptyToken: IDisposable
+        {
+            public void Dispose() { }
+        }
+
         /// <summary>
         ///     This method is called when MarkDocs starts to refresh sources of all documentations
         /// </summary>
-        public virtual void StorageRefreshAllStarted() { }
-
-        /// <summary>
-        ///     This method is called when MarkDocs completes to refresh sources of all documentations
-        /// </summary>
-        public virtual void StorageRefreshAllCompleted() { }
-
-        /// <summary>
-        ///     This method is called when MarkDocs starts to refresh sources of documentation <paramref name="id"/>
-        /// </summary>
-        public virtual void StorageRefreshStarted(string id) { }
-
-        /// <summary>
-        ///     This method is called when MarkDocs completes to refresh sources of documentation <paramref name="id"/>
-        /// </summary>
-        public virtual void StorageRefreshCompleted(string id) { }
+        public virtual IDisposable StorageRefresh(string documentationId = null) => new EmptyToken();
 
         /// <summary>
         ///     This method is called when MarkDocs starts to compile all documentations
         /// </summary>
-        public virtual void CompilationStarted() { }
-
-        /// <summary>
-        ///     This method is called when MarkDocs completes to compile all documentations
-        /// </summary>
-        public virtual void CompilationCompleted() { }
+        public virtual IDisposable CompilationStarted() => new EmptyToken();
 
         /// <summary>
         ///     This method is called when MarkDocs starts to compile documentation <paramref name="id"/>
         /// </summary>
-        public virtual void CompilationStarted(string id) { }
-
-        /// <summary>
-        ///     This method is called when MarkDocs starts to compile documentation <paramref name="id"/>
-        /// </summary>
-        public virtual void CompilationCompleted(string id) { }
+        public virtual IDisposable CompilationStarted(string id) => new EmptyToken();
 
         /// <summary>
         ///     This method is called when MarkDocs detects source changes
@@ -67,7 +47,7 @@ namespace ITGlobal.MarkDocs
         /// <summary>
         ///     This method is called when MarkDocs fails to render a page
         /// </summary>
-        public virtual void Warning(string documentationId, string pageId, string message, string location = null) { }
+        public virtual void Warning(string documentationId, string pageId, string message, string location = null) {}
 
         /// <summary>
         ///     This method is called when MarkDocs detects non-fatal issues when rendering a page

@@ -12,51 +12,21 @@ namespace ITGlobal.MarkDocs
         /// <summary>
         ///     This method is called when MarkDocs starts to refresh sources of all documentations
         /// </summary>
-        [PublicAPI]
-        void StorageRefreshAllStarted();
-
-        /// <summary>
-        ///     This method is called when MarkDocs completes to refresh sources of all documentations
-        /// </summary>
-        [PublicAPI]
-        void StorageRefreshAllCompleted();
-
-        /// <summary>
-        ///     This method is called when MarkDocs starts to refresh sources of documentation <paramref name="id"/>
-        /// </summary>
-        [PublicAPI]
-        void StorageRefreshStarted([NotNull] string id);
-
-        /// <summary>
-        ///     This method is called when MarkDocs completes to refresh sources of documentation <paramref name="id"/>
-        /// </summary>
-        [PublicAPI]
-        void StorageRefreshCompleted([NotNull] string id);
+        [PublicAPI, NotNull]
+        IDisposable StorageRefresh(string documentationId = null);
 
         /// <summary>
         ///     This method is called when MarkDocs starts to compile all documentations
         /// </summary>
-        [PublicAPI]
-        void CompilationStarted();
-
-        /// <summary>
-        ///     This method is called when MarkDocs completes to compile all documentations
-        /// </summary>
-        [PublicAPI]
-        void CompilationCompleted();
+        [PublicAPI, NotNull]
+        IDisposable CompilationStarted();
 
         /// <summary>
         ///     This method is called when MarkDocs starts to compile documentation <paramref name="id"/>
         /// </summary>
-        [PublicAPI]
-        void CompilationStarted([NotNull] string id);
-
-        /// <summary>
-        ///     This method is called when MarkDocs starts to compile documentation <paramref name="id"/>
-        /// </summary>
-        [PublicAPI]
-        void CompilationCompleted([NotNull] string id);
-
+        [PublicAPI, NotNull]
+        IDisposable CompilationStarted([NotNull] string id);
+        
         /// <summary>
         ///     This method is called when MarkDocs detects source changes
         /// </summary>

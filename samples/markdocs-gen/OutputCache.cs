@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using ITGlobal.MarkDocs.Cache;
+using ITGlobal.MarkDocs.Storage;
 
 namespace ITGlobal.MarkDocs.StaticGen
 {
@@ -13,6 +15,11 @@ namespace ITGlobal.MarkDocs.StaticGen
         {
             _directory = directory;
             _template = template;
+        }
+
+        public CacheVerifyResult Verify(IReadOnlyList<IContentDirectory> contentDirectories)
+        {
+            return CacheVerifyResult.OutOfDate;
         }
 
         public ICacheUpdateOperation BeginUpdate()

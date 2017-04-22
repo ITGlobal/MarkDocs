@@ -1,9 +1,11 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26114.2
+VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2E2F3543-25DB-43BD-A8A9-9691F4D6B957}"
+	ProjectSection(SolutionItems) = preProject
+		src\common.props = src\common.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{82B0859E-A87A-46BA-9054-B5BC558C423B}"
 EndProject

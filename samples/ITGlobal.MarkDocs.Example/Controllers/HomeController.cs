@@ -53,20 +53,11 @@ namespace ITGlobal.MarkDocs.Example.Controllers
         [HttpPost, Route("refresh")]
         public IActionResult Refresh()
         {
-            _service.RefreshAllDocumentations();
+            _service.Synchronize();
 
             return Redirect("/");
         }
-
-        [HttpPost, Route("refresh/{branch}")]
-        public IActionResult Refresh(string branch)
-        {
-            _service.RefreshDocumentation(branch);
-
-            return Redirect($"/{branch}");
-        }
-
-
+        
         [HttpGet, Route("{branch}/by-tag/{*tag}")]
         public IActionResult Tags(string branch, string tag)
         {
