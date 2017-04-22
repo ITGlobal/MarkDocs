@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using ITGlobal.MarkDocs.Storage;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Cache
@@ -9,6 +11,12 @@ namespace ITGlobal.MarkDocs.Cache
     [PublicAPI]
     public interface ICache
     {
+        /// <summary>
+        ///     Checks whether cache is up to date
+        /// </summary>
+        [PublicAPI]
+        CacheVerifyResult Verify([NotNull] IReadOnlyList<IContentDirectory> contentDirectories);
+
         /// <summary>
         ///     Starts update operation
         /// </summary>

@@ -34,24 +34,14 @@ namespace ITGlobal.MarkDocs
         /// </returns>
         [PublicAPI, CanBeNull]
         IDocumentation GetDocumentation([NotNull] string documentationId);
-
-        /// <summary>
-        ///     Checks out latest revision of specified documentation branch.
-        ///     Any local changes are discarded.
-        /// </summary>
-        /// <param name="documentationId">
-        ///     Documentation ID
-        /// </param>
-        [PublicAPI]
-        void RefreshDocumentation([NotNull] string documentationId);
-
+        
         /// <summary>
         ///     Fetches all documentation branches. 
-        ///     Existing branches are updated, new branches are checked out as 'private' documentation.
+        ///     Existing branches are updated, new branches are checked out.
         ///     Any local changes are discarded.
         /// </summary>
         [PublicAPI]
-        void RefreshAllDocumentations();
+        void Synchronize();
 
         /// <summary>
         ///     Gets an instance of an extension

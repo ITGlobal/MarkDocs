@@ -150,12 +150,7 @@ namespace ITGlobal.MarkDocs.Content
         #endregion
 
         #region methods
-
-        /// <summary>
-        ///     Forces a documentation to refresh itself and rebuild cached pages
-        /// </summary>
-        public void ForceRefresh() => _service.RefreshDocumentation(Id);
-
+        
         /// <summary>
         ///     Compiles documentation and builds cached pages
         /// </summary>

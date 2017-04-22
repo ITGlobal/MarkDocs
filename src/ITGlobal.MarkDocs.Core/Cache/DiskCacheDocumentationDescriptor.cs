@@ -12,5 +12,11 @@ namespace ITGlobal.MarkDocs.Cache
         /// </summary>
         [JsonProperty("directory")]
         public string Directory { get; set; }
+
+        /// <summary>
+        ///     Cache subdirectory source version
+        /// </summary>
+        [JsonProperty("version")]
+        public string Version { get; set; }
     }
 }

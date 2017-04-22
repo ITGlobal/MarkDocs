@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ITGlobal.MarkDocs.Cache
@@ -104,7 +103,7 @@ namespace ITGlobal.MarkDocs.Cache
                     Task.WaitAll(_contentWriteTasks.ToArray());
                 }
             }
-
+            
             _descriptor.LastUpdateTime = DateTime.UtcNow;
             _descriptor.Save(_cache.DescriptorFileName, _cache.Log);
         }

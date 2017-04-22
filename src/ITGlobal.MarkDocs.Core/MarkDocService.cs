@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using ITGlobal.MarkDocs.Cache;
 using ITGlobal.MarkDocs.Content;
 using ITGlobal.MarkDocs.Extensions;
@@ -21,7 +22,7 @@ namespace ITGlobal.MarkDocs
         #region fields
 
         private readonly ExtensionCollection _extensions;
-        
+
         private readonly ManualResetEventSlim _initialized = new ManualResetEventSlim(false);
 
         private readonly object _stateLock = new object();
@@ -88,19 +89,33 @@ namespace ITGlobal.MarkDocs
         /// <inheritdoc />
         void IMarkDocService.Initialize()
         {
-            using (Log.BeginScope("Initialize()"))
+            using (Log.BeginScope("Initialize"))
             {
                 try
                 {
                     Log.LogInformation("Initializing documentation...");
                     Storage.Initialize();
+                    var contentDirectories = Storage.GetContentDirectories();
 
-                    var state = RefreshAllDocumentations(_state);
+                    var result = Cache.Verify(contentDirectories);
+                    if (result == CacheVerifyResult.UpToDate)
+                    {
+                        Task.Factory.StartNew(() =>
+                        {
+                            _initialized.Wait();
+                            Log.LogInformation("Checking for updates...");
+                            Resync();
+                        });
+                    }
+                    else
+                    {
+                        Log.LogInformation("Checking out documentation...");
+                        Resync();
+                    }
 
-                    _extensions.CreateExtensions(this, state);
+                    _extensions.CreateExtensions(this, State);
 
                     Log.LogInformation("Documentation is ready");
-
                     _initialized.Set();
 
                 }
@@ -127,10 +142,7 @@ namespace ITGlobal.MarkDocs
         }
 
         /// <inheritdoc />
-        void IMarkDocService.RefreshDocumentation(string id) => RefreshDocumentation(id);
-
-        /// <inheritdoc />
-        void IMarkDocService.RefreshAllDocumentations() => RefreshAllDocumentations(State);
+        void IMarkDocService.Synchronize() => Resync();
 
         /// <inheritdoc />
         TExtension IMarkDocService.GetExtension<TExtension>() => _extensions.GetExtension<TExtension>();
@@ -154,95 +166,68 @@ namespace ITGlobal.MarkDocs
         #endregion
 
         #region private methods
-        
-        internal void RefreshDocumentation(string id)
+
+        private void Resync(string documentationId = null)
         {
-            Documentation.NormalizeId(ref id);
-
-            using (Log.BeginScope("Refresh({0})", id))
+            using (Log.BeginScope("Resync"))
             {
-                Callback.StorageRefreshStarted(id);
-                Storage.Refresh(id);
-                Callback.StorageRefreshCompleted(id);
+                using (Callback.StorageRefresh(documentationId))
+                {
+                    if (!string.IsNullOrEmpty(documentationId))
+                    {
+                        Storage.Refresh(documentationId);
+                    }
+                    else
+                    {
+                        Storage.RefreshAll();
+                    }
+                }
 
-                
-                RebuildDocumentation(id);
-                Callback.CompilationCompleted(id);
+                using (Callback.CompilationStarted())
+                {
+                    Recompile(documentationId);
+                }
             }
         }
 
-        private MarkDocServiceState RefreshAllDocumentations(MarkDocServiceState originalState)
-        {
-            using (Log.BeginScope("RefreshAll()"))
-            {
-                Callback.StorageRefreshAllStarted();
-                Storage.RefreshAll();
-                Callback.StorageRefreshAllCompleted();
-
-                Callback.CompilationStarted();
-                var state =  RebuildDocumentations(originalState);
-                Callback.CompilationCompleted();
-
-                return state;
-            }
-        }
-
-        private MarkDocServiceState RebuildDocumentations(MarkDocServiceState originalState)
+        private void Recompile(string id = null)
         {
             try
             {
                 var docs = new List<IDocumentation>();
-                MarkDocServiceState state;
-
-                using (var directoryScanner = new DirectoryScanner(Log, Format, Storage))
-                using (var operation = Cache.BeginUpdate())
+                if (!string.IsNullOrEmpty(id))
                 {
-                    foreach (var contentDirectory in Storage.GetContentDirectories())
+                    Documentation.NormalizeId(ref id);
+                    foreach (var doc in from d in State.List where d.Id != id select d)
                     {
-                        var doc = CompileDocumentation(directoryScanner, operation, contentDirectory);
                         docs.Add(doc);
-                    }
-
-                    state = new MarkDocServiceState(docs);
-
-                    operation.Flush();
-
-                    lock (_stateLock)
-                    {
-                        operation.Commit();
-                        _state = state;
                     }
                 }
 
-                _extensions.Update(state);
-
-                return state;
-            }
-            catch (Exception e)
-            {
-                Log.LogError(0, e, "Failed to rebuild all documentations");
-                return originalState;
-            }
-        }
-
-        private void RebuildDocumentation(string id)
-        {
-            try
-            {
-                Documentation.NormalizeId(ref id);
-
-                var docs = new List<IDocumentation>(from d in State.List where d.Id != id select d);
                 MarkDocServiceState state;
-
                 using (var directoryScanner = new DirectoryScanner(Log, Format, Storage))
                 using (var operation = Cache.BeginUpdate())
                 {
-                    var contentDirectory = Storage.GetContentDirectory(id);
-                    var doc = CompileDocumentation(directoryScanner, operation, contentDirectory);
-                    docs.Add(doc);
+                    var contentDirectories = Storage.GetContentDirectories();
+                    if (!string.IsNullOrEmpty(id))
+                    {
+                        contentDirectories = contentDirectories.Where(d => d.Id == id).ToArray();
+                    }
 
+                    foreach (var contentDirectory in contentDirectories)
+                    {
+                        using (Callback.CompilationStarted(contentDirectory.Id))
+                        {
+                            var catalog = directoryScanner.ScanDirectory(contentDirectory.Path);
+
+                            var doc = new Documentation(this, contentDirectory.Id, contentDirectory.ContentVersion,
+                                catalog);
+                            doc.Compile(operation);
+                            docs.Add(doc);
+                        }
+                    }
+                    
                     state = new MarkDocServiceState(docs);
-
                     operation.Flush();
 
                     lock (_stateLock)
@@ -260,35 +245,12 @@ namespace ITGlobal.MarkDocs
             }
         }
 
-        private IDocumentation CompileDocumentation(
-            DirectoryScanner directoryScanner,
-            ICacheUpdateOperation operation,
-            IContentDirectory contentDirectory)
-        {
-            Callback.CompilationStarted(contentDirectory.Id);
-            var catalog = directoryScanner.ScanDirectory(contentDirectory.Path);
-
-            var documentation = new Documentation(this, contentDirectory.Id, contentDirectory.ContentVersion, catalog);
-            documentation.Compile(operation);
-
-            Callback.CompilationCompleted(contentDirectory.Id);
-
-            return documentation;
-        }
-
         private void OnStorageChanged(object sender, StorageChangedEventArgs e)
         {
             Log.LogInformation("Documentation change detected");
             Callback.StorageChanged(e.DocumentationId);
 
-            if (!string.IsNullOrEmpty(e.DocumentationId))
-            {
-                RebuildDocumentation(e.DocumentationId);
-            }
-            else
-            {
-                RebuildDocumentations(State);
-            }
+            Resync(e.DocumentationId);
         }
 
         #endregion
