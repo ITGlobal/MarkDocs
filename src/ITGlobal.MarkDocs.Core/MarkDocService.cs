@@ -100,6 +100,11 @@ namespace ITGlobal.MarkDocs
                     var result = Cache.Verify(contentDirectories);
                     if (result == CacheVerifyResult.UpToDate)
                     {
+                        using (Callback.CompilationStarted())
+                        {
+                            Recompile();
+                        }
+
                         Task.Factory.StartNew(() =>
                         {
                             _initialized.Wait();
@@ -181,6 +186,15 @@ namespace ITGlobal.MarkDocs
                     {
                         Storage.RefreshAll();
                     }
+                }
+
+                var contentDirectories = Storage.GetContentDirectories();
+
+                var result = Cache.Verify(contentDirectories);
+                if (result == CacheVerifyResult.UpToDate)
+                {
+                    Log.LogInformation("Documentation is already up to date");
+                    return;
                 }
 
                 using (Callback.CompilationStarted())
