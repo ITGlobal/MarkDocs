@@ -21,10 +21,31 @@ namespace ITGlobal.MarkDocs.StaticGen
         private readonly BuildReport report = new BuildReport();
         private IProgressBar progressBar;
 
-        public override void CompilationStarted(string id)
+        private sealed class DisposableToken : IDisposable
+        {
+            private readonly Action _action;
+
+            public DisposableToken(Action action)
+            {
+                _action = action;
+            }
+
+            public void Dispose() => _action();
+        }
+
+        public override IDisposable CompilationStarted(string id)
         {
             progressBar = CLI.ProgressBar();
             progressBar.SetState(0, "compiling");
+
+            return new DisposableToken(() =>
+            {
+                progressBar?.Dispose();
+                progressBar = null;
+
+                report.Print();
+                report.Clear();
+            });
         }
 
         public override void CompilingPage(string documentationId, string id, int i, int count)
@@ -41,15 +62,6 @@ namespace ITGlobal.MarkDocs.StaticGen
         public override void Warning(string documentationId, string pageId, string message, string location = null)
         {
             report.AddWarning(pageId, message, location ?? "");
-        }
-
-        public override void CompilationCompleted(string id)
-        {
-            progressBar?.Dispose();
-            progressBar = null;
-
-            report.Print();
-            report.Clear();
         }
     }
 }
