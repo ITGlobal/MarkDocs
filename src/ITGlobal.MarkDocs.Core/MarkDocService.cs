@@ -113,7 +113,7 @@ namespace ITGlobal.MarkDocs
                         Resync();
                     }
 
-                    _extensions.CreateExtensions(this, State);
+                    _extensions.CreateExtensions(this, _state);
 
                     Log.LogInformation("Documentation is ready");
                     _initialized.Set();
@@ -198,7 +198,7 @@ namespace ITGlobal.MarkDocs
                 if (!string.IsNullOrEmpty(id))
                 {
                     Documentation.NormalizeId(ref id);
-                    foreach (var doc in from d in State.List where d.Id != id select d)
+                    foreach (var doc in from d in _state.List where d.Id != id select d)
                     {
                         docs.Add(doc);
                     }
