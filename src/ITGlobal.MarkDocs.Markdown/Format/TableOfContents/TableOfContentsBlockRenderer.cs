@@ -145,10 +145,14 @@ namespace ITGlobal.MarkDocs.Format.TableOfContents
                 if (relativeDepth < 0)
                 {
                     // End of nested headings
-                    for (var i = 0; i <= -relativeDepth && roots.Count > 0; i++)
+                    while (relativeDepth < 0)
                     {
                         currentRoot = roots.Pop();
+                        relativeDepth = heading.Level - (currentRoot.Level + 1);
                     }
+
+                    roots.Push(currentRoot);
+
                     lastNode = currentRoot.AppendChild(heading);
                     continue;
                 }
