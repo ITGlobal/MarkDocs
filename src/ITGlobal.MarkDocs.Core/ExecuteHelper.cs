@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using Microsoft.Extensions.Logging;
 
-namespace ITGlobal.MarkDocs.Git
+namespace ITGlobal.MarkDocs
 {
     internal sealed class ExecuteHelper : IDisposable
     {
         private enum OutputStream
         {
+            Stdin = 0,
             Stdout = 1,
             Stderr = 2
         }
@@ -27,7 +29,14 @@ namespace ITGlobal.MarkDocs.Git
 
             public void Print(ILogger log)
             {
-                log.LogDebug("\t{0}> {1}", (int)Stream, Line);
+                if (Stream != OutputStream.Stdin)
+                {
+                    log.LogDebug("\t{0}> {1}", (int) Stream, Line);
+                }
+                else
+                {
+                    log.LogDebug("\t{0}< {1}", (int)Stream, Line);
+                }
             }
         }
 
@@ -52,7 +61,9 @@ namespace ITGlobal.MarkDocs.Git
                     CreateNoWindow = true,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    FileName = programName
+                    FileName = programName,
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8
                 },
                 EnableRaisingEvents = true
             };
@@ -72,13 +83,25 @@ namespace ITGlobal.MarkDocs.Git
             => _output.Where(_ => _.Stream == OutputStream.Stderr).Select(_ => _.Line);
         public int ExitCode { get; private set; }
 
-        public void Run(IList<string> arguments)
+        public void Run(IList<string> arguments, IList<string> stdin = null)
         {
             _process.StartInfo.Arguments = string.Join(" ", from arg in arguments select EscapeArgument(arg));
+            _process.StartInfo.RedirectStandardInput = stdin != null;
 
             _process.Start();
             _process.BeginErrorReadLine();
             _process.BeginOutputReadLine();
+
+            if (stdin != null)
+            {
+                foreach (var line in stdin)
+                {
+                    var buffer = Encoding.UTF8.GetBytes(line);
+                    _process.StandardInput.BaseStream.Write(buffer, 0, buffer.Length);
+                    WriteStandardInput(line);
+                }
+                _process.StandardInput.Flush();
+            }
 
             _process.WaitForExit();
 
@@ -120,6 +143,17 @@ namespace ITGlobal.MarkDocs.Git
         }
 
         public void Dispose() => _process.Dispose();
+
+        private void WriteStandardInput(string line)
+        {
+            if (!string.IsNullOrEmpty(line))
+            {
+                lock (_outputLock)
+                {
+                    _output.Add(new OutputLine(OutputStream.Stdin, line));
+                }
+            }
+        }
 
         private void WriteStandardOutput(string line)
         {
