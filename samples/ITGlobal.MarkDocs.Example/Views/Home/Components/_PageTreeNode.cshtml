@@ -4,7 +4,7 @@
 
 @{
     var url = Model.Node.IsHyperlink ?
-        string.Format("/{0}/{1}", Uri.EscapeDataString(Model.Documentation.Id), Model.Node.Id)
+        string.Format("/{0}{1}", Uri.EscapeDataString(Model.Documentation.Id), Model.Node.Id)
         : null;
 
     var isFolder = Model.Node.Nodes != null;

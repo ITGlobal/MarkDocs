@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using AngleSharp;
+using System.Threading.Tasks;
 using AngleSharp.Dom.Css;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Css;
 using AngleSharp.Parser.Html;
-using AngleSharp.Services;
 using JetBrains.Annotations;
-using Jint;
-using Jint.Native;
+using Microsoft.Extensions.Logging;
 
 namespace ITGlobal.MarkDocs.Format
 {
@@ -24,10 +21,13 @@ namespace ITGlobal.MarkDocs.Format
     public sealed class ServerHighlightJsSyntaxColorizer : ISyntaxColorizer
     {
         private readonly HighlightJsStylesheet _stylesheet;
-        private readonly Engine _jintEngine;
+        private readonly string _tempDirectory;
         private readonly HtmlParser _htmlParser;
 
+        private NpmHelper _npm;
+        private NodejsHelper _nodejs;
         private ICssStyleSheet _styles;
+        private string _renderJs;
 
         static ServerHighlightJsSyntaxColorizer()
         {
@@ -38,18 +38,12 @@ namespace ITGlobal.MarkDocs.Format
         ///     .ctor
         /// </summary>
         [PublicAPI]
-        public ServerHighlightJsSyntaxColorizer()
-            : this(HighlightJsStylesheet.Vs)
-        { }
-
-        /// <summary>
-        ///     .ctor
-        /// </summary>
-        [PublicAPI]
-        public ServerHighlightJsSyntaxColorizer(HighlightJsStylesheet stylesheet)
+        public ServerHighlightJsSyntaxColorizer(
+            string tempDirectory,
+            HighlightJsStylesheet stylesheet = HighlightJsStylesheet.Vs)
         {
+            _tempDirectory = tempDirectory;
             _stylesheet = stylesheet;
-            _jintEngine = new Engine();
             _htmlParser = new HtmlParser();
         }
 
@@ -61,25 +55,32 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Initializes syntax colorizer
         /// </summary>
-        public void Initialize()
+        public void Initialize(ILogger log)
         {
-            var js = LoadResource("Resources.highlight.min.js");
-            _jintEngine.Execute("var exports = {};");
-            _jintEngine.Execute(js);
-            _jintEngine.Execute("var hljs = exports;");
-            js = LoadResource("Resources.highlight.pack.js");
-            _jintEngine.Execute(js);
+            if (!Directory.Exists(_tempDirectory))
+            {
+                Directory.CreateDirectory(_tempDirectory);
+            }
 
-            _jintEngine.Execute("var langs = hljs.listLanguages();");
-            SupportedLanguages = _jintEngine.GetValue("langs").AsArray()
-                .GetOwnProperties()
-                .Where(_ => _.Value.Value.IsString())
-                .Select(_ => _.Value.Value.AsString())
-                .ToArray();
+            _nodejs = new NodejsHelper(log);
+            if (!_nodejs.IsNodeInstalled)
+            {
+                throw new Exception("nodejs executable is not found in PATH");
+            }
 
+            _npm = new NpmHelper(log);
+            if (!_npm.IsNpmInstalled)
+            {
+                throw new Exception("NPM executable is not found in PATH");
+            }
+
+            var listJs = DeployJs("hljs-list-langs.js");
+            _renderJs = DeployJs("hljs-render.js");
+            SupportedLanguages = _nodejs.Invoke<string[]>(listJs);
+                
             if (_stylesheet != HighlightJsStylesheet.None)
             {
-                var css = LoadResource($"Resources.styles.{ResourceAttribute.GetId(_stylesheet)}");
+                var css = LoadResource($"styles.{ResourceAttribute.GetId(_stylesheet)}");
                 var cssParser = new CssParser();
                 _styles = cssParser.ParseStylesheet(css);
             }
@@ -90,11 +91,8 @@ namespace ITGlobal.MarkDocs.Format
         /// </summary>
         public string Render(string language, string sourceCode)
         {
-            _jintEngine.SetValue("sourceCode", sourceCode);
-            _jintEngine.SetValue("language", language);
-            _jintEngine.Execute("var output = hljs.highlight(language, sourceCode, true).value;");
-            var html = _jintEngine.GetValue("output").AsString();
-
+            var html = _nodejs.Invoke<string>(_renderJs, new {language, sourceCode });
+              
             if (_stylesheet != HighlightJsStylesheet.None)
             {
                 var doc = _htmlParser.Parse(html);
@@ -110,7 +108,7 @@ namespace ITGlobal.MarkDocs.Format
         {
             using (var stream = typeof(ServerHighlightJsSyntaxColorizer).GetTypeInfo()
                 .Assembly
-                .GetManifestResourceStream($"ITGlobal.MarkDocs.Markdown.{name}"))
+                .GetManifestResourceStream($"ITGlobal.MarkDocs.Markdown.Resources.{name}"))
             {
                 if (stream == null)
                 {
@@ -125,6 +123,23 @@ namespace ITGlobal.MarkDocs.Format
             }
         }
 
+        private string DeployJs(string name)
+        {
+            var dir = Path.Combine(_tempDirectory);
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            var filename = Path.Combine(dir, name);
+            var source = LoadResource(name);
+            File.WriteAllText(filename, source, Encoding.UTF8);
+
+            _npm.Install(dir, "highlightjs");
+
+            return filename;
+        }
+        
         private static void InlineCss(IHtmlElement element, ICssStyleSheet styles)
         {
             if (element.HasChildNodes)

@@ -1,9 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using ColorCode;
 using ColorCode.Formatting;
 using ColorCode.Styling.StyleSheets;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 
 namespace ITGlobal.MarkDocs.Format
 {
@@ -24,7 +26,7 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Initializes syntax colorizer
         /// </summary>
-        public void Initialize() { }
+        public void Initialize(ILogger log) { }
 
         /// <summary>
         ///     Render a source code into an HTML
