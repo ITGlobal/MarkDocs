@@ -172,6 +172,9 @@ namespace ITGlobal.MarkDocs.Content
                     _service.Log.LogDebug("Compiled page {0}:{1}", Id, page.RelativeFileName);
                 }
 
+                // Wait for pending page compilations since they might produce new attachments
+                operation.Flush();
+
                 // Put each non-page file into cache
                 i = 0;
                 foreach (var attachment in _attachmentsById.Values)

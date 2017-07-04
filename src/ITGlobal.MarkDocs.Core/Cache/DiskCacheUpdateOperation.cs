@@ -101,6 +101,7 @@ namespace ITGlobal.MarkDocs.Cache
                 if (_contentWriteTasks.Count > 0)
                 {
                     Task.WaitAll(_contentWriteTasks.ToArray());
+                    _contentWriteTasks.Clear();
                 }
             }
             
