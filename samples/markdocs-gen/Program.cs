@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using ITGlobal.CommandLine;
 using ITGlobal.MarkDocs.Cache;
@@ -170,7 +171,7 @@ namespace ITGlobal.MarkDocs.StaticGen
         {
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddSerilog(Log.Logger);
-
+            
             var services = new ServiceCollection();
             services.AddSingleton<ILoggerFactory>(loggerFactory);
             services.AddMarkDocs(config =>
@@ -180,7 +181,8 @@ namespace ITGlobal.MarkDocs.StaticGen
                 config.Cache.Use(sp => sp.AddSingleton<ICache>(new OutputCache(targetDir, template)));
                 config.Format.UseMarkdown(new MarkdownOptions
                 {
-                    ResourceUrlResolver = new ResourceUrlResolver()
+                    ResourceUrlResolver = new ResourceUrlResolver(),
+                    SyntaxColorizer = new ServerHighlightJsSyntaxColorizer(Path.Combine(Path.GetTempPath(), $"markdocs-gen-{Guid.NewGuid():N}"))
                 });
             });
 

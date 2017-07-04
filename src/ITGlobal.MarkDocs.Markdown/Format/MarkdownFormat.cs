@@ -51,14 +51,15 @@ namespace ITGlobal.MarkDocs.Format
         public MarkdownFormat(
             [NotNull] MarkdownOptions options,
             [NotNull] ILoggerFactory loggerFactory,
-            [NotNull] IMarkDocsEventCallback callback)
+            [NotNull] IMarkDocsEventCallback callback,
+            [NotNull] IServiceProvider serviceProvider)
         {
             _log = loggerFactory.CreateLogger(typeof(MarkdownFormat));
             _options = options;
             _resourceUrlResolver = options.ResourceUrlResolver;
             _callback = callback;
 
-            options.SyntaxColorizer.Initialize();
+            options.SyntaxColorizer.Initialize(_log);
             _pipeline = CreateMarkdownPipeline(options);
         }
 
@@ -156,9 +157,9 @@ namespace ITGlobal.MarkDocs.Format
 
                 var isIndexFileLink = false;
                 var filename = Path.GetFileName(url);
-                foreach(var name in IndexFileNames) 
+                foreach (var name in IndexFileNames)
                 {
-                    if(filename == name) 
+                    if (filename == name)
                     {
                         url = Path.GetDirectoryName(url);
                         isIndexFileLink = true;
@@ -167,7 +168,7 @@ namespace ITGlobal.MarkDocs.Format
                 }
 
                 // Remove .md extension if specified
-                if(!isIndexFileLink)
+                if (!isIndexFileLink)
                 {
                     var ext = Path.GetExtension(url);
                     if (_extensions.Contains(ext))
@@ -223,10 +224,10 @@ namespace ITGlobal.MarkDocs.Format
         private static string NormalizeResourcePath(IPage page, string resourceUrl)
         {
             var basePath = page.Id;
-            
+
             var basePathSegments = basePath.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
             var basePathLen = basePathSegments.Length;
-            if(!page.PageTreeNode.IsIndexPage)
+            if (!page.PageTreeNode.IsIndexPage)
             {
                 basePathLen--;
             }

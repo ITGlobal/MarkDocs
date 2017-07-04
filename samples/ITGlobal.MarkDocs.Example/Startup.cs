@@ -43,10 +43,13 @@ namespace ITGlobal.MarkDocs.Example
             {
                 config.Format.UseMarkdown(new MarkdownOptions
                 {
-                    ResourceUrlResolver = new ResourceUrlResolver()
+                    ResourceUrlResolver = new ResourceUrlResolver(),
+                    SyntaxColorizer = new ServerHighlightJsSyntaxColorizer(Path.Combine(Env.ContentRootPath, "Data", "temp"))
                 });
                 config.Cache.UseDisk(Path.Combine(Env.ContentRootPath, "Data", "cached-content"), enableConcurrentWrites: false);
+
                 config.Storage.UseStaticDirectory(Path.GetFullPath(Path.Combine(Env.ContentRootPath, "../../docs")), enableWatch: true);
+                
                 config.Extensions.AddLiteDbComments(Path.Combine(Env.ContentRootPath, "Data", "comments.dat"));
                 config.Extensions.AddTags();
             });
@@ -55,18 +58,9 @@ namespace ITGlobal.MarkDocs.Example
         public void Configure(
             IApplicationBuilder app,
             IHostingEnvironment env,
-            ILoggerFactory loggerFactory,
             IApplicationLifetime appLifetime,
             IMarkDocService markDocs)
         {
-            Log.Logger = new LoggerConfiguration()
-                .Enrich.FromLogContext()
-                .WriteTo.LiterateConsole(
-                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext} -> {Message}{NewLine}{Exception}")
-                .MinimumLevel.Verbose()
-                .CreateLogger();
-
-            loggerFactory.AddSerilog(Log.Logger);
             appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
             app.UseDeveloperExceptionPage();
 

@@ -1,4 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 
 namespace ITGlobal.MarkDocs.Format
 {
@@ -187,7 +189,7 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Initializes syntax colorizer
         /// </summary>
-        public void Initialize() { }
+        public void Initialize(ILogger log) { }
 
         /// <summary>
         ///     Render a source code into an HTML

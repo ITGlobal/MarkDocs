@@ -14,6 +14,6 @@
     <ProjectReference Include="..\ITGlobal.MarkDocs.Comments\ITGlobal.MarkDocs.Comments.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="LiteDB" Version="3.0.0-beta3" />
+    <PackageReference Include="LiteDB" Version="3.1.1" />
   </ItemGroup>
 </Project>

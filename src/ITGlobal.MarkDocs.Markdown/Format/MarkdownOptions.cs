@@ -18,7 +18,7 @@ namespace ITGlobal.MarkDocs.Format
         ///     A syntax colorizer
         /// </summary>
         [PublicAPI]
-        public ISyntaxColorizer SyntaxColorizer { get; set; } = new ServerHighlightJsSyntaxColorizer();
+        public ISyntaxColorizer SyntaxColorizer { get; set; } = new ClientHighlightJsSyntaxColorizer();
 
         /// <summary>
         ///     A PlantUML renderer
