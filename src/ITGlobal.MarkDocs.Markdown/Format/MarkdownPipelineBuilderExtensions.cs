@@ -3,6 +3,7 @@ using ITGlobal.MarkDocs.Format.CodeBlockRenderers;
 using ITGlobal.MarkDocs.Format.CustomHeading;
 using ITGlobal.MarkDocs.Format.Icons;
 using ITGlobal.MarkDocs.Format.TableOfContents;
+using ITGlobal.MarkDocs.Markdown.Format.Admonition;
 using Markdig;
 
 namespace ITGlobal.MarkDocs.Format
@@ -38,6 +39,12 @@ namespace ITGlobal.MarkDocs.Format
             MarkdownOptions options)
         {
             pipeline.Extensions.Add(new CustomCodeBlockRenderingExtension(options));
+            return pipeline;
+        }
+
+        public static MarkdownPipelineBuilder UseAdmonitions(this MarkdownPipelineBuilder pipeline)
+        {
+            pipeline.Extensions.Add(new AdmonitionExtension());
             return pipeline;
         }
     }

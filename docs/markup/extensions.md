@@ -432,3 +432,65 @@ This is a spoiler
 :::
 
 :::
+
+***
+
+## Admonitions
+
+Use the following markup to define alerts and warnings:
+
+:::col-md-6
+
+    !!! success
+        Success block
+
+    !!! success "Title text"
+        Success block with title
+
+    !!! info
+        Information block
+
+    !!! info "Title text"
+        Information block with title
+
+    !!! warning
+        Warning block
+
+    !!! warning "Title text"
+        Warning block with title
+
+    !!! danger
+        Error block
+
+    !!! danger "Title text"
+        Error block with title
+
+:::
+
+:::col-md-6
+
+!!! success
+    Success block
+
+!!! success "Title text"
+    Success block with title
+
+!!! info
+    Information block
+
+!!! info "Title text"
+    Information block with title
+
+!!! warning
+    Warning block
+
+!!! warning "Title text"
+    Warning block with title
+
+!!! danger
+    Error block
+
+!!! danger "Title text"
+    Error block with title
+
+:::

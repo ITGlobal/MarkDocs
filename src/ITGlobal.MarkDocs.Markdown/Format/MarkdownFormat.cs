@@ -111,7 +111,7 @@ namespace ITGlobal.MarkDocs.Format
                 _resourceUrlResolver
                 ))
             {
-                var ast = Markdown.Parse(markup, _pipeline);
+                var ast = Markdig.Markdown.Parse(markup, _pipeline);
 
                 RewriteLinkUrls(ctx.Page, ast);
 
@@ -132,12 +132,10 @@ namespace ITGlobal.MarkDocs.Format
 
         private void RewriteLinkUrls(IPage page, MarkdownDocument ast)
         {
-            foreach (LinkInline link in ast.Descendants().OfType<LinkInline>())
+            foreach (var link in ast.Descendants().OfType<LinkInline>())
             {
                 var url = link.Url;
-                Uri uri;
-
-                if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out uri))
+                if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uri))
                 {
                     continue;
                 }
@@ -371,6 +369,7 @@ namespace ITGlobal.MarkDocs.Format
             builder.UseChildrenList();
             builder.UseCustomHeading();
             builder.UseCustomCodeBlockRendering(options);
+            builder.UseAdmonitions();
 
             if (options.MathRenderer != null)
             {
@@ -383,7 +382,7 @@ namespace ITGlobal.MarkDocs.Format
         private MarkdownDocument ParseFile(string filename)
         {
             var markdown = File.ReadAllText(filename, Encoding.UTF8);
-            var document = Markdown.Parse(markdown, _pipeline);
+            var document = Markdig.Markdown.Parse(markdown, _pipeline);
             return document;
         }
 
