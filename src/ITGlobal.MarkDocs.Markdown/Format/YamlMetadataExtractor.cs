@@ -73,19 +73,43 @@ namespace ITGlobal.MarkDocs.Format
                     }
                     break;
 
+                case "description":
+                    var description = (node as YamlScalarNode)?.Value ?? "";
+                    if (!string.IsNullOrEmpty(description))
+                    {
+                        CombineMetaTags(metadata, "description", description);
+                    }
+                    break;
+
                 case "meta":
                     var map = node as YamlMappingNode;
                     if (map != null)
                     {
-                        var metaTags = map.Children.Select(pair => new MetaTag
+                        var metaTags = map.Children
+                            .Select(pair => new
+                            {
+                                Name = (pair.Key as YamlScalarNode)?.Value,
+                                Content = (pair.Value as YamlScalarNode)?.Value
+                            })
+                            .Where(_ => !string.IsNullOrEmpty(_.Name));
+                        foreach (var metaTag in metaTags)
                         {
-                            Name = (pair.Key as YamlScalarNode)?.Value,
-                            Content = (pair.Value as YamlScalarNode)?.Value
-                        }).ToArray();
-                        metadata.MetaTags = metaTags;
+                            CombineMetaTags(metadata, metaTag.Name, metaTag.Content);
+                        }
                     }
                     break;
             }
+        }
+
+        private static void CombineMetaTags(Metadata metadata, string name, string content)
+        {
+                var existing = metadata.MetaTags.FirstOrDefault(_ => _.Name == name);
+                if (existing != null)
+                {
+                    existing.Content = content;
+                }
+
+            metadata.MetaTags = metadata.MetaTags.Concat(new[] {new MetaTag {Name = name, Content = content}}).ToArray();
         }
     }
 }
