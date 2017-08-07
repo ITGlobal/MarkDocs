@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
     <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
     <VersionPrefix Condition="'$(Version)' == ''">0.0.0-dev</VersionPrefix>
     <VersionPrefix Condition="'$(Version)' != ''">$(Version)</VersionPrefix>
