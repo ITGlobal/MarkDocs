@@ -63,7 +63,8 @@ namespace ITGlobal.MarkDocs
                     RedirectStandardError = true,
                     FileName = programName,
                     StandardOutputEncoding = Encoding.UTF8,
-                    StandardErrorEncoding = Encoding.UTF8
+                    StandardErrorEncoding = Encoding.UTF8,
+                    UseShellExecute = false
                 },
                 EnableRaisingEvents = true
             };
