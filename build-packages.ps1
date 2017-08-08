@@ -19,10 +19,23 @@ $buildNumber = 0
 if($env:APPVEYOR) {
     $buildNumber = $env:APPVEYOR_BUILD_NUMBER
 }
-$branch = $(git rev-parse --abbrev-ref HEAD).Replace("/", "").Replace("-", "").Replace("\\", "")
+if($env:APPVEYOR) {
+    if($env:APPVEYOR_PULL_REQUEST_NUMBER) {
+        $branch = "pullrequest-" + $env:APPVEYOR_PULL_REQUEST_NUMBER
+    } else {
+        $branch = $env:APPVEYOR_REPO_BRANCH
+    }    
+} else {
+    $branch = $(git rev-parse --abbrev-ref HEAD).Replace("/", "").Replace("-", "").Replace("\\", "")
+}
+
 $VERSION = $gitVersion + "." + $buildNumber
 if($branch -ne "master") {
     $VERSION += "-$branch"
+}
+
+if($env:APPVEYOR) {
+    & appveyor UpdateBuild -Version $VERSION
 }
 
 Write-Host "Version: $VERSION"
