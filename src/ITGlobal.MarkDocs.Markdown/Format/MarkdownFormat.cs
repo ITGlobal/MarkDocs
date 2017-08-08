@@ -106,8 +106,7 @@ namespace ITGlobal.MarkDocs.Format
             using (MarkdownRenderingContext.SetCurrentRenderingContext(
                 _log,
                 ctx,
-                _options.UmlRenderer,
-                _options.MathRenderer,
+                _options,
                 _resourceUrlResolver
                 ))
             {

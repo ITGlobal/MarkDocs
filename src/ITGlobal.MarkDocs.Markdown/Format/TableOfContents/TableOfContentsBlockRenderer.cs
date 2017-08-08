@@ -21,7 +21,16 @@ namespace ITGlobal.MarkDocs.Format.TableOfContents
                 var headings = document.OfType<HeadingBlock>().ToArray();
 
                 var tree = GenerateTocTree(headings);
-                tree.Render(renderer);
+                
+                var tocRenderer = TocRenderer;
+                if (tocRenderer != null)
+                {
+                    tocRenderer.Render(renderer, tree);
+                }
+                else
+                {
+                    tree.Render(renderer);
+                }
             }
             catch (Exception exception)
             {
@@ -30,24 +39,25 @@ namespace ITGlobal.MarkDocs.Format.TableOfContents
             }
         }
 
-        private sealed class TocTreeNode
+        private sealed class TocTreeNode : ITocTreeNode
         {
+            private readonly List<ITocTreeNode> children = new List<ITocTreeNode>();
+            
             private TocTreeNode(HeadingBlock heading)
             {
                 Heading = heading;
             }
 
             public HeadingBlock Heading { get; }
-            public string Text => Heading?.Inline.GetText() ?? "";
-
+            public string Title => Heading?.Inline.GetText() ?? "";
             public int Level => Heading?.Level ?? 0;
 
-            public List<TocTreeNode> Children { get; } = new List<TocTreeNode>();
+            public IReadOnlyList<ITocTreeNode> Children => children;
 
             public TocTreeNode AppendChild(HeadingBlock heading)
             {
                 var child = new TocTreeNode(heading);
-                Children.Add(child);
+                children.Add(child);
                 return child;
             }
 
@@ -68,11 +78,11 @@ namespace ITGlobal.MarkDocs.Format.TableOfContents
                     {
                         sb.Append("  ");
                     }
-                    sb.Append(Text);
+                    sb.Append(Title);
                     sb.AppendLine();
                 }
 
-                foreach (var child in Children)
+                foreach (TocTreeNode child in Children)
                 {
                     child.ToString(sb);
                 }
@@ -87,7 +97,7 @@ namespace ITGlobal.MarkDocs.Format.TableOfContents
                     // This is a root (dummy) node and it contains only one H1 node
                     // We should short-circuit rendering to this H1 node to avoid
                     // rendering of extra outer <ul>
-                    Children[0].Render(renderer, 0);
+                    ((TocTreeNode)Children[0]).Render(renderer, 0);
                     return;
                 }
 
@@ -110,7 +120,7 @@ namespace ITGlobal.MarkDocs.Format.TableOfContents
                     renderer.WriteLine("<ul>");
                     for (var i = 0; i < Children.Count; i++)
                     {
-                        var child = Children[i];
+                        var child = (TocTreeNode)Children[i];
                         child.Render(renderer, i);
                     }
                     renderer.WriteLine("</ul>");

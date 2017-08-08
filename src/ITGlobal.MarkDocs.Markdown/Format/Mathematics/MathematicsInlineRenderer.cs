@@ -20,7 +20,7 @@ namespace ITGlobal.MarkDocs.Format.Mathematics
 
                 var markup = block.GetText();
                 var image = MathRenderer.Render(markup);
-                var filename = $"uml_{Guid.NewGuid():N}{image.FileType}";
+                var filename = $"math_{Guid.NewGuid():N}{image.FileType}";
 
                 var illustration = RenderContext.CreateAttachment(filename, image.Content);
 

@@ -33,6 +33,12 @@ namespace ITGlobal.MarkDocs.Format
         public IMathRenderer MathRenderer { get; set; } = new CodecogsMathRenderer();
 
         /// <summary>
+        ///     A TOC renderer
+        /// </summary>
+        [PublicAPI]
+        public ITocRenderer TocRenderer { get; set; }
+
+        /// <summary>
         ///     Enable abbreviations extension
         /// </summary>
         [PublicAPI]

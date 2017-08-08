@@ -12,6 +12,7 @@ namespace ITGlobal.MarkDocs.Format
         public static IRenderContext RenderContext => Get(_ => _.RenderContext);
         public static IUmlRenderer UmlRenderer => Get(_ => _.UmlRenderer);
         public static IMathRenderer MathRenderer => Get(_ => _.MathRenderer);
+        public static ITocRenderer TocRenderer => Get(_ => _.TocRenderer);
         public static IResourceUrlResolver ResourceUrlResolver => Get(_ => _.ResourceUrlResolver);
 
         private sealed class State
@@ -20,6 +21,7 @@ namespace ITGlobal.MarkDocs.Format
             public IRenderContext RenderContext { get; set; }
             public IUmlRenderer UmlRenderer { get; set; }
             public IMathRenderer MathRenderer { get; set; }
+            public ITocRenderer TocRenderer { get; set; }
             public IResourceUrlResolver ResourceUrlResolver { get; set; }
         }
 
@@ -32,8 +34,7 @@ namespace ITGlobal.MarkDocs.Format
         public static ScopeToken SetCurrentRenderingContext(
             ILogger logger,
             IRenderContext renderContext,
-            IUmlRenderer umlRenderer,
-            IMathRenderer mathRenderer,
+            MarkdownOptions options,
             IResourceUrlResolver resourceUrlResolver
         )
         {
@@ -41,8 +42,9 @@ namespace ITGlobal.MarkDocs.Format
             {
                 Logger = logger,
                 RenderContext = renderContext,
-                UmlRenderer = umlRenderer,
-                MathRenderer = mathRenderer,
+                UmlRenderer = options.UmlRenderer,
+                MathRenderer = options.MathRenderer,
+                TocRenderer = options.TocRenderer,
                 ResourceUrlResolver = resourceUrlResolver
             };
 
