@@ -7,7 +7,7 @@ namespace ITGlobal.MarkDocs.Markdown.Format
     {
         public void Setup(MarkdownPipelineBuilder pipeline)
         {
-            pipeline.BlockParsers.Insert(0, new AlertBlockParser());
+            pipeline.BlockParsers.Add(new AlertBlockParser());
         }
 
         public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer)
