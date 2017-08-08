@@ -7,7 +7,7 @@ build:
 cache: 
 - 'C:\projects\MarkDocs\scripts\tools'
 build_script:
-- ps: '& ./build.ps1 -v'
+- ps: '& ./build-packages.ps1'
 test: off
 artifacts:
 - path: artifacts\**\*.nupkg
