@@ -1,13 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.6;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
   </PropertyGroup>
   <Import Project="../common.props" />
   <PropertyGroup>
     <AssemblyTitle>MarkDocs.Comments.LiteDB</AssemblyTitle>
     <AssemblyName>ITGlobal.MarkDocs.Comments.LiteDB</AssemblyName>
     <PackageId>ITGlobal.MarkDocs.Comments.LiteDB</PackageId>
-    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.csproj" />
