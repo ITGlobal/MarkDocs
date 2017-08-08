@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using ITGlobal.MarkDocs.Example.Model;
+using ITGlobal.MarkDocs.Search;
 using ITGlobal.MarkDocs.Tags;
 using Microsoft.AspNetCore.Mvc;
 
@@ -69,6 +70,32 @@ namespace ITGlobal.MarkDocs.Example.Controllers
             var pages = documentation.GetPagesByTag(tag);
 
            return View(new PagesByTagModel(documentation, tag, pages));
+        }
+
+        [HttpGet, Route("_/search/suggestions/{branch}")]
+        public IActionResult Suggest(string branch, string q)
+        {
+            var documentation = _service.GetDocumentation(branch);
+            if (documentation == null)
+            {
+                return NotFound($"ResourceNotFound: [{branch}]");
+            }
+
+            var items = documentation.Suggest(q);
+            return Json(new { items });
+        }
+
+        [HttpGet, Route("_/search/{branch}")]
+        public IActionResult Search(string branch, string q)
+        {
+            var documentation = _service.GetDocumentation(branch);
+            if (documentation == null)
+            {
+                return NotFound($"ResourceNotFound: [{branch}]");
+            }
+
+            var results = documentation.Search(q);
+            return View(new SearchResultsModel(documentation, results, q));
         }
     }
 }

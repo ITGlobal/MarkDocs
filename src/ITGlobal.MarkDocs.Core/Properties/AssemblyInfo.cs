@@ -23,7 +23,4 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Comments")]
 [assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Git")]
 [assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Search")]
-[assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Compiler")]
-[assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Comments")]
-[assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Comments.LiteDB")]
 [assembly: InternalsVisibleTo("ITGlobal.MarkDocs.Tags")]

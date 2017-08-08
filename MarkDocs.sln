@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ITGlobal.MarkDocs.Example",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "markdocs-gen", "samples\markdocs-gen\markdocs-gen.csproj", "{AB3591F5-B14A-46F0-931E-BAE73B3BF7B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITGlobal.MarkDocs.Search", "src\ITGlobal.MarkDocs.Search\ITGlobal.MarkDocs.Search.csproj", "{8D303CAA-F61F-4C34-B7CE-406D17603DC9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{AB3591F5-B14A-46F0-931E-BAE73B3BF7B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB3591F5-B14A-46F0-931E-BAE73B3BF7B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB3591F5-B14A-46F0-931E-BAE73B3BF7B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D303CAA-F61F-4C34-B7CE-406D17603DC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D303CAA-F61F-4C34-B7CE-406D17603DC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D303CAA-F61F-4C34-B7CE-406D17603DC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D303CAA-F61F-4C34-B7CE-406D17603DC9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,5 +75,6 @@ Global
 		{774FDDB5-E880-4C77-B813-73AC2A681D36} = {2E2F3543-25DB-43BD-A8A9-9691F4D6B957}
 		{F797F9C6-22F1-4265-9B88-0E0B71F1B014} = {82B0859E-A87A-46BA-9054-B5BC558C423B}
 		{AB3591F5-B14A-46F0-931E-BAE73B3BF7B0} = {82B0859E-A87A-46BA-9054-B5BC558C423B}
+		{8D303CAA-F61F-4C34-B7CE-406D17603DC9} = {2E2F3543-25DB-43BD-A8A9-9691F4D6B957}
 	EndGlobalSection
 EndGlobal

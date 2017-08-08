@@ -28,8 +28,9 @@ if($env:APPVEYOR) {
         write-host "APPVEYOR_REPO_BRANCH: $env:APPVEYOR_REPO_BRANCH"
     }    
 } else {
-    $branch = $(git rev-parse --abbrev-ref HEAD).Replace("/", "").Replace("-", "").Replace("\\", "")
+    $branch = $(git rev-parse --abbrev-ref HEAD)
 }
+$branch = $branch.Replace("/", "").Replace("-", "").Replace("\\", "")
 
 $VERSION = $gitVersion + "." + $buildNumber
 if($branch -ne "master") {
