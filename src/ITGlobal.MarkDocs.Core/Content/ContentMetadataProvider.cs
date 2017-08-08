@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ITGlobal.MarkDocs.Format;
 
 namespace ITGlobal.MarkDocs.Content
@@ -9,13 +10,15 @@ namespace ITGlobal.MarkDocs.Content
     internal sealed class ContentMetadataProvider : IMetadataProvider
     {
         private readonly IFormat _format;
+        private readonly IMarkDocsEventCallback _callback;
 
         /// <summary>
         ///     .ctor
         /// </summary>
-        public ContentMetadataProvider(IFormat format)
+        public ContentMetadataProvider(IFormat format, IMarkDocsEventCallback callback)
         {
             _format = format;
+            _callback = callback;
         }
 
         /// <summary>
@@ -37,7 +40,17 @@ namespace ITGlobal.MarkDocs.Content
         ///     Page metadata if available, null otherwise
         /// </returns>
         public Metadata GetMetadata(string rootDirectory, string filename, HashSet<string> consumedFiles, bool isIndexFile)
-            => _format.ParseProperties(filename);
+        {
+            try
+            {
+                return _format.ParseProperties(filename);
+            }
+            catch (Exception e)
+            {
+                _callback.MetadataError(filename, e);
+                return null;
+            }
+        }
 
         /// <inheritdoc />
         public void Dispose() { }

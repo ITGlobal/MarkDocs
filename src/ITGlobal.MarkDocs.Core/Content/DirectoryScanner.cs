@@ -29,7 +29,7 @@ namespace ITGlobal.MarkDocs.Content
         /// <summary>
         ///     .ctor
         /// </summary>
-        public DirectoryScanner(ILogger log, IFormat format, IStorage storage)
+        public DirectoryScanner(ILogger log, IFormat format, IStorage storage, IMarkDocsEventCallback callback)
         {
             _log = log;
             _format = format;
@@ -38,7 +38,7 @@ namespace ITGlobal.MarkDocs.Content
             _metadataProviders = new IMetadataProvider[]
             {
                 new TocMetadataProvider(_log),
-                new ContentMetadataProvider(format),
+                new ContentMetadataProvider(format, callback),
                 new ContentIdMetadataProvider(storage)
             };
         }

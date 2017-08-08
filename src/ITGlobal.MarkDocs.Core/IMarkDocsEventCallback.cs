@@ -56,5 +56,11 @@ namespace ITGlobal.MarkDocs
         /// </summary>
         [PublicAPI]
         void Error([NotNull] string documentationId, [NotNull] string pageId, [NotNull] Exception e);
+
+        /// <summary>
+        ///     This method is called when MarkDocs detects non-fatal issues when extracting file metadata
+        /// </summary>
+        [PublicAPI]
+        void MetadataError([NotNull] string filename, [NotNull] Exception e);
     }
 }

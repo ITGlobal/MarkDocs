@@ -219,7 +219,7 @@ namespace ITGlobal.MarkDocs
                 }
 
                 MarkDocServiceState state;
-                using (var directoryScanner = new DirectoryScanner(Log, Format, Storage))
+                using (var directoryScanner = new DirectoryScanner(Log, Format, Storage, Callback))
                 using (var operation = Cache.BeginUpdate())
                 {
                     var contentDirectories = Storage.GetContentDirectories();

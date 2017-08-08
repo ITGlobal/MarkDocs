@@ -53,5 +53,10 @@ namespace ITGlobal.MarkDocs
         ///     This method is called when MarkDocs detects non-fatal issues when rendering a page
         /// </summary>
         public virtual void Error(string documentationId, string pageId, Exception e) { }
+
+        /// <summary>
+        ///     This method is called when MarkDocs detects non-fatal issues when extracting file metadata
+        /// </summary>
+        public virtual void MetadataError(string filename, Exception e) { }
     }
 }
