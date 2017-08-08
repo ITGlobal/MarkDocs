@@ -180,7 +180,7 @@ namespace ITGlobal.MarkDocs.Content
                 foreach (var attachment in _attachmentsById.Values)
                 {
                     i++;
-                    _service.Callback.CachingAttachment(Id, attachment.Id, i, _pages.Count);
+                    _service.Callback.CachingAttachment(Id, attachment.Id, i, _attachmentsById.Count);
 
                     attachment.PutIntoCache(operation);
                     _service.Log.LogDebug("Cached file {0}:{1}", Id, attachment.FileName);
