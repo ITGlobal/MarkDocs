@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ITGlobal.MarkDocs.Cache;
 using ITGlobal.MarkDocs.Format;
-using ITGlobal.MarkDocs.Comments;
 using ITGlobal.MarkDocs.Git;
 using ITGlobal.MarkDocs.Storage;
 using ITGlobal.MarkDocs.Tags;
@@ -50,7 +49,6 @@ namespace ITGlobal.MarkDocs.Example
 
                 config.Storage.UseStaticDirectory(Path.GetFullPath(Path.Combine(Env.ContentRootPath, "../../docs")), enableWatch: true);
                 
-                config.Extensions.AddLiteDbComments(Path.Combine(Env.ContentRootPath, "Data", "comments.dat"));
                 config.Extensions.AddTags();
             });
         }

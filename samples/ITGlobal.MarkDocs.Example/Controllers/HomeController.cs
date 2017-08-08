@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using ITGlobal.MarkDocs.Comments;
 using ITGlobal.MarkDocs.Example.Model;
 using ITGlobal.MarkDocs.Tags;
 using Microsoft.AspNetCore.Mvc;
@@ -69,108 +68,7 @@ namespace ITGlobal.MarkDocs.Example.Controllers
 
             var pages = documentation.GetPagesByTag(tag);
 
-            return View(new PagesByTagModel(documentation, tag, pages));
-        }
-
-        [HttpPost, Route("_/comment/add")]
-        public IActionResult AddComment(string branch, string page, string user, string text)
-        {
-            var documentation = _service.GetDocumentation(branch);
-            if (documentation == null)
-            {
-                return NotFound($"ResourceNotFound: [{branch}]");
-            }
-
-            var p = documentation.GetPage(page ?? "");
-            if (p == null)
-            {
-                return NotFound($"ResourceNotFound: [{branch}!{page}]");
-            }
-
-            var comments = p.GetComments();
-            comments.AddComment(user, text);
-
-            return Redirect($"/{branch}/{page}");
-        }
-
-        [HttpPost, Route("_/comment/edit")]
-        public IActionResult EditComment(string branch, string page, string id, string text)
-        {
-            var documentation = _service.GetDocumentation(branch);
-            if (documentation == null)
-            {
-                return NotFound($"ResourceNotFound: [{branch}]");
-            }
-
-            var p = documentation.GetPage(page ?? "");
-            if (p == null)
-            {
-                return NotFound($"ResourceNotFound: [{branch}!{page}]");
-            }
-
-            var comments = p.GetComments();
-            var comment = comments.FindComment(id);
-            if (comment == null)
-            {
-                return NotFound($"ResourceNotFound: [{branch}!{page}#{id}]");
-            }
-
-            comment.Edit(text);
-
-            return Redirect($"/{branch}/{page}");
-        }
-
-        [HttpPost, Route("_/comment/delete")]
-        public IActionResult DeleteComment(string branch, string page, string id)
-        {
-            var documentation = _service.GetDocumentation(branch);
-            if (documentation == null)
-            {
-                return NotFound($"ResourceNotFound: [{branch}]");
-            }
-
-            var p = documentation.GetPage(page ?? "");
-            if (p == null)
-            {
-                return NotFound($"ResourceNotFound: [{branch}!{page}]");
-            }
-
-            var comments = p.GetComments();
-            var comment = comments.FindComment(id);
-            if (comment == null)
-            {
-                return NotFound($"ResourceNotFound: [{branch}!{page}#{id}]");
-            }
-
-            comment.Delete();
-
-            return Redirect($"/{branch}/{page}");
-        }
-
-        [HttpPost, Route("_/comment/reply")]
-        public IActionResult AddReply(string branch, string page, string replyto, string user, string text)
-        {
-            var documentation = _service.GetDocumentation(branch);
-            if (documentation == null)
-            {
-                return NotFound($"ResourceNotFound: [{branch}]");
-            }
-
-            var p = documentation.GetPage(page ?? "");
-            if (p == null)
-            {
-                return NotFound($"ResourceNotFound: [{branch}!{page}]");
-            }
-
-            var comments = p.GetComments();
-            var comment = comments.FindComment(replyto);
-            if (comment == null)
-            {
-                return NotFound($"ResourceNotFound: [{branch}!{page}#{replyto}]");
-            }
-
-            comment.Reply(user, text);
-            return Redirect($"/{branch}/{page}");
+           return View(new PagesByTagModel(documentation, tag, pages));
         }
     }
 }

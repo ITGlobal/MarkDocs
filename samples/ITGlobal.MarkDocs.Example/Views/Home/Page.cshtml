@@ -78,11 +78,6 @@
                     <i class="fa fa-hashtag"></i> Tags
                 </a>
             </li>
-            <li role="presentation">
-                <a href="#comments" data-toggle="tab">
-                    <i class="fa fa-comments"></i> Comments
-                </a>
-            </li>
         </ul>
 
         <div class="tab-content">
@@ -94,9 +89,6 @@
             </div>
             <div class="tab-pane" id="pagetags">
                 @Html.Partial("Components/_PageTags", Model.Page)
-            </div>
-            <div class="tab-pane" id="comments">
-                @Html.Partial("Components/_CommentList", Model.Page)
             </div>
         </div>
     </div>
