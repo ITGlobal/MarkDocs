@@ -14,7 +14,15 @@ Get-ChildItem -Filter "bin" -Directory -Recurse | Remove-Item -Force -Recurse
 Get-ChildItem -Filter "obj" -Directory -Recurse | Remove-Item -Force -Recurse
 
 # version
-$gitVersion = $(git tag) | ? { $_ -match "v([0-9]+\.[0-9]+)" } | Select -Last 1 | % { $_.Substring(1) }
+$gitVersion = $(git tag) | ? { $_ -match "v([0-9]+\.[0-9]+)" } | % { 
+    $m = [regex]::Match($_, "v([0-9]+)\.([0-9]+)")
+    $i = [int]($m.Groups[1].Value)
+    $j = [int]($m.Groups[2].Value)
+    return $i * 1000 + $j
+ } | Sort -Descending | Select -First 1
+$verMajor = [int]([math]::Round($gitVersion / 1000))
+$verMinor = $gitVersion % 1000
+
 $buildNumber = 0
 if($env:APPVEYOR) {
     $buildNumber = $env:APPVEYOR_BUILD_NUMBER
@@ -32,7 +40,7 @@ if($env:APPVEYOR) {
 }
 $branch = $branch.Replace("/", "").Replace("-", "").Replace("\\", "")
 
-$VERSION = $gitVersion + "." + $buildNumber
+$VERSION = "$($verMajor).$($verMinor).$($buildNumber)"
 if($branch -ne "master") {
     $VERSION += "-$branch"
 }
