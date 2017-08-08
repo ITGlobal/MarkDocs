@@ -1,3 +1,4 @@
+using ITGlobal.MarkDocs.Format.ChildrenList;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Format
@@ -37,6 +38,12 @@ namespace ITGlobal.MarkDocs.Format
         /// </summary>
         [PublicAPI]
         public ITocRenderer TocRenderer { get; set; }
+
+        /// <summary>
+        ///     A "Children List" renderer
+        /// </summary>
+        [PublicAPI]
+        public IChildrenListRenderer ChildrenListRenderer { get; set; } = new DefaultChildrenListRenderer();
 
         /// <summary>
         ///     ptions for rendering markdown into HTML

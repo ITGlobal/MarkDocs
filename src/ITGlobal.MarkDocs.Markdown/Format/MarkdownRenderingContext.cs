@@ -13,6 +13,7 @@ namespace ITGlobal.MarkDocs.Format
         public static IUmlRenderer UmlRenderer => Get(_ => _.UmlRenderer);
         public static IMathRenderer MathRenderer => Get(_ => _.MathRenderer);
         public static ITocRenderer TocRenderer => Get(_ => _.TocRenderer);
+        public static IChildrenListRenderer ChildrenListRenderer => Get(_ => _.ChildrenListRenderer);
         public static IResourceUrlResolver ResourceUrlResolver => Get(_ => _.ResourceUrlResolver);
 
         private sealed class State
@@ -22,6 +23,7 @@ namespace ITGlobal.MarkDocs.Format
             public IUmlRenderer UmlRenderer { get; set; }
             public IMathRenderer MathRenderer { get; set; }
             public ITocRenderer TocRenderer { get; set; }
+            public IChildrenListRenderer ChildrenListRenderer { get; set; }
             public IResourceUrlResolver ResourceUrlResolver { get; set; }
         }
 
@@ -45,6 +47,7 @@ namespace ITGlobal.MarkDocs.Format
                 UmlRenderer = options.UmlRenderer,
                 MathRenderer = options.MathRenderer,
                 TocRenderer = options.TocRenderer,
+                ChildrenListRenderer = options.ChildrenListRenderer,
                 ResourceUrlResolver = resourceUrlResolver
             };
 
