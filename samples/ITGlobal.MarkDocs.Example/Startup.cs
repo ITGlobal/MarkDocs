@@ -11,6 +11,7 @@ using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Git;
 using ITGlobal.MarkDocs.Storage;
 using ITGlobal.MarkDocs.Tags;
+using ITGlobal.MarkDocs.Search;
 using Serilog;
 
 namespace ITGlobal.MarkDocs.Example
@@ -50,6 +51,7 @@ namespace ITGlobal.MarkDocs.Example
                 config.Storage.UseStaticDirectory(Path.GetFullPath(Path.Combine(Env.ContentRootPath, "../../docs")), enableWatch: true);
                 
                 config.Extensions.AddTags();
+                config.Extensions.AddSearch(Path.Combine(Env.ContentRootPath, "Data", "search-index"));
             });
         }
 

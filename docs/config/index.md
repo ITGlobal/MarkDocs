@@ -70,10 +70,10 @@ Use the following code to enable Tags Extension:
 config.Extensions.AddTags();
 ```
 
-### Page comments (with LiteDB storage)
+### Text search
 
-Use the following code to enable Comments Extension with LiteDB storage:
+Use the following code to enable Tags Extension:
 
 ```csharp
-config.Extensions.AddLiteDbComments(pathToDatabaseFile);
+config.Extensions.AddSearch("path-to-index-dir");
 ```
