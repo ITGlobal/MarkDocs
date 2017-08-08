@@ -1,4 +1,18 @@
 ﻿namespace ITGlobal.MarkDocs.Markdown.Format
 {
-    public enum AlertBlockType { Information, Warning }
+    /// <summary>
+    ///     Alert type
+    /// </summary>
+    public enum AlertBlockType
+    {
+        /// <summary>
+        ///     Information alert
+        /// </summary>
+        Information,
+
+        /// <summary>
+        ///     Warning alert
+        /// </summary>
+        Warning
+    }
 }

@@ -7,7 +7,7 @@ using Markdig.Helpers;
 namespace ITGlobal.MarkDocs.Format.CodeBlockRenderers
 {
     /// <summary>
-    ///    Based on <see cref="https://bitbucket.org/xact/cs.ff.xact.lib/src/HEAD/XAct.Diagrams/XAct.Diagrams.Uml.PlantUml/Uml/Services/Implementations/PlantUmlDiagramService.cs"/>
+    ///    Based on https://bitbucket.org/xact/cs.ff.xact.lib/src/HEAD/XAct.Diagrams/XAct.Diagrams.Uml.PlantUml/Uml/Services/Implementations/PlantUmlDiagramService.cs
     /// </summary>
     internal static class PlantUml
     {

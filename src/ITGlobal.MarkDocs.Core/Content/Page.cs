@@ -20,7 +20,6 @@ namespace ITGlobal.MarkDocs.Content
         {
             private readonly Page _page;
             private readonly IFormat _format;
-            private Stream _isCached;
 
             public ResourceContent(Page page, IFormat format)
             {

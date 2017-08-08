@@ -10,12 +10,6 @@ namespace ITGlobal.MarkDocs
     public interface IAttachment : IResource
     {
         /// <summary>
-        ///     Attachment file name
-        /// </summary>
-        [PublicAPI, NotNull]
-        string FileName { get; }
-
-        /// <summary>
         ///     Attachment MIME type
         /// </summary>
         [PublicAPI, NotNull]

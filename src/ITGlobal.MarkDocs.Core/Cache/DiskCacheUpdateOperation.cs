@@ -11,8 +11,7 @@ namespace ITGlobal.MarkDocs.Cache
     internal sealed class DiskCacheUpdateOperation : ICacheUpdateOperation
     {
         #region fields
-
-        private readonly object _lockObject;
+        
         private readonly DiskCache _cache;
         private readonly DiskCacheDescriptor _descriptor = new DiskCacheDescriptor();
 
@@ -20,7 +19,6 @@ namespace ITGlobal.MarkDocs.Cache
         private readonly List<Task> _contentWriteTasks = new List<Task>();
 
         private DiskCacheDescriptor _oldDescriptor;
-        private bool _isCommited;
 
         #endregion
 
