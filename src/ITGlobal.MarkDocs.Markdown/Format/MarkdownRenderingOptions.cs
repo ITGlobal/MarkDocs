@@ -16,30 +16,41 @@ namespace ITGlobal.MarkDocs.Format
     public sealed class MarkdownRenderingOptions : IMarkdownExtension
     {
         private readonly List<Action<HtmlRenderer>> _htmlRendererOverrides = new List<Action<HtmlRenderer>>();
-        
-        internal MarkdownRenderingOptions()
+
+        internal MarkdownRenderingOptions() { }
+
+        /// <summary>
+        ///     Sets custom rendering function for <typeparamref name="T"/>
+        /// </summary>
+        [PublicAPI]
+        public MarkdownRenderingOptions OverrideRendering<T>(Action<HtmlRenderer, T> func)
+            where T : MarkdownObject
         {
+            OverrideRendering<T>((renderer, block) =>
+            {
+                func(renderer, block);
+                return true;
+            });
+            return this;
         }
 
         /// <summary>
         ///     Sets custom rendering function for <typeparamref name="T"/>
         /// </summary>
         [PublicAPI]
-        public MarkdownRenderingOptions OverrideRendering<T>(Action<HtmlRenderer, T> renderer)
+        public MarkdownRenderingOptions OverrideRendering<T>(Func<HtmlRenderer, T, bool> func)
             where T : MarkdownObject
         {
             _htmlRendererOverrides.Add(htmlRenderer =>
             {
-                var existing = htmlRenderer.ObjectRenderers.FirstOrDefault(_ => _ is HtmlObjectRenderer<T>);
+                var existing = htmlRenderer.ObjectRenderers.FirstOrDefault(_ => _ is HtmlObjectRenderer<T>) as HtmlObjectRenderer<T>;
                 if (existing != null)
                 {
-                    var index = htmlRenderer.ObjectRenderers.IndexOf(existing);
-                    htmlRenderer.ObjectRenderers.Insert(index, new HtmlObjectRendererImpl<T>(renderer));
-                    htmlRenderer.ObjectRenderers.Remove(existing);
+                    existing.TryWriters.Add((renderer, block) => func(renderer, block));
                 }
                 else
                 {
-                    htmlRenderer.ObjectRenderers.Add(new HtmlObjectRendererImpl<T>(renderer));
+                    htmlRenderer.ObjectRenderers.Add(new HtmlObjectRendererImpl<T>(func));
                 }
             });
 
@@ -49,9 +60,9 @@ namespace ITGlobal.MarkDocs.Format
         private sealed class HtmlObjectRendererImpl<T> : HtmlObjectRenderer<T>
             where T : MarkdownObject
         {
-            private readonly Action<HtmlRenderer, T> _renderer;
+            private readonly Func<HtmlRenderer, T, bool> _renderer;
 
-            public HtmlObjectRendererImpl(Action<HtmlRenderer, T> renderer)
+            public HtmlObjectRendererImpl(Func<HtmlRenderer, T, bool> renderer)
             {
                 _renderer = renderer;
             }
