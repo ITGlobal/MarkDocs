@@ -11,31 +11,43 @@ namespace ITGlobal.MarkDocs
     [PublicAPI]
     public sealed class MarkDocsConfigurationBuilder
     {
-        private IMarkDocsEventCallback _eventCallback = new MarkDocsEventCallback();
+        private readonly IServiceCollection _services;
+
+        internal MarkDocsConfigurationBuilder(IServiceCollection services)
+        {
+            _services = services;
+
+            Storage = new MarkDocsStorageConfigurationBuilder(services);
+            Format = new MarkDocsFormatConfigurationBuilder(services);
+            Cache = new MarkDocsCacheConfigurationBuilder(services);
+            Extensions = new MarkDocsExtensionConfigurationBuilder(services);
+
+            _services.AddSingleton<IMarkDocsEventCallback>(new MarkDocsEventCallback());
+        }
 
         /// <summary>
         ///     Storage configuration builder
         /// </summary>
         [PublicAPI, NotNull]
-        public MarkDocsStorageConfigurationBuilder Storage { get; } = new MarkDocsStorageConfigurationBuilder();
+        public MarkDocsStorageConfigurationBuilder Storage { get; }
 
         /// <summary>
         ///     Page format configuration builder
         /// </summary>
         [PublicAPI, NotNull]
-        public MarkDocsFormatConfigurationBuilder Format { get; } = new MarkDocsFormatConfigurationBuilder();
+        public MarkDocsFormatConfigurationBuilder Format { get; }
 
         /// <summary>
         ///     Content cache configuration builder
         /// </summary>
         [PublicAPI, NotNull]
-        public MarkDocsCacheConfigurationBuilder Cache { get; } = new MarkDocsCacheConfigurationBuilder();
+        public MarkDocsCacheConfigurationBuilder Cache { get; }
 
         /// <summary>
         ///     Extensions configuration builder
         /// </summary>
         [PublicAPI, NotNull]
-        public MarkDocsExtensionConfigurationBuilder Extensions { get; } = new MarkDocsExtensionConfigurationBuilder();
+        public MarkDocsExtensionConfigurationBuilder Extensions { get; }
 
         /// <summary>
         ///     Sets a lifetime event callback
@@ -48,16 +60,7 @@ namespace ITGlobal.MarkDocs
                 throw new ArgumentNullException(nameof(callback));
             }
 
-            _eventCallback = callback;
-        }
-
-        internal void Configure(IServiceCollection services)
-        {
-            Storage.Configure(services);
-            Format.Configure(services);
-            Cache.Configure(services);
-            Extensions.Configure(services);
-            services.AddSingleton(_eventCallback);
+            _services.AddSingleton(callback);
         }
     }
 }

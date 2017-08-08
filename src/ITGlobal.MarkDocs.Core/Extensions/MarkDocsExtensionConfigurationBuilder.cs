@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,35 +10,37 @@ namespace ITGlobal.MarkDocs.Extensions
     [PublicAPI]
     public sealed class MarkDocsExtensionConfigurationBuilder
     {
-        private List<Action<IServiceCollection>> _registrations = new List<Action<IServiceCollection>>();
-        
-        /// <summary>
-        ///     Adds an extension
-        /// </summary>
-        [PublicAPI, NotNull]
-        public MarkDocsExtensionConfigurationBuilder Add([NotNull] Func<IServiceProvider, IExtensionFactory> factory)
+        private readonly IServiceCollection _services;
+
+        internal MarkDocsExtensionConfigurationBuilder(IServiceCollection services)
         {
-            _registrations.Add(sp => sp.AddSingleton(factory));
-            return this;
+            _services = services;
         }
-        
+
         /// <summary>
         ///     Adds an extension
         /// </summary>
         [PublicAPI, NotNull]
-        public MarkDocsExtensionConfigurationBuilder Add<TExtensionFactory>()
-            where TExtensionFactory : IExtensionFactory
+        public MarkDocsExtensionConfigurationBuilder Add([NotNull] Func<IServiceCollection, Func<IServiceProvider, IExtensionFactory>> factory)
         {
-            _registrations.Add(sp => sp.AddSingleton(typeof(IExtensionFactory), typeof(TExtensionFactory)));
+            _services.AddSingleton(factory(_services));
             return this;
         }
 
-        internal void Configure(IServiceCollection services)
+        /// <summary>
+        ///     Adds an extension
+        /// </summary>
+        [PublicAPI, NotNull]
+        public MarkDocsExtensionConfigurationBuilder Add<TExtensionFactory>(Action<IServiceCollection> configureServices = null)
+            where TExtensionFactory : IExtensionFactory
         {
-            foreach (var action in _registrations)
+            if (configureServices != null)
             {
-                action(services);
+                configureServices(_services);
             }
+
+            _services.AddSingleton(typeof(IExtensionFactory), typeof(TExtensionFactory));
+            return this;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace ITGlobal.MarkDocs.Search
     /// <summary>
     ///     Lucene.Net-bases search engine
     /// </summary>
-    internal sealed class LuceneSearchEngine : ISearchEngine
+    internal sealed class LuceneSearchEngine
     {
         #region consts
 
@@ -50,10 +50,10 @@ namespace ITGlobal.MarkDocs.Search
         /// <summary>
         ///     .ctor
         /// </summary>
-        public LuceneSearchEngine(ILoggerFactory loggerFactory, string indexRootDirectory)
+        public LuceneSearchEngine(ILoggerFactory loggerFactory, SearchOptions options)
         {
             _log = loggerFactory.CreateLogger<LuceneSearchEngine>();
-            _indexRootDirectory = indexRootDirectory;
+            _indexRootDirectory = options.IndexDirectory;
 
             lock (_descriptorLock)
             {
@@ -63,7 +63,7 @@ namespace ITGlobal.MarkDocs.Search
 
         #endregion
 
-        #region ISearchEngine
+        #region public methods
 
         /// <summary>
         ///     Runs indexing on a documentation state

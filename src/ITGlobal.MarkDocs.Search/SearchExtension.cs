@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using ITGlobal.MarkDocs.Extensions;
+﻿using ITGlobal.MarkDocs.Extensions;
 
 namespace ITGlobal.MarkDocs.Search
 {
@@ -13,7 +10,7 @@ namespace ITGlobal.MarkDocs.Search
     {
         #region fields
 
-        private readonly ISearchEngine _engine;
+        private readonly LuceneSearchEngine _engine;
 
         #endregion
 
@@ -22,7 +19,7 @@ namespace ITGlobal.MarkDocs.Search
         /// <summary>
         ///     .ctor
         /// </summary>
-        public SearchExtension(ISearchEngine engine, IMarkDocServiceState state)
+        public SearchExtension(LuceneSearchEngine engine, IMarkDocServiceState state)
         {
             _engine = engine;
             engine.Index(state, isInitial: true);

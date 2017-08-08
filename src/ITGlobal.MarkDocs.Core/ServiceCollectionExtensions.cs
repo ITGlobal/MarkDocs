@@ -27,15 +27,12 @@ namespace ITGlobal.MarkDocs
         [PublicAPI]
         public static void AddMarkDocs(this IServiceCollection services, Action<MarkDocsConfigurationBuilder> configure)
         {
-            var builder = new MarkDocsConfigurationBuilder();
-
+            var builder = new MarkDocsConfigurationBuilder(services);
             builder.Cache.UseNull();
-
             configure(builder);
-            builder.Configure(services);
 
             services.AddSingleton<MarkDocService>();
-            services.AddSingleton<IMarkDocService>(CreateService);
+            services.AddSingleton<IMarkDocService, MarkDocService>();
 
             VerifyService<IStorage>(services);
             VerifyService<IFormat>(services);

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using ITGlobal.MarkDocs.Extensions;
+﻿using ITGlobal.MarkDocs.Extensions;
 
 namespace ITGlobal.MarkDocs.Search
 {
@@ -10,9 +7,9 @@ namespace ITGlobal.MarkDocs.Search
     /// </summary>
     internal sealed class SearchExtensionFactory : IExtensionFactory
     {
-        private readonly ISearchEngine _engine;
+        private readonly LuceneSearchEngine _engine;
 
-        public SearchExtensionFactory(ISearchEngine engine)
+        public SearchExtensionFactory(LuceneSearchEngine engine)
         {
             _engine = engine;
         }
@@ -29,6 +26,7 @@ namespace ITGlobal.MarkDocs.Search
         /// <returns>
         ///     MarkDocs extension
         /// </returns>
-        public IExtension Create(IMarkDocService service, IMarkDocServiceState state) => new SearchExtension(_engine, state);
+        public IExtension Create(IMarkDocService service, IMarkDocServiceState state) 
+            => new SearchExtension(_engine, state);
     }
 }

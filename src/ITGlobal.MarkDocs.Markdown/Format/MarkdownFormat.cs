@@ -51,8 +51,7 @@ namespace ITGlobal.MarkDocs.Format
         public MarkdownFormat(
             [NotNull] MarkdownOptions options,
             [NotNull] ILoggerFactory loggerFactory,
-            [NotNull] IMarkDocsEventCallback callback,
-            [NotNull] IServiceProvider serviceProvider)
+            [NotNull] IMarkDocsEventCallback callback)
         {
             _log = loggerFactory.CreateLogger(typeof(MarkdownFormat));
             _options = options;

@@ -1,20 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using ITGlobal.MarkDocs.Extensions;
-using Newtonsoft.Json;
-using System.IO;
-using System.Text;
-using Microsoft.Extensions.Logging;
-using AngleSharp.Dom;
-using AngleSharp.Parser.Html;
-using Lucene.Net.Store;
-using Lucene.Net.Index;
-using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Search;
-using System.Linq;
-using Lucene.Net.Search.Spell;
-using Lucene.Net.Util;
+﻿using System.Collections.Generic;
 
 namespace ITGlobal.MarkDocs.Search
 {
@@ -25,9 +9,9 @@ namespace ITGlobal.MarkDocs.Search
     internal sealed class SearchServiceWrapper : ISearchService
     {
         private readonly IDocumentation _documentation;
-        private readonly ISearchEngine _engine;
+        private readonly LuceneSearchEngine _engine;
 
-        public SearchServiceWrapper(IDocumentation documentation, ISearchEngine engine)
+        public SearchServiceWrapper(IDocumentation documentation, LuceneSearchEngine engine)
         {
             _documentation = documentation;
             _engine = engine;

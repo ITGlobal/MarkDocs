@@ -10,7 +10,12 @@ namespace ITGlobal.MarkDocs
     [PublicAPI]
     public sealed class MarkDocsFormatConfigurationBuilder
     {
-        private Action<IServiceCollection> _registration;
+        private readonly IServiceCollection _services;
+
+        internal MarkDocsFormatConfigurationBuilder(IServiceCollection services)
+        {
+            _services = services;
+        }
 
         /// <summary>
         ///     Applies specified configuration functions
@@ -18,13 +23,8 @@ namespace ITGlobal.MarkDocs
         [PublicAPI, NotNull]
         public MarkDocsFormatConfigurationBuilder Use([NotNull] Action<IServiceCollection> func)
         {
-            _registration = func;
+            func(_services);
             return this;
-        }
-
-        internal void Configure(IServiceCollection services)
-        {
-            _registration?.Invoke(services);
         }
     }
 }
