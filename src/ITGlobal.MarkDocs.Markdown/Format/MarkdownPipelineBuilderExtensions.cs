@@ -3,6 +3,7 @@ using ITGlobal.MarkDocs.Format.CodeBlockRenderers;
 using ITGlobal.MarkDocs.Format.CustomHeading;
 using ITGlobal.MarkDocs.Format.Icons;
 using ITGlobal.MarkDocs.Format.TableOfContents;
+using ITGlobal.MarkDocs.Markdown.Format;
 using ITGlobal.MarkDocs.Markdown.Format.Admonition;
 using Markdig;
 
@@ -45,6 +46,12 @@ namespace ITGlobal.MarkDocs.Format
         public static MarkdownPipelineBuilder UseAdmonitions(this MarkdownPipelineBuilder pipeline)
         {
             pipeline.Extensions.Add(new AdmonitionExtension());
+            return pipeline;
+        }
+
+        public static MarkdownPipelineBuilder UseAlerts(this MarkdownPipelineBuilder pipeline)
+        {
+            pipeline.Extensions.Add(new AlertBlockExtension());
             return pipeline;
         }
     }

@@ -369,6 +369,7 @@ namespace ITGlobal.MarkDocs.Format
             builder.UseCustomHeading();
             builder.UseCustomCodeBlockRendering(options);
             builder.UseAdmonitions();
+            builder.UseAlerts();
 
             if (options.MathRenderer != null)
             {
