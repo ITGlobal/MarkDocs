@@ -40,7 +40,18 @@ namespace ITGlobal.MarkDocs.Format
                 }
             }
         }
-        
+
+        public void Install(string directory)
+        {
+            // $ npm install {package}
+
+            using (var exec = new ExecuteHelper(_log, _npmPath, directory, true))
+            {
+                exec.Run(new[] { "install" });
+                exec.ThrowIfFailed();
+            }
+        }
+
         public void Install(string directory, string package)
         {
             // $ npm install {package}

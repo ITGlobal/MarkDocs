@@ -131,11 +131,28 @@ namespace ITGlobal.MarkDocs.Format
                 Directory.CreateDirectory(dir);
             }
 
+            var packageJson = Path.Combine(dir, "package.json");
+            if (!File.Exists(packageJson))
+            {
+                const string packageJsonContent = @"{
+  ""name"": ""ServerHighlightJsSyntaxColorizer"",
+  ""version"": ""1.0.0"",
+  ""description"": ""none"",
+  ""dependencies"": {
+    ""highlightjs"": ""^ 9.10.0""
+  },
+  ""author"": """",
+  ""repository"": ""none"",
+  ""license"": ""MIT""
+}";
+                File.WriteAllText(packageJson, packageJsonContent, Encoding.UTF8);
+            }
+
             var filename = Path.Combine(dir, name);
             var source = LoadResource(name);
             File.WriteAllText(filename, source, Encoding.UTF8);
-
-            _npm.Install(dir, "highlightjs");
+            
+            _npm.Install(dir);
 
             return filename;
         }

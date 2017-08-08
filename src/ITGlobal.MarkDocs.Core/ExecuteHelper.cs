@@ -89,6 +89,7 @@ namespace ITGlobal.MarkDocs
             _process.StartInfo.Arguments = string.Join(" ", from arg in arguments select EscapeArgument(arg));
             _process.StartInfo.RedirectStandardInput = stdin != null;
 
+            var w = Stopwatch.StartNew();
             _process.Start();
             _process.BeginErrorReadLine();
             _process.BeginOutputReadLine();
@@ -107,6 +108,7 @@ namespace ITGlobal.MarkDocs
             _process.WaitForExit();
 
             ExitCode = _process.ExitCode;
+            w.Stop();
 
             if (ExitCode != 0 || _verboseOutput)
             {
@@ -119,7 +121,7 @@ namespace ITGlobal.MarkDocs
                         line.Print(_log);
                     }
 
-                    _log.LogDebug($"{_programName} exited with {_process.ExitCode}");
+                    _log.LogDebug($"{_programName} exited with {_process.ExitCode} in {w.ElapsedMilliseconds}ms");
                 }
             }
         }
