@@ -1,10 +1,10 @@
 ﻿using Markdig.Syntax.Inlines;
 
-namespace ITGlobal.MarkDocs.Format.Icons
+namespace ITGlobal.MarkDocs.Format
 {
-    internal sealed class IconInline : LeafInline
+    public sealed class IconInline : LeafInline
     {
-        public IconInline(string type, string id)
+        internal IconInline(string type, string id)
         {
             Type = type;
             Id = id;

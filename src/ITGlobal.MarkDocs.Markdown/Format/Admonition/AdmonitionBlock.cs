@@ -1,11 +1,11 @@
 ﻿using Markdig.Parsers;
 using Markdig.Syntax;
 
-namespace ITGlobal.MarkDocs.Markdown.Format.Admonition
+namespace ITGlobal.MarkDocs.Markdown.Format
 {
-    internal sealed class AdmonitionBlock : LeafBlock
+    public sealed class AdmonitionBlock : LeafBlock
     {
-        public AdmonitionBlock(BlockParser parser)
+        internal AdmonitionBlock(BlockParser parser)
             : base(parser)
         {
             ProcessInlines = true;

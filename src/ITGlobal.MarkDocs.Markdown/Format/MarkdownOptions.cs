@@ -39,6 +39,12 @@ namespace ITGlobal.MarkDocs.Format
         public ITocRenderer TocRenderer { get; set; }
 
         /// <summary>
+        ///     ptions for rendering markdown into HTML
+        /// </summary>
+        [PublicAPI]
+        public MarkdownRenderingOptions Rendering { get; } = new MarkdownRenderingOptions();
+
+        /// <summary>
         ///     Enable abbreviations extension
         /// </summary>
         [PublicAPI]

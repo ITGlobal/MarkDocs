@@ -375,6 +375,8 @@ namespace ITGlobal.MarkDocs.Format
                 builder.Extensions.Add(new MathematicsExtension());
             }
 
+            builder.Extensions.Add(options.Rendering);
+            
             return builder.Build();
         }
 
