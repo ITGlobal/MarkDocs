@@ -7,7 +7,7 @@
         {
             "taskName": "build",
             "args": [
-                "${workspaceRoot}\\samples\\MarkDocs.Compiler\\project.json"
+                "${workspaceRoot}\\samples\\ITGlobal.MarkDocs.Example\\ITGlobal.MarkDocs.Example.csproj"
             ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"

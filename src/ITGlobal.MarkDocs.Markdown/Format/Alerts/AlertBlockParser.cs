@@ -28,11 +28,17 @@ namespace ITGlobal.MarkDocs.Markdown.Format
                 processor.NextChar();
             }
 
-            var c = processor.NextChar();
-            if (c.IsSpaceOrTab())
+            if(processor.CurrentChar != ' ')
+            {
+                return BlockState.None;
+            }
+
+            processor.NextChar();
+            if (processor.CurrentChar.IsSpaceOrTab())
             {
                 processor.NextColumn();
             }
+            
 
             var type = i == 1 ? AlertBlockType.Information : AlertBlockType.Warning;
 
