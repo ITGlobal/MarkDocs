@@ -30,6 +30,7 @@ namespace ITGlobal.MarkDocs.Markdown.Format
 
             if(processor.CurrentChar != ' ')
             {
+                processor.GoToColumn(column);
                 return BlockState.None;
             }
 
