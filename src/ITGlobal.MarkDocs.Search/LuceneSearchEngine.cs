@@ -86,6 +86,7 @@ namespace ITGlobal.MarkDocs.Search
                     {
                         var config = new IndexWriterConfig(LuceneVersion.LUCENE_48, analyzer);
                         spellChecker.IndexDictionary(new LuceneDictionary(indexReader, IDX_PAGE_TITLE), config, true);
+                        config = new IndexWriterConfig(LuceneVersion.LUCENE_48, analyzer);
                         spellChecker.IndexDictionary(new LuceneDictionary(indexReader, IDX_PAGE_TEXT), config, true);
 
                         var suggestions = spellChecker.SuggestSimilar(q, MAX_SUGGESTIONS);
