@@ -167,7 +167,7 @@ namespace ITGlobal.MarkDocs.Format
             if (!page.Anchors.ContainsKey(hash))
             {
                 MarkdownRenderingContext.RenderContext.Error(
-                    $"Anchor #{hash} doesn't exist on page \"{page.PageTreeNode.FileName}\"",
+                    $"Anchor #{hash} doesn't exist on page \"{page.PageTreeNode.RelativeFilePath}\"",
                     link.Line
                 );
             }
@@ -191,7 +191,7 @@ namespace ITGlobal.MarkDocs.Format
                 if (!referencedPage.Anchors.ContainsKey(hash))
                 {
                     MarkdownRenderingContext.RenderContext.Error(
-                        $"Anchor #{hash} doesn't exist on page \"{page.PageTreeNode.FileName}\"",
+                        $"Anchor #{hash} doesn't exist on page \"{referencedPage.PageTreeNode.RelativeFilePath}\"",
                         link.Line
                     );
                 }
