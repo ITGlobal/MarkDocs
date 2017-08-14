@@ -1,5 +1,5 @@
 $SOLUTION_DIR = Resolve-Path "."
-$ARTIFACTS = Join-Path $SOLUTION_DIR "artifacts"
+$ARTIFACTS = Join-Path $SOLUTION_DIR "artifacts/choco"
 $CONFIGURATION = "Release"
 $VERSION = $env:MARKDOCS_BUILD_VERSION
 if (!$VERSION) {
