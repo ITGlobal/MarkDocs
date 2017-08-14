@@ -10,7 +10,7 @@ if (!$NUGET_API_KEY) {
 Get-ChildItem -Path $ARTIFACTS -Filter *.nupkg -File | % {
     $package = $_.FullName
     Write-Host "Pushing package $package"
-    & dotnet nuget push --api-key $NUGET_API_KEY --force-english-output $package
+    & dotnet nuget push --api-key $NUGET_API_KEY --force-english-output -s nuget.org $package
     if ($LASTEXITCODE -ne 0) {
         Write-Host "'dotnet nuget push' exited with $LASTEXITCODE"
         exit 1
