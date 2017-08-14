@@ -97,9 +97,9 @@ namespace ITGlobal.MarkDocs.Content
 
         #region methods
 
-        internal void PutIntoCache(ICacheUpdateOperation operation)
+        internal void PutIntoCache(ICacheUpdateOperation operation, Action callback)
         {
-            operation.Write(this, this);
+            operation.Write(this, this, callback);
         }
         
         #endregion

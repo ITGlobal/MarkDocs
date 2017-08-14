@@ -28,6 +28,9 @@ namespace ITGlobal.MarkDocs.Content
         /// <param name="filename">
         ///     Page file name
         /// </param>
+        /// <param name="report">
+        ///     Compilation report builder
+        /// </param>
         /// <param name="consumedFiles">
         ///     Consumed content files
         /// </param>
@@ -37,7 +40,12 @@ namespace ITGlobal.MarkDocs.Content
         /// <returns>
         ///     Page metadata if available, null otherwise
         /// </returns>
-        public Metadata GetMetadata(string rootDirectory, string filename, HashSet<string> consumedFiles, bool isIndexFile)
+        public Metadata GetMetadata(
+            string rootDirectory, 
+            string filename,
+            ICompilationReportBuilder report, 
+            HashSet<string> consumedFiles,
+            bool isIndexFile)
         {
             var contentId = _storage.GetContentId(rootDirectory, filename);
             if (string.IsNullOrEmpty(contentId))

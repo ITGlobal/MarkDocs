@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using ITGlobal.MarkDocs.Cache;
 using ITGlobal.MarkDocs.Format;
-using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace ITGlobal.MarkDocs.Content
@@ -14,57 +14,6 @@ namespace ITGlobal.MarkDocs.Content
     [DebuggerDisplay("{Id}")]
     internal sealed class Page : IPage
     {
-        #region nested classes
-
-        private sealed class ResourceContent : IResourceContent, IRenderContext
-        {
-            private readonly Page _page;
-            private readonly IFormat _format;
-
-            public ResourceContent(Page page, IFormat format)
-            {
-                _page = page;
-                _format = format;
-            }
-
-            /// <summary>
-            ///    A page reference
-            /// </summary>
-            public IPage Page => _page;
-
-            /// <summary>
-            ///     Gets a content
-            /// </summary>
-            public Stream GetContent()
-            {
-                string str;
-                try
-                {
-                    var markup = File.ReadAllText(_page.FileName, _format.SourceEncoding);
-                    str = _format.Render(this, markup);
-                }
-                catch (Exception e)
-                {
-                    var documentation = _page._documentation;
-                    ((MarkDocService)documentation.Service).Log.LogError(0, e, "Failed to render page {0}!{1}", documentation.Id, _page.Id);
-                    str = "<h1 style=\"color: red;\">Failed to render page</h1>";
-
-                    ((MarkDocService)_page._documentation.Service).Callback.Error(_page.Documentation.Id, _page.Id, e);
-                }
-
-                var bytes = Encoding.UTF8.GetBytes(str);
-                return new MemoryStream(bytes);
-            }
-
-            /// <summary>
-            ///   Add a generated attachment
-            /// </summary>
-            public IAttachment CreateAttachment(string name, byte[] content)
-                => _page._documentation.CreateAttachment(name, content);
-        }
-
-        #endregion
-
         #region fields
 
         private readonly Documentation _documentation;
@@ -72,6 +21,9 @@ namespace ITGlobal.MarkDocs.Content
         private readonly ICache _cache;
         private readonly PageTreeNode _node;
         private readonly string _cacheItemId;
+        private readonly Dictionary<string, string> _anchors = new Dictionary<string, string>();
+
+        private IParsedPage _parsedPage;
 
         #endregion
 
@@ -87,9 +39,9 @@ namespace ITGlobal.MarkDocs.Content
             _cache = cache;
             _node = node;
 
-            _cacheItemId = _node.RelativeFileName;
+            _cacheItemId = _node.RelativeFilePath;
             ResourceId.Normalize(ref _cacheItemId);
-            _cacheItemId = Path.ChangeExtension(_node.RelativeFileName, ".html");
+            _cacheItemId = Path.ChangeExtension(_node.RelativeFilePath, ".html");
         }
 
         #endregion
@@ -99,7 +51,7 @@ namespace ITGlobal.MarkDocs.Content
         /// <summary>
         ///     Page file name relative to content root directory
         /// </summary>
-        internal string RelativeFileName => _node.RelativeFileName;
+        internal string RelativeFilePath => _node.RelativeFilePath;
 
         #endregion
 
@@ -141,6 +93,11 @@ namespace ITGlobal.MarkDocs.Content
         public Metadata Metadata => _node.Metadata;
 
         /// <summary>
+        ///     Page anchors (with names)
+        /// </summary>
+        public IReadOnlyDictionary<string, string> Anchors => _anchors;
+
+        /// <summary>
         ///     Reads page source markup
         /// </summary>
         /// <returns>
@@ -170,11 +127,157 @@ namespace ITGlobal.MarkDocs.Content
         #region methods
 
         /// <summary>
-        ///     Compiles page into cache
+        ///     Parses HTML page after compilation
         /// </summary>
-        internal void Compile(ICacheUpdateOperation operation)
+        internal void Parse(IPageCompilationReportBuilder report)
         {
-            operation.Write(this, new ResourceContent(this, _format));
+            string markup;
+            try
+            {
+                markup = File.ReadAllText(FileName, _format.SourceEncoding);
+            }
+            catch (Exception e)
+            {
+                report.Error($"Unable to read source file. {e.Message}", null, e);
+                return;
+            }
+
+            _parsedPage = _format.ParsePage(new ParseContext(this, report), markup);
+
+            foreach (var pair in _parsedPage.Anchors)
+            {
+                _anchors[pair.Key] = pair.Value;
+            }
+        }
+
+        /// <summary>
+        ///     Runs page validation after compilation
+        /// </summary>
+        internal void Render(ICacheUpdateOperation operation, IPageCompilationReportBuilder report, Action callback)
+        {
+            if (_parsedPage == null)
+            {
+                operation.Write(this, new EmptyResourceContent(), callback);
+                return;
+            }
+
+            operation.Write(this, new ResourceContent(this, _parsedPage, report), callback);
+            _parsedPage = null;
+        }
+
+        #endregion
+
+        #region ParseContext
+
+        private sealed class ParseContext : IParseContext
+        {
+            private readonly Page _page;
+            private readonly IPageCompilationReportBuilder _report;
+
+            public ParseContext(Page page, IPageCompilationReportBuilder report)
+            {
+                _page = page;
+                _report = report;
+            }
+
+            /// <summary>
+            ///    A page reference
+            /// </summary>
+            public IPage Page => _page;
+
+            /// <summary>
+            ///     Add a warning to compilation report
+            /// </summary>
+            public void Warning(string message, int? lineNumber = null, Exception exception = null)
+                => _report.Warning(message, lineNumber, exception);
+
+            /// <summary>
+            ///     Add an error to compilation report
+            /// </summary>
+            public void Error(string message, int? lineNumber = null, Exception exception = null)
+                => _report.Error(message, lineNumber, exception);
+        }
+
+        #endregion
+
+        #region ResourceContent
+
+        private sealed class ResourceContent : IResourceContent, IRenderContext
+        {
+            private readonly Page _page;
+            private readonly IParsedPage _parsedPage;
+            private readonly IPageCompilationReportBuilder _report;
+
+            public ResourceContent(Page page, IParsedPage parsedPage, IPageCompilationReportBuilder report)
+            {
+                _page = page;
+                _parsedPage = parsedPage;
+                _report = report;
+            }
+
+            /// <summary>
+            ///     Gets a content
+            /// </summary>
+            Stream IResourceContent.GetContent()
+            {
+                string html;
+                try
+                {
+                    html = _parsedPage.Render(this);
+                }
+                catch (Exception e)
+                {
+                    html = "<h1 style=\"color: red;\">Failed to render page</h1>";
+                    _report.Error($"Failed to render page. {e.Message}", null, e);
+                }
+
+                var bytes = Encoding.UTF8.GetBytes(html);
+                return new MemoryStream(bytes);
+            }
+
+            /// <summary>
+            ///   Add a generated attachment
+            /// </summary>
+            public IAttachment CreateAttachment(string name, byte[] content)
+                => _page._documentation.CreateAttachment(name, content);
+
+            /// <summary>
+            ///    A page reference
+            /// </summary>
+            IPage IRenderContext.Page => _page;
+
+            /// <summary>
+            ///     Add a warning to compilation report
+            /// </summary>
+            void IRenderContext.Warning(string message, int? lineNumber, Exception exception)
+            {
+                _report.Warning(message, lineNumber, exception);
+            }
+
+            /// <summary>
+            ///     Add an error to compilation report
+            /// </summary>
+            void IRenderContext.Error(string message, int? lineNumber, Exception exception)
+            {
+                _report.Error(message, lineNumber, exception);
+            }
+        }
+
+        #endregion
+
+        #region EmptyResourceContent
+
+        private sealed class EmptyResourceContent : IResourceContent
+        {
+            /// <summary>
+            ///     Gets a content
+            /// </summary>
+            public Stream GetContent()
+            {
+                var html = "<h1 style=\"color: red;\">Unable to render page</h1>";
+                var bytes = Encoding.UTF8.GetBytes(html);
+                return new MemoryStream(bytes);
+            }
         }
 
         #endregion

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using ITGlobal.MarkDocs.Format;
 
 namespace ITGlobal.MarkDocs.Content
@@ -7,18 +8,17 @@ namespace ITGlobal.MarkDocs.Content
     /// <summary>
     ///     Provides page metadata from page content
     /// </summary>
-    internal sealed class ContentMetadataProvider : IMetadataProvider
+    internal sealed class ContentMetadataProvider : IMetadataProvider, IParsePropertiesContext
     {
         private readonly IFormat _format;
-        private readonly IMarkDocsEventCallback _callback;
+        private readonly ThreadLocal<IPageCompilationReportBuilder> _report = new ThreadLocal<IPageCompilationReportBuilder>();
 
         /// <summary>
         ///     .ctor
         /// </summary>
-        public ContentMetadataProvider(IFormat format, IMarkDocsEventCallback callback)
+        public ContentMetadataProvider(IFormat format)
         {
             _format = format;
-            _callback = callback;
         }
 
         /// <summary>
@@ -30,6 +30,9 @@ namespace ITGlobal.MarkDocs.Content
         /// <param name="filename">
         ///     Page file name
         /// </param>
+        /// <param name="report">
+        ///     Compilation report builder
+        /// </param>
         /// <param name="consumedFiles">
         ///     Consumed content files
         /// </param>
@@ -39,20 +42,40 @@ namespace ITGlobal.MarkDocs.Content
         /// <returns>
         ///     Page metadata if available, null otherwise
         /// </returns>
-        public Metadata GetMetadata(string rootDirectory, string filename, HashSet<string> consumedFiles, bool isIndexFile)
+        public Metadata GetMetadata(
+            string rootDirectory,
+            string filename,
+            ICompilationReportBuilder report,
+            HashSet<string> consumedFiles,
+            bool isIndexFile)
         {
             try
             {
-                return _format.ParseProperties(filename);
+                _report.Value = report.ForFile(filename);
+                return _format.ParseProperties(this, filename);
             }
             catch (Exception e)
             {
-                _callback.MetadataError(filename, e);
+                _report.Value.Error($"Failed to parse content metadata. {e.Message}", exception: e);
                 return null;
+            }
+            finally
+            {
+                _report.Value = null;
             }
         }
 
         /// <inheritdoc />
         public void Dispose() { }
+
+        void IParsePropertiesContext.Warning(string message, int? lineNumber, Exception exception)
+        {
+            _report.Value.Warning(message, lineNumber, exception);
+        }
+
+        void IParsePropertiesContext.Error(string message, int? lineNumber, Exception exception)
+        {
+            _report.Value.Error(message, lineNumber, exception);
+        }
     }
 }

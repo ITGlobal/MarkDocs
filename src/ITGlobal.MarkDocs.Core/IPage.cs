@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using ITGlobal.MarkDocs.Format;
 using JetBrains.Annotations;
 
@@ -27,6 +28,11 @@ namespace ITGlobal.MarkDocs
         /// </summary>
         [PublicAPI, NotNull]
         Metadata Metadata { get; }
+
+        /// <summary>
+        ///     Page anchors (with names)
+        /// </summary>
+        IReadOnlyDictionary<string, string> Anchors { get; }
 
         /// <summary>
         ///     Reads page source markup

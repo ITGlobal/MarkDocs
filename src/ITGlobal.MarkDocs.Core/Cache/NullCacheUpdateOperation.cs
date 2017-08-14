@@ -47,7 +47,10 @@ namespace ITGlobal.MarkDocs.Cache
         /// <param name="content">
         ///     Item content
         /// </param>
-        void ICacheUpdateOperation.Write(IResource item, IResourceContent content)
+        /// <param name="callback">
+        ///     A callback that is called after cache item is written into cache
+        /// </param>
+        void ICacheUpdateOperation.Write(IResource item, IResourceContent content, Action callback)
         {
             Dictionary<string, IResourceContent> dict;
             if (!_contentProviders.TryGetValue(item.Documentation.Id, out dict))
@@ -57,6 +60,7 @@ namespace ITGlobal.MarkDocs.Cache
             }
 
             dict[item.Documentation.Id] = content;
+            callback();
         }
 
         /// <summary>

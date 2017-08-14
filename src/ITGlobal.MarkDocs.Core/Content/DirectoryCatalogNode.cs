@@ -17,7 +17,7 @@ namespace ITGlobal.MarkDocs.Content
             : base(id, metadata)
         {
             FileName = filename;
-            RelativeFileName = relativeFileName;
+            RelativeFilePath = relativeFileName;
             Nodes = nodes
                 .OfType<PageTreeNode>()
                 .OrderBy(_ => _.Order != 0 ? _.Order : int.MaxValue)
@@ -39,7 +39,7 @@ namespace ITGlobal.MarkDocs.Content
         /// <summary>
         ///     File name (relative to root directory)
         /// </summary>
-        public override string RelativeFileName { get; }
+        public override string RelativeFilePath { get; }
 
         /// <summary>
         ///     true if this node refers to a page

@@ -23,5 +23,7 @@
     <PackageReference Include="ColorCode.Netstandard" Version="1.0.4.3" />
     <PackageReference Include="AngleSharp" Version="0.9.9" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.3.0" />
+    <PackageReference Include="AngleSharp" Version="0.9.9" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
 </Project>

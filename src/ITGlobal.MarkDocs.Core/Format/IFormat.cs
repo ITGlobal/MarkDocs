@@ -31,12 +31,12 @@ namespace ITGlobal.MarkDocs.Format
         ///     Reads a page file <paramref name="filename"/> and parses it's metadata (see <see cref="Metadata"/>)
         /// </summary>
         [NotNull]
-        Metadata ParseProperties([NotNull] string filename);
+        Metadata ParseProperties([NotNull] IParsePropertiesContext ctx, [NotNull] string filename);
 
         /// <summary>
-        ///     Renders content of <paramref name="markup"/> into HTML
+        ///     Parses content of <paramref name="markup"/>
         /// </summary>
         [NotNull]
-        string Render([NotNull] IRenderContext ctx, [NotNull] string markup);
+        IParsedPage ParsePage([NotNull] IParseContext ctx, [NotNull] string markup);
     }
 }

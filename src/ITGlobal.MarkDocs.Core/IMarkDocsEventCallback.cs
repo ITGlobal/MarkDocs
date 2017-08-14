@@ -34,16 +34,22 @@ namespace ITGlobal.MarkDocs
         void StorageChanged([CanBeNull] string id = null);
 
         /// <summary>
-        ///     This method is called when MarkDocs is compiling specified page
+        ///     This method is called when MarkDocs is parsing specified page
         /// </summary>
         [PublicAPI]
-        void CompilingPage([NotNull] string documentationId, [NotNull] string id, int i, int count);
+        void ParsedPage([NotNull] string documentationId, [NotNull] string id, int i, int count);
+
+        /// <summary>
+        ///     This method is called when MarkDocs is rendering specified page
+        /// </summary>
+        [PublicAPI]
+        void RenderedPage([NotNull] string documentationId, [NotNull] string id, int i, int count);
 
         /// <summary>
         ///     This method is called when MarkDocs is caching specified attachment
         /// </summary>
         [PublicAPI]
-        void CachingAttachment([NotNull] string documentationId, [NotNull] string id, int i, int count);
+        void CachedAttachment([NotNull] string documentationId, [NotNull] string id, int i, int count);
 
         /// <summary>
         ///     This method is called when MarkDocs fails to render a page

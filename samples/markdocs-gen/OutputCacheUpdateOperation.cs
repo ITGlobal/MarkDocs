@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using ITGlobal.MarkDocs.Cache;
 
@@ -27,46 +28,56 @@ namespace ITGlobal.MarkDocs.StaticGen
             _template.Initialize(this, documentation);
         }
 
-        public void Write(IResource item, IResourceContent content)
+        public void Write(IResource item, IResourceContent content, Action callback)
         {
-            var filename = OutputCache.GetResourcePath(item);
-            if (filename.StartsWith("/"))
+            try
             {
-                filename = filename.Substring(1);
-            }
-            filename = Path.Combine(_directory, filename);
-            var directory = Path.GetDirectoryName(filename);
-            if (!Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-
-
-            if (item.Type == ResourceType.Page)
-            {
-                var page = item.Documentation.GetPage(item.Id);
-                if (page != null)
+                var filename = OutputCache.GetResourcePath(item);
+                if (filename.StartsWith("/"))
                 {
-                    string html;
-                    using (var stream = content.GetContent())
-                    using (var reader = new StreamReader(stream, Encoding.UTF8))
-                    {
-                        html = reader.ReadToEnd();
-                    }
+                    filename = filename.Substring(1);
+                }
+                filename = Path.Combine(_directory, filename);
+                var directory = Path.GetDirectoryName(filename);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
 
-                    using (var stream = File.OpenWrite(filename))
-                    using (var writer = new StreamWriter(stream))
+
+                if (item.Type == ResourceType.Page)
+                {
+                    var page = item.Documentation.GetPage(item.Id);
+                    if (page != null)
                     {
-                        _template.Render(page, html, writer);
-                        return;
+                        string html;
+                        using (var stream = content.GetContent())
+                        using (var reader = new StreamReader(stream, Encoding.UTF8))
+                        {
+                            html = reader.ReadToEnd();
+                        }
+
+                        using (var stream = File.OpenWrite(filename))
+                        using (var writer = new StreamWriter(stream))
+                        {
+                            _template.Render(page, html, writer);
+                            return;
+                        }
                     }
                 }
-            }
 
-            using (var fileStream = File.OpenWrite(filename))
-            using (var contentStream = content.GetContent())
+                using (var fileStream = File.OpenWrite(filename))
+                using (var contentStream = content.GetContent())
+                {
+                    contentStream.CopyTo(fileStream);
+                }
+            }
+            finally
             {
-                contentStream.CopyTo(fileStream);
+                if (callback != null)
+                {
+                    callback();
+                }
             }
         }
 

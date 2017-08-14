@@ -58,7 +58,10 @@ namespace ITGlobal.MarkDocs.Cache
         /// <param name="content">
         ///     Item content
         /// </param>
-        void ICacheUpdateOperation.Write(IResource item, IResourceContent content)
+        /// <param name="callback">
+        ///     A callback that is called after cache item is written into cache
+        /// </param>
+        void ICacheUpdateOperation.Write(IResource item, IResourceContent content, Action callback)
         {
             var filename = _cache.GetCachedFileName(_descriptor, item);
             var directory = Path.GetDirectoryName(filename);
@@ -74,6 +77,8 @@ namespace ITGlobal.MarkDocs.Cache
                 {
                     await contentStream.CopyToAsync(fileStream);
                 }
+
+                callback();
             });
 
             if (_cache.Options.EnableConcurrentWrites)

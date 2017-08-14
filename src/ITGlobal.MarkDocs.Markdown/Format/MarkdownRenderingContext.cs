@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Threading;
-using Microsoft.Extensions.Logging;
 
 namespace ITGlobal.MarkDocs.Format
 {
     internal static class MarkdownRenderingContext
     {
-        public static bool IsMarkdownRenderingContextPresent => CurrentState.Value != null;
+        public static bool IsPresent => CurrentState.Value != null;
 
-        public static ILogger Logger => Get(_ => _.Logger);
         public static IRenderContext RenderContext => Get(_ => _.RenderContext);
         public static IUmlRenderer UmlRenderer => Get(_ => _.UmlRenderer);
         public static IMathRenderer MathRenderer => Get(_ => _.MathRenderer);
@@ -18,7 +16,6 @@ namespace ITGlobal.MarkDocs.Format
 
         private sealed class State
         {
-            public ILogger Logger { get; set; }
             public IRenderContext RenderContext { get; set; }
             public IUmlRenderer UmlRenderer { get; set; }
             public IMathRenderer MathRenderer { get; set; }
@@ -34,7 +31,6 @@ namespace ITGlobal.MarkDocs.Format
 
 
         public static ScopeToken SetCurrentRenderingContext(
-            ILogger logger,
             IRenderContext renderContext,
             MarkdownOptions options,
             IResourceUrlResolver resourceUrlResolver
@@ -42,7 +38,6 @@ namespace ITGlobal.MarkDocs.Format
         {
             CurrentState.Value = new State
             {
-                Logger = logger,
                 RenderContext = renderContext,
                 UmlRenderer = options.UmlRenderer,
                 MathRenderer = options.MathRenderer,

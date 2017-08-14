@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Format
@@ -32,14 +33,29 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Render a MathML/Tex/LaTex into an image
         /// </summary>
-        public ImageData Render(string sourceCode)
+        public ImageData Render(string sourceCode, int? lineNumber)
         {
-            var url = $"{_url}?{Uri.EscapeDataString(sourceCode)}";
+            var bytes = RenderAsync(sourceCode, lineNumber).Result;
+            return new ImageData(bytes);
+        }
 
-            using (var httpClient = new HttpClient())
+        private async Task<byte[]> RenderAsync(string sourceCode, int? lineNumber)
+        {
+            try
             {
-                var bytes = httpClient.GetByteArrayAsync(url).Result;
-                return new ImageData(bytes);
+                var url = $"{_url}?{Uri.EscapeDataString(sourceCode)}";
+                
+                using (var httpClient = new HttpClient())
+                {
+                    httpClient.Timeout = TimeSpan.FromSeconds(30);
+                    var bytes = await httpClient.GetByteArrayAsync(url);
+                    return bytes;
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                MarkdownRenderingContext.RenderContext?.Error($"Failed to render math markup. {e.Message}", lineNumber, e);
+                return Array.Empty<byte>();
             }
         }
     }

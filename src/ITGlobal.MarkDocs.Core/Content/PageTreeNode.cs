@@ -76,7 +76,7 @@ namespace ITGlobal.MarkDocs.Content
         /// <summary>
         ///     File name (relative to root directory)
         /// </summary>
-        public abstract string RelativeFileName { get; }
+        public abstract string RelativeFilePath { get; }
 
         /// <summary>
         ///     Page metadata

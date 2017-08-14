@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
@@ -8,7 +9,7 @@ namespace ITGlobal.MarkDocs.Format
 {
     internal sealed class YamlMetadataExtractor : IMetadataExtractor
     {
-        public void TryExtract(MarkdownDocument document, Metadata metadata)
+        public void TryExtract(IParsePropertiesContext ctx, MarkdownDocument document, Metadata metadata)
         {
             var block = document.Descendants<YamlFrontMatterBlock>().FirstOrDefault();
             if (block == null)
@@ -16,24 +17,31 @@ namespace ITGlobal.MarkDocs.Format
                 return;
             }
 
-            var yaml = string.Join("\n", from l in block.Lines.Lines select l.Slice.ToString());
-            using (var reader = new StringReader(yaml))
+            try
             {
-                var stream = new YamlStream();
-                stream.Load(reader);
-
-                var properties = stream.Documents[0].RootNode as YamlMappingNode;
-                if (properties != null)
+                var yaml = string.Join("\n", from l in block.Lines.Lines select l.Slice.ToString());
+                using (var reader = new StringReader(yaml))
                 {
-                    foreach (var pair in properties.Children)
+                    var stream = new YamlStream();
+                    stream.Load(reader);
+
+                    var properties = stream.Documents[0].RootNode as YamlMappingNode;
+                    if (properties != null)
                     {
-                        var key = (pair.Key as YamlScalarNode)?.Value;
-                        if (key != null)
+                        foreach (var pair in properties.Children)
                         {
-                            ProcessNode(metadata, key, pair.Value);
+                            var key = (pair.Key as YamlScalarNode)?.Value;
+                            if (key != null)
+                            {
+                                ProcessNode(metadata, key, pair.Value);
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                ctx.Error($"Malformed YAML frontmatter. {e.Message}", block.Line, e);
             }
         }
 
@@ -103,13 +111,13 @@ namespace ITGlobal.MarkDocs.Format
 
         private static void CombineMetaTags(Metadata metadata, string name, string content)
         {
-                var existing = metadata.MetaTags.FirstOrDefault(_ => _.Name == name);
-                if (existing != null)
-                {
-                    existing.Content = content;
-                }
+            var existing = metadata.MetaTags.FirstOrDefault(_ => _.Name == name);
+            if (existing != null)
+            {
+                existing.Content = content;
+            }
 
-            metadata.MetaTags = metadata.MetaTags.Concat(new[] {new MetaTag {Name = name, Content = content}}).ToArray();
+            metadata.MetaTags = metadata.MetaTags.Concat(new[] { new MetaTag { Name = name, Content = content } }).ToArray();
         }
     }
 }

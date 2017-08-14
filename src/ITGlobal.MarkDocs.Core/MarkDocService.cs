@@ -212,14 +212,17 @@ namespace ITGlobal.MarkDocs
                 if (!string.IsNullOrEmpty(id))
                 {
                     Documentation.NormalizeId(ref id);
-                    foreach (var doc in from d in _state.List where d.Id != id select d)
+                    lock (_stateLock)
                     {
-                        docs.Add(doc);
+                        foreach (var doc in from d in _state.List where d.Id != id select d)
+                        {
+                            docs.Add(doc);
+                        }
                     }
                 }
 
                 MarkDocServiceState state;
-                using (var directoryScanner = new DirectoryScanner(Log, Format, Storage, Callback))
+                using (var directoryScanner = new DirectoryScanner(Log, Format, Storage))
                 using (var operation = Cache.BeginUpdate())
                 {
                     var contentDirectories = Storage.GetContentDirectories();
@@ -232,15 +235,12 @@ namespace ITGlobal.MarkDocs
                     {
                         using (Callback.CompilationStarted(contentDirectory.Id))
                         {
-                            var catalog = directoryScanner.ScanDirectory(contentDirectory.Path);
-
-                            var doc = new Documentation(this, contentDirectory.Id, contentDirectory.ContentVersion,
-                                catalog);
-                            doc.Compile(operation);
+                            var doc = new Documentation(this, contentDirectory);
+                            doc.Compile(directoryScanner, operation);
                             docs.Add(doc);
                         }
                     }
-                    
+
                     state = new MarkDocServiceState(docs);
                     operation.Flush();
 

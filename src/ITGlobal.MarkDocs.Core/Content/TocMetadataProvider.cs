@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using ITGlobal.MarkDocs.Format;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace ITGlobal.MarkDocs.Content
@@ -22,20 +21,7 @@ namespace ITGlobal.MarkDocs.Content
 
         #region fields
 
-        private readonly ILogger _log;
         private readonly ConcurrentDictionary<string, TocFile> _entries = new ConcurrentDictionary<string, TocFile>();
-
-        #endregion
-
-        #region .ctor
-
-        /// <summary>
-        ///     .ctor
-        /// </summary>
-        public TocMetadataProvider(ILogger log)
-        {
-            _log = log;
-        }
 
         #endregion
 
@@ -50,6 +36,9 @@ namespace ITGlobal.MarkDocs.Content
         /// <param name="filename">
         ///     Page file name
         /// </param>
+        /// <param name="report">
+        ///     Compilation report builder
+        /// </param>
         /// <param name="consumedFiles">
         ///     Consumed content files
         /// </param>
@@ -59,12 +48,17 @@ namespace ITGlobal.MarkDocs.Content
         /// <returns>
         ///     Page metadata if available, null otherwise
         /// </returns>
-        public Metadata GetMetadata(string rootDirectory, string filename, HashSet<string> consumedFiles, bool isIndexFile)
+        public Metadata GetMetadata(
+            string rootDirectory,
+            string filename,
+            ICompilationReportBuilder report,
+            HashSet<string> consumedFiles,
+            bool isIndexFile)
         {
             if (isIndexFile)
             {
-                var indexMetadata = GetIndexLevelMetadata(filename, consumedFiles);
-                var plainMetadata = GetPlainLevelMetadata(filename, consumedFiles);
+                var indexMetadata = GetIndexLevelMetadata(filename, report, consumedFiles);
+                var plainMetadata = GetPlainLevelMetadata(filename, report, consumedFiles);
 
                 if (indexMetadata != null)
                 {
@@ -80,23 +74,24 @@ namespace ITGlobal.MarkDocs.Content
             }
             else
             {
-                return GetPlainLevelMetadata(filename, consumedFiles);
+                return GetPlainLevelMetadata(filename, report, consumedFiles);
             }
         }
 
         /// <inheritdoc />
         public void Dispose() { }
-        
+
+
         #endregion
 
         #region private methods
 
-        private Metadata GetIndexLevelMetadata(string filename, HashSet<string> consumedFiles)
+        private Metadata GetIndexLevelMetadata(string filename, ICompilationReportBuilder report, HashSet<string> consumedFiles)
         {
             var directory = Path.GetDirectoryName(filename);
             var tocFileName = Path.Combine(Path.GetDirectoryName(directory), TOC_FILE_NAME);
 
-            var tocFile = _entries.GetOrAdd(tocFileName, path => TryReadTocFile(path, consumedFiles));
+            var tocFile = _entries.GetOrAdd(tocFileName, path => TryReadTocFile(path, report, consumedFiles));
             if (tocFile == null)
             {
                 return null;
@@ -106,11 +101,11 @@ namespace ITGlobal.MarkDocs.Content
             return properties;
         }
 
-        private Metadata GetPlainLevelMetadata(string filename, HashSet<string> consumedFiles)
+        private Metadata GetPlainLevelMetadata(string filename, ICompilationReportBuilder report, HashSet<string> consumedFiles)
         {
             var tocFileName = Path.Combine(Path.GetDirectoryName(filename), TOC_FILE_NAME);
 
-            var tocFile = _entries.GetOrAdd(tocFileName, path => TryReadTocFile(path, consumedFiles));
+            var tocFile = _entries.GetOrAdd(tocFileName, path => TryReadTocFile(path, report, consumedFiles));
             if (tocFile == null)
             {
                 return null;
@@ -119,8 +114,8 @@ namespace ITGlobal.MarkDocs.Content
             var properties = tocFile.TryGetMetadata(Path.GetFileNameWithoutExtension(filename));
             return properties;
         }
-        
-        private TocFile TryReadTocFile(string path, HashSet<string> consumedFiles)
+
+        private static TocFile TryReadTocFile(string path, ICompilationReportBuilder report, HashSet<string> consumedFiles)
         {
             if (!File.Exists(path))
             {
@@ -136,7 +131,7 @@ namespace ITGlobal.MarkDocs.Content
             }
             catch (Exception e)
             {
-                _log.LogError(0, e, "Unable to read TOC file '{0}'", path);
+                report.Error($"Unable to read {TOC_FILE_NAME}. {e.Message}", e);
                 return null;
             }
         }

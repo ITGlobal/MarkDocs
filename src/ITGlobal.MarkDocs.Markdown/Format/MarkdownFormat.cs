@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
+using AngleSharp.Dom.Html;
+using AngleSharp.Extensions;
+using AngleSharp.Parser.Html;
 using ITGlobal.MarkDocs.Format.Mathematics;
 using JetBrains.Annotations;
 using Markdig;
 using Markdig.Extensions.Tables;
 using Markdig.Renderers;
 using Markdig.Syntax;
-using Markdig.Syntax.Inlines;
 using Microsoft.Extensions.Logging;
 
 namespace ITGlobal.MarkDocs.Format
@@ -34,11 +35,13 @@ namespace ITGlobal.MarkDocs.Format
             new YamlMetadataExtractor()
         };
 
-        private static HashSet<string> _extensions = new HashSet<string>(StringComparer.CurrentCultureIgnoreCase)
+        internal static readonly HashSet<string> Extensions = new HashSet<string>(StringComparer.CurrentCultureIgnoreCase)
         {
             ".md",
             ".markdown"
         };
+
+        internal static readonly string[] IndexFileNames = { "index.md", "README.md" };
 
         #endregion
 
@@ -74,7 +77,7 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Get a list of index page file filters
         /// </summary>
-        public string[] IndexFileNames { get; } = { "index.md", "README.md" };
+        string[] IFormat.IndexFileNames => IndexFileNames;
 
         /// <summary>
         ///     Encoding for source files
@@ -84,43 +87,47 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Reads a page file <paramref name="filename"/> and parses it's metadata (see <see cref="Metadata"/>)
         /// </summary>
-        public Metadata ParseProperties(string filename)
+        public Metadata ParseProperties(IParsePropertiesContext ctx, string filename)
         {
             var properties = new Metadata();
             var document = ParseFile(filename);
 
             foreach (var extractor in MetadataExtractors)
             {
-                extractor.TryExtract(document, properties);
+                extractor.TryExtract(ctx, document, properties);
             }
 
             return properties;
         }
 
         /// <summary>
-        ///     Renders content of <paramref name="markup"/> into HTML
+        ///     Parses content of <paramref name="markup"/>
         /// </summary>
-        public string Render(IRenderContext ctx, string markup)
+        public IParsedPage ParsePage(IParseContext ctx, string markup)
         {
-            using (MarkdownRenderingContext.SetCurrentRenderingContext(
-                _log,
-                ctx,
-                _options,
-                _resourceUrlResolver
-                ))
+            using (MarkdownParseContext.SetCurrentParseContext(ctx))
+          //  using (MarkdownRenderingContext.SetCurrentRenderingContext(new FakeRenderContext(ctx), _options, _resourceUrlResolver))
             {
+                // Parse markdown
                 var ast = Markdig.Markdown.Parse(markup, _pipeline);
 
-                RewriteLinkUrls(ctx.Page, ast);
-
+                // Render HTML (temporary)
+                string html;
                 using (var writer = new StringWriter())
                 {
                     var renderer = new HtmlRenderer(writer);
                     _pipeline.Setup(renderer);
                     renderer.Render(ast);
                     writer.Flush();
-                    return writer.ToString();
+
+                    html = writer.ToString();
                 }
+
+                // Extract anchors
+                var anchors = new Dictionary<string, string>();
+                ExtractAnchors(ctx, html, anchors);
+
+                return new MarkdownPage(ast, _options, _pipeline, _resourceUrlResolver, anchors);
             }
         }
 
@@ -128,155 +135,31 @@ namespace ITGlobal.MarkDocs.Format
 
         #region helpers
 
-        private void RewriteLinkUrls(IPage page, MarkdownDocument ast)
+        private static void ExtractAnchors(IParseContext ctx, string html, Dictionary<string, string> anchors)
         {
-            foreach (var link in ast.Descendants().OfType<LinkInline>())
+            var parser = new HtmlParser();
+            var document = parser.Parse(html);
+            foreach (var node in document.Body.Descendents())
             {
-                var url = link.Url;
-                if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uri))
+                switch (node)
                 {
-                    continue;
-                }
-
-                if (uri.IsAbsoluteUri)
-                {
-                    continue;
-                }
-
-                string hash = null;
-                var i = url.IndexOf('#');
-                if (i >= 0)
-                {
-                    hash = url.Substring(i);
-                    url = url.Substring(0, i);
-                }
-
-                var isIndexFileLink = false;
-                var filename = Path.GetFileName(url);
-                foreach (var name in IndexFileNames)
-                {
-                    if (filename == name)
-                    {
-                        url = Path.GetDirectoryName(url);
-                        isIndexFileLink = true;
+                    case IHtmlHeadingElement heading:
+                        if (!string.IsNullOrEmpty(heading.Id))
+                        {
+                            var id = heading.Id;
+                            var text = heading.Text();
+                            if (!anchors.ContainsKey(id))
+                            {
+                                anchors.Add(id, text);
+                            }
+                            else
+                            {
+                                ctx.Warning($"Anchor \"{id}\" is defined more than once");
+                            }
+                        }
                         break;
-                    }
-                }
-
-                // Remove .md extension if specified
-                if (!isIndexFileLink)
-                {
-                    var ext = Path.GetExtension(url);
-                    if (_extensions.Contains(ext))
-                    {
-                        url = Path.ChangeExtension(url, null);
-                    }
-                }
-
-                url = _resourceUrlResolver.ResolveUrl(GetResourceFromUrl(page, link, url), page);
-
-                if (!string.IsNullOrEmpty(hash))
-                {
-                    url += hash;
-                }
-
-                link.Url = url;
-            }
-        }
-
-        private IResource GetResourceFromUrl(IPage page, LinkInline link, string url)
-        {
-            try
-            {
-                if (!url.StartsWith("/") && !url.StartsWith("\\"))
-                {
-                    url = NormalizeResourcePath(page, url);
                 }
             }
-            catch (InvalidOperationException)
-            {
-                throw new InvalidOperationException($"Href \"{url}\" is not a valid relative reference for page \"{page.Id}\"");
-            }
-
-            ResourceType type;
-            if (page.Documentation.GetPage(url) != null)
-            {
-                type = ResourceType.Page;
-            }
-            else if (page.Documentation.GetAttachment(url) != null)
-            {
-                type = ResourceType.Attachment;
-            }
-            else
-            {
-                _callback.Warning(page.Documentation.Id, page.Id, $"Invalid hyperlink: \"{url}\"", $"({link.Line}, {link.Column})");
-                type = ResourceType.Attachment;
-            }
-
-            var resource = PseudoResource.Get(page.Documentation, url, GetResourceFileName(url), type);
-            return resource;
-        }
-
-        private static string NormalizeResourcePath(IPage page, string resourceUrl)
-        {
-            var basePath = page.Id;
-
-            var basePathSegments = basePath.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
-            var basePathLen = basePathSegments.Length;
-            if (!page.PageTreeNode.IsIndexPage)
-            {
-                basePathLen--;
-            }
-
-            var resourcePathSegments = resourceUrl.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
-            var resourcePathLen = 0;
-            for (var i = 0; i < resourcePathSegments.Length; i++)
-            {
-                if (resourcePathSegments[i] == "..")
-                {
-                    basePathLen--;
-                    if (basePathLen < 0)
-                    {
-                        throw new InvalidOperationException("Invalid relative resource path");
-                    }
-                }
-                else
-                {
-                    resourcePathLen++;
-                }
-            }
-
-            var normalizedUrlSegments = new string[basePathLen + resourcePathLen];
-            var index = 0;
-            for (var i = 0; i < basePathLen; i++)
-            {
-                normalizedUrlSegments[index] = basePathSegments[i];
-                index++;
-            }
-            for (var i = 0; i < resourcePathSegments.Length; i++)
-            {
-                if (resourcePathSegments[i] != "..")
-                {
-                    normalizedUrlSegments[index] = resourcePathSegments[i];
-                    index++;
-                }
-            }
-
-            var normalizedUrl = "/" + string.Join("/", normalizedUrlSegments);
-            return normalizedUrl;
-        }
-
-        private static string GetResourceFileName(string url)
-        {
-            var filename = Path.GetFileName(url);
-
-            var ext = Path.GetExtension(filename);
-            if (ext == ".md" || ext == ".markdown")
-            {
-                filename = Path.ChangeExtension(filename, ".html");
-            }
-
-            return filename;
         }
 
         private static MarkdownPipeline CreateMarkdownPipeline(MarkdownOptions options)
@@ -376,7 +259,7 @@ namespace ITGlobal.MarkDocs.Format
             }
 
             builder.Extensions.Add(options.Rendering);
-            
+
             return builder.Build();
         }
 
@@ -386,7 +269,7 @@ namespace ITGlobal.MarkDocs.Format
             var document = Markdig.Markdown.Parse(markdown, _pipeline);
             return document;
         }
-
+        
         #endregion
     }
 }

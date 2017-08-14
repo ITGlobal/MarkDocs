@@ -24,11 +24,9 @@ namespace ITGlobal.MarkDocs.Format
         }
 
         public string Id { get; private set; }
-
         public IDocumentation Documentation { get; private set; }
-
         public string FileName { get; private set; }
-
+        public string RelativeFilePath { get; private set; }
         public ResourceType Type { get; private set; }
     }
 }

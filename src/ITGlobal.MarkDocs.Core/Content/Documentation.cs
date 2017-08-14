@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ITGlobal.MarkDocs.Cache;
+using ITGlobal.MarkDocs.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace ITGlobal.MarkDocs.Content
@@ -13,11 +14,15 @@ namespace ITGlobal.MarkDocs.Content
         #region fields
 
         private readonly MarkDocService _service;
-        private readonly RootDirectoryPageTreeNode _pageTree;
+        private readonly IContentDirectory _contentDirectory;
+        private readonly ICompilationReportBuilder _compilationReport = new CompilationReportBuilder();
 
         private readonly Dictionary<string, Page> _pages = new Dictionary<string, Page>(StringComparer.OrdinalIgnoreCase);
         private readonly List<IAttachment> _attachments = new List<IAttachment>();
         private readonly Dictionary<string, Attachment> _attachmentsById = new Dictionary<string, Attachment>(StringComparer.OrdinalIgnoreCase);
+
+        private RootDirectoryPageTreeNode _pageTree;
+
 
         #endregion
 
@@ -26,47 +31,14 @@ namespace ITGlobal.MarkDocs.Content
         /// <summary>
         ///     .ctor
         /// </summary>
-        public Documentation(
-            MarkDocService service,
-            string id,
-            IContentVersion contentVersion,
-            RootDirectoryPageTreeNode pageTree)
+        public Documentation(MarkDocService service, IContentDirectory contentDirectory)
         {
+            var id = contentDirectory.Id;
             NormalizeId(ref id);
 
             Id = id;
             _service = service;
-            _pageTree = pageTree;
-            ContentVersion = contentVersion;
-
-            // Build page dictionary
-            pageTree.ScanNodes((node, _) =>
-            {
-                if (node.IsHyperlink)
-                {
-                    var page = new Page(this, _service.Format, _service.Cache, node);
-                    _pages[node.Id] = page;
-                }
-            });
-
-            // Link nodes to documentation
-            pageTree.LinkToDocumentation(this);
-
-            // Build attachment dictionary
-            foreach (var path in pageTree.Attachments)
-            {
-                var relativePath = DirectoryScanner.GetRelativePath(pageTree.RootDirectory, path);
-
-                string contentType;
-                if (!_service.ContentTypeProvider.TryGetContentType(path, out contentType))
-                {
-                    contentType = Attachment.DEFAULT_MIME_TYPE;
-                }
-
-                var attachment = new FileAttachment(this, _service.Cache, relativePath, path, contentType);
-                _attachmentsById[attachment.Id] = attachment;
-                _attachments.Add(attachment);
-            }
+            _contentDirectory = contentDirectory;
         }
 
         #endregion
@@ -91,12 +63,17 @@ namespace ITGlobal.MarkDocs.Content
         /// <summary>
         ///     Documentation version
         /// </summary>
-        public IContentVersion ContentVersion { get; }
+        public IContentVersion ContentVersion => _contentDirectory.ContentVersion;
 
         /// <summary>
         ///     Page tree
         /// </summary>
         public IPageTree PageTree => _pageTree;
+
+        /// <summary>
+        ///     Provides errors and warning for documentation
+        /// </summary>
+        public ICompilationReport CompilationReport { get; private set; }
 
         /// <summary>
         ///     Documentation attached files
@@ -150,41 +127,115 @@ namespace ITGlobal.MarkDocs.Content
         #endregion
 
         #region methods
-        
+
         /// <summary>
         ///     Compiles documentation and builds cached pages
         /// </summary>
-        public void Compile(ICacheUpdateOperation operation)
+        public void Compile(DirectoryScanner directoryScanner, ICacheUpdateOperation operation)
         {
             using (_service.Log.BeginScope("Compile({0})", Id))
             {
+                // Scan content directory and populate pages
+                ScanDirectoryTree(directoryScanner);
+
                 // Clear cache
                 operation.Clear(this);
 
-                // Compile pages and put them into cache
-                var i = 0;
-                foreach (var page in _pages.Values)
-                {
-                    i++;
-                    _service.Callback.CompilingPage(Id, page.Id, i, _pages.Count);
+                // Parse pages
+                ParsePages();
 
-                    page.Compile(operation);
-                    _service.Log.LogDebug("Compiled page {0}:{1}", Id, page.RelativeFileName);
-                }
+                // Render pages and put them into cache
+                RenderPages(operation);
 
                 // Wait for pending page compilations since they might produce new attachments
                 operation.Flush();
 
                 // Put each non-page file into cache
-                i = 0;
-                foreach (var attachment in _attachmentsById.Values)
-                {
-                    i++;
-                    _service.Callback.CachingAttachment(Id, attachment.Id, i, _attachmentsById.Count);
+                CacheAttachments(operation);
 
-                    attachment.PutIntoCache(operation);
-                    _service.Log.LogDebug("Cached file {0}:{1}", Id, attachment.FileName);
+                CompilationReport = _compilationReport.Build();
+            }
+        }
+
+        private void ScanDirectoryTree(DirectoryScanner directoryScanner)
+        {
+            // Scan content directory
+            _pageTree = directoryScanner.ScanDirectory(_contentDirectory.Path, _compilationReport);
+
+            // Populate pages
+            _pageTree.ScanNodes((node, _) =>
+            {
+                if (node.IsHyperlink)
+                {
+                    var page = new Page(this, _service.Format, _service.Cache, node);
+                    _pages[node.Id] = page;
                 }
+            });
+
+            // Link nodes to documentation
+            _pageTree.LinkToDocumentation(this);
+
+            // Populate attachments
+            foreach (var path in _pageTree.Attachments)
+            {
+                var relativePath = DirectoryScanner.GetRelativePath(_pageTree.RootDirectory, path);
+
+                string contentType;
+                if (!_service.ContentTypeProvider.TryGetContentType(path, out contentType))
+                {
+                    contentType = Attachment.DEFAULT_MIME_TYPE;
+                }
+
+                var attachment = new FileAttachment(this, _service.Cache, relativePath, path, contentType);
+                _attachmentsById[attachment.Id] = attachment;
+                _attachments.Add(attachment);
+            }
+        }
+
+        private void ParsePages()
+        {
+            var i = 0;
+            foreach (var page in _pages.Values)
+            {
+                i++;
+                _service.Callback.ParsedPage(Id, page.Id, i, _pages.Count);
+
+                page.Parse(_compilationReport.ForPage(page));
+                _service.Log.LogDebug("Parsed page {0}:{1}", Id, page.RelativeFilePath);
+            }
+        }
+
+        private void RenderPages(ICacheUpdateOperation operation)
+        {
+            var i = 0;
+            foreach (var page in _pages.Values)
+            {
+                i++;
+
+                var j = i;
+                var p = page;
+
+                page.Render(operation, _compilationReport.ForPage(page), () =>
+                {
+                    _service.Callback.RenderedPage(Id, p.Id, j, _pages.Count);
+                });
+            }
+        }
+
+        private void CacheAttachments(ICacheUpdateOperation operation)
+        {
+            var i = 0;
+            foreach (var attachment in _attachmentsById.Values)
+            {
+                i++;
+
+                var j = i;
+                var a = attachment;
+
+                attachment.PutIntoCache(operation, () =>
+                {
+                    _service.Callback.CachedAttachment(Id, a.Id, j, _attachmentsById.Count);
+                });
             }
         }
 

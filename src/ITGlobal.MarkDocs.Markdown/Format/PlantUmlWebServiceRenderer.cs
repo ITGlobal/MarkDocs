@@ -36,9 +36,9 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Render a PlantUML into an image
         /// </summary>
-        public ImageData Render(string sourceCode)
+        public ImageData Render(string sourceCode, int? lineNumber)
         {
-            var bytes = PlantUml.Render(_url, sourceCode);
+            var bytes = PlantUml.Render(_url, sourceCode, lineNumber);
             return new ImageData(bytes);
         }
     }

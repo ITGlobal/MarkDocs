@@ -2,8 +2,6 @@
 using Markdig.Extensions.Mathematics;
 using Markdig.Renderers;
 using Markdig.Renderers.Html;
-using Microsoft.Extensions.Logging;
-using static ITGlobal.MarkDocs.Format.MarkdownRenderingContext;
 
 namespace ITGlobal.MarkDocs.Format.Mathematics
 {
@@ -13,18 +11,18 @@ namespace ITGlobal.MarkDocs.Format.Mathematics
         {
             try
             {
-                if (!IsMarkdownRenderingContextPresent || MathRenderer == null)
+                if (!MarkdownRenderingContext.IsPresent || MarkdownRenderingContext.MathRenderer == null)
                 {
                     return;
                 }
 
                 var markup = block.GetText();
-                var image = MathRenderer.Render(markup);
+                var image = MarkdownRenderingContext.MathRenderer.Render(markup, block.Line);
                 var filename = $"math_{Guid.NewGuid():N}{image.FileType}";
 
-                var illustration = RenderContext.CreateAttachment(filename, image.Content);
+                var illustration = MarkdownRenderingContext.RenderContext.CreateAttachment(filename, image.Content);
 
-                var resourceUrl = ResourceUrlResolver.ResolveUrl(illustration, RenderContext.Page);
+                var resourceUrl = MarkdownRenderingContext.ResourceUrlResolver.ResolveUrl(illustration, MarkdownRenderingContext.RenderContext.Page);
 
                 renderer.EnsureLine();
                 renderer.Write("<img src=\"");
@@ -34,9 +32,9 @@ namespace ITGlobal.MarkDocs.Format.Mathematics
                 renderer.Write(" alt=\"\"");
                 renderer.Write(" />");
             }
-            catch (Exception exception)
+            catch (Exception e)
             {
-                Logger.LogError(0, exception, "Error while rendering {0}", nameof(MathBlock));
+                MarkdownRenderingContext.RenderContext?.Error($"Failed to render math block. {e.Message}", block.Line, e);
                 renderer.WriteError("Failed to render math block");
             }
         }

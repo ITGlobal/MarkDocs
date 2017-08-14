@@ -5,8 +5,6 @@ using System.Text;
 using Markdig.Renderers;
 using Markdig.Renderers.Html;
 using Markdig.Syntax;
-using Microsoft.Extensions.Logging;
-using static ITGlobal.MarkDocs.Format.MarkdownRenderingContext;
 
 namespace ITGlobal.MarkDocs.Format.TableOfContents
 {
@@ -16,13 +14,18 @@ namespace ITGlobal.MarkDocs.Format.TableOfContents
         {
             try
             {
+                if (!MarkdownRenderingContext.IsPresent)
+                {
+                    return;
+                }
+                
                 var document = block.Document;
 
                 var headings = document.OfType<HeadingBlock>().ToArray();
 
                 var tree = GenerateTocTree(headings);
                 
-                var tocRenderer = TocRenderer;
+                var tocRenderer = MarkdownRenderingContext.TocRenderer;
                 if (tocRenderer != null)
                 {
                     tocRenderer.Render(renderer, tree);
@@ -32,16 +35,16 @@ namespace ITGlobal.MarkDocs.Format.TableOfContents
                     tree.Render(renderer);
                 }
             }
-            catch (Exception exception)
+            catch (Exception e)
             {
-                Logger.LogError(0, exception, "Error while rendering {0}", nameof(TableOfContentsBlock));
+                MarkdownRenderingContext.RenderContext?.Error($"Failed to render table of contents. {e.Message}", block.Line, e);
                 renderer.WriteError("Failed to render table of contents");
             }
         }
 
         private sealed class TocTreeNode : ITocTreeNode
         {
-            private readonly List<ITocTreeNode> children = new List<ITocTreeNode>();
+            private readonly List<ITocTreeNode> _children = new List<ITocTreeNode>();
             
             private TocTreeNode(HeadingBlock heading)
             {
@@ -52,12 +55,12 @@ namespace ITGlobal.MarkDocs.Format.TableOfContents
             public string Title => Heading?.Inline.GetText() ?? "";
             public int Level => Heading?.Level ?? 0;
 
-            public IReadOnlyList<ITocTreeNode> Children => children;
+            public IReadOnlyList<ITocTreeNode> Children => _children;
 
             public TocTreeNode AppendChild(HeadingBlock heading)
             {
                 var child = new TocTreeNode(heading);
-                children.Add(child);
+                _children.Add(child);
                 return child;
             }
 

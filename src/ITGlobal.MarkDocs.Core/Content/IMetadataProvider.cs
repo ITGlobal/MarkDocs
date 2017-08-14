@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using ITGlobal.MarkDocs.Format;
-using ITGlobal.MarkDocs.Storage;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Content
@@ -20,6 +19,9 @@ namespace ITGlobal.MarkDocs.Content
         /// <param name="filename">
         ///     Page file name
         /// </param>
+        /// <param name="report">
+        ///     Compilation report builder
+        /// </param>
         /// <param name="consumedFiles">
         ///     Consumed content files
         /// </param>
@@ -33,6 +35,7 @@ namespace ITGlobal.MarkDocs.Content
         Metadata GetMetadata(
             [NotNull] string rootDirectory,
             [NotNull] string filename, 
+            [NotNull] ICompilationReportBuilder report,
             [NotNull] HashSet<string> consumedFiles,
             bool isIndexFile
             );

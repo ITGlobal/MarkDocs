@@ -48,7 +48,8 @@ namespace ITGlobal.MarkDocs.Example
                 });
                 config.Cache.UseDisk(Path.Combine(Env.ContentRootPath, "Data", "cached-content"), enableConcurrentWrites: false);
 
-                config.Storage.UseStaticDirectory(Path.GetFullPath(Path.Combine(Env.ContentRootPath, "../../docs")), enableWatch: true);
+                //config.Storage.UseStaticDirectory(Path.GetFullPath(Path.Combine(Env.ContentRootPath, "../../docs")), enableWatch: true);
+                config.Storage.UseStaticDirectory("D:\\projects\\docs-ow-net", enableWatch: true);
                 
                 config.Extensions.AddTags();
                 config.Extensions.AddSearch(Path.Combine(Env.ContentRootPath, "Data", "search-index"));

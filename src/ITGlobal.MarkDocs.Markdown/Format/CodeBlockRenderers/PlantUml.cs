@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Markdig.Helpers;
 
 namespace ITGlobal.MarkDocs.Format.CodeBlockRenderers
@@ -11,13 +12,25 @@ namespace ITGlobal.MarkDocs.Format.CodeBlockRenderers
     /// </summary>
     internal static class PlantUml
     {
-        public static byte[] Render(string baseUrl,string markup)
+        public static byte[] Render(string baseUrl,string markup, int? lineNumber)
+            => RenderAsync(baseUrl, markup, lineNumber).Result;
+
+        private static async Task<byte[]> RenderAsync(string baseUrl, string markup, int? lineNumber)
         {
-            var url = $"{baseUrl}/png/{SerializeUml(markup)}";
-            using (var httpClient = new HttpClient())
+            try
             {
-                var bytes = httpClient.GetByteArrayAsync(url).Result;
-                return bytes;
+                var url = $"{baseUrl}/png/{SerializeUml(markup)}";
+                using (var httpClient = new HttpClient())
+                {
+                    httpClient.Timeout = TimeSpan.FromSeconds(30);
+                    var bytes = await httpClient.GetByteArrayAsync(url);
+                    return bytes;
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                MarkdownRenderingContext.RenderContext?.Error($"Failed to render PlantUML markup. {e.Message}", lineNumber, e);
+                return Array.Empty<byte>();
             }
         }
 

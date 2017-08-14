@@ -5,7 +5,6 @@ using Markdig.Renderers;
 using Markdig.Renderers.Html;
 using Markdig.Syntax;
 using Microsoft.Extensions.Logging;
-using static ITGlobal.MarkDocs.Format.MarkdownRenderingContext;
 
 namespace ITGlobal.MarkDocs.Format.CodeBlockRenderers
 {
@@ -35,6 +34,11 @@ namespace ITGlobal.MarkDocs.Format.CodeBlockRenderers
 
         protected override void Write(HtmlRenderer renderer, CodeBlock obj)
         {
+            if (!MarkdownRenderingContext.IsPresent)
+            {
+                return;
+            }
+            
             renderer.EnsureLine();
 
             var fencedCodeBlock = obj as FencedCodeBlock;
@@ -52,7 +56,7 @@ namespace ITGlobal.MarkDocs.Format.CodeBlockRenderers
                     }
                     catch (Exception exception)
                     {
-                        Logger.LogError(0, exception, "Error while rendering {0} with {1}", nameof(CodeBlock), r.GetType().Name);
+                        MarkdownRenderingContext.RenderContext.Error("Error while rendering code block", obj.Line, exception);;
                     }
                 }
 

@@ -29,7 +29,7 @@ namespace ITGlobal.MarkDocs.Content
         /// <summary>
         ///     .ctor
         /// </summary>
-        public DirectoryScanner(ILogger log, IFormat format, IStorage storage, IMarkDocsEventCallback callback)
+        public DirectoryScanner(ILogger log, IFormat format, IStorage storage)
         {
             _log = log;
             _format = format;
@@ -37,8 +37,8 @@ namespace ITGlobal.MarkDocs.Content
 
             _metadataProviders = new IMetadataProvider[]
             {
-                new TocMetadataProvider(_log),
-                new ContentMetadataProvider(format, callback),
+                new TocMetadataProvider(),
+                new ContentMetadataProvider(format),
                 new ContentIdMetadataProvider(storage)
             };
         }
@@ -53,26 +53,26 @@ namespace ITGlobal.MarkDocs.Content
         /// <param name="directory">
         ///     Content root directory
         /// </param>
+        /// <param name="report">
+        ///     Compilation report builder
+        /// </param>
         /// <returns>
         ///     Page tree
         /// </returns>
         [NotNull]
-        public RootDirectoryPageTreeNode ScanDirectory([NotNull] string directory)
+        public RootDirectoryPageTreeNode ScanDirectory([NotNull] string directory, [NotNull] ICompilationReportBuilder report)
         {
-            string id;
-            Metadata metadata;
-            string indexPageFileName;
-            List<IPageTreeNode> nodes;
             var consumedFiles = new HashSet<string>();
 
             ScanDirectory(
                 directory,
                 directory,
+                report,
                 consumedFiles,
-                out id,
-                out metadata,
-                out indexPageFileName,
-                out nodes);
+                out var id,
+                out var metadata,
+                out var indexPageFileName,
+                out var nodes);
 
             if (indexPageFileName != null)
             {
@@ -114,18 +114,19 @@ namespace ITGlobal.MarkDocs.Content
         private bool ScanDirectory(
             string rootDirectory,
             string path,
+            ICompilationReportBuilder report,
             HashSet<string> consumedFiles,
             out string id,
             out Metadata metadata,
             out string indexPageFileName,
             out List<IPageTreeNode> nodes)
         {
-            ScanDirectorySubdirectories(rootDirectory, path, consumedFiles, out nodes);
+            ScanDirectorySubdirectories(rootDirectory, path, report, consumedFiles, out nodes);
 
             var pages = ScanDirectoryFiles(rootDirectory, path, out indexPageFileName);
             foreach (var filename in pages)
             {
-                nodes.Add(LeafNode(rootDirectory, filename, consumedFiles));
+                nodes.Add(LeafNode(rootDirectory, filename, report, consumedFiles));
             }
 
             id = GetRelativePath(rootDirectory, path);
@@ -134,7 +135,7 @@ namespace ITGlobal.MarkDocs.Content
             metadata = null;
             if (indexPageFileName != null)
             {
-                metadata = GetMetadata(rootDirectory, indexPageFileName, consumedFiles, true);
+                metadata = GetMetadata(rootDirectory, indexPageFileName, report, consumedFiles, true);
             }
             metadata = metadata ?? new Metadata();
             if (string.IsNullOrEmpty(metadata.Title))
@@ -156,6 +157,7 @@ namespace ITGlobal.MarkDocs.Content
         private void ScanDirectorySubdirectories(
             string rootDirectory,
             string directory,
+            ICompilationReportBuilder report,
             HashSet<string> consumedFiles,
             out List<IPageTreeNode> nodes)
         {
@@ -169,7 +171,7 @@ namespace ITGlobal.MarkDocs.Content
                     continue;
                 }
 
-                var node = DirectoryNode(rootDirectory, subDirectory, consumedFiles);
+                var node = DirectoryNode(rootDirectory, subDirectory, report, consumedFiles);
                 if (node != null)
                 {
                     nodes.Add(node);
@@ -232,21 +234,17 @@ namespace ITGlobal.MarkDocs.Content
             return pages;
         }
 
-        private IPageTreeNode DirectoryNode(string rootDirectory, string path, HashSet<string> consumedFiles)
+        private IPageTreeNode DirectoryNode(string rootDirectory, string path, ICompilationReportBuilder report, HashSet<string> consumedFiles)
         {
-            string id;
-            Metadata metadata;
-            string indexPageFileName;
-            List<IPageTreeNode> nodes;
-
             if (!ScanDirectory(
                 rootDirectory,
                 path,
+                report,
                 consumedFiles,
-                out id,
-                out metadata,
-                out indexPageFileName,
-                out nodes))
+                out var id,
+                out var metadata,
+                out var indexPageFileName,
+                out var nodes))
             {
                 return null;
             }
@@ -269,12 +267,12 @@ namespace ITGlobal.MarkDocs.Content
                 nodes);
         }
 
-        private IPageTreeNode LeafNode(string rootDirectory, string path, HashSet<string> consumedFiles)
+        private IPageTreeNode LeafNode(string rootDirectory, string path, ICompilationReportBuilder report, HashSet<string> consumedFiles)
         {
             var id = GetRelativePath(rootDirectory, path);
             id = Path.Combine(Path.GetDirectoryName(id), Path.GetFileNameWithoutExtension(id));
 
-            var properties = GetMetadata(rootDirectory, path, consumedFiles, false);
+            var properties = GetMetadata(rootDirectory, path, report, consumedFiles, false);
             if (string.IsNullOrEmpty(properties.Title))
             {
                 properties.Title = Path.GetFileNameWithoutExtension(path);
@@ -289,7 +287,7 @@ namespace ITGlobal.MarkDocs.Content
             {
                 var normalizedRootPath = Path.GetFullPath(rootDirectory);
                 var normalizedPath = Path.GetFullPath(path);
-                
+
                 if (!normalizedPath.StartsWith(normalizedRootPath))
                 {
                     throw new Exception($"\"{normalizedRootPath}\" is not a valid root for \"{normalizedPath}\"");
@@ -302,7 +300,7 @@ namespace ITGlobal.MarkDocs.Content
                 {
                     relativePath = relativePath.Substring(1);
                 }
-                
+
                 return relativePath;
             }
             catch (Exception e)
@@ -312,8 +310,9 @@ namespace ITGlobal.MarkDocs.Content
         }
 
         private Metadata GetMetadata(
-            string rootDirectory, 
-            string filename, 
+            string rootDirectory,
+            string filename,
+            ICompilationReportBuilder report,
             HashSet<string> consumedFiles,
             bool isIndexFile)
         {
@@ -321,7 +320,7 @@ namespace ITGlobal.MarkDocs.Content
 
             foreach (var provider in _metadataProviders)
             {
-                var p = provider.GetMetadata(rootDirectory, filename, consumedFiles, isIndexFile);
+                var p = provider.GetMetadata(rootDirectory, filename, report, consumedFiles, isIndexFile);
                 if (p != null)
                 {
                     properties.CopyFrom(p);
@@ -330,7 +329,7 @@ namespace ITGlobal.MarkDocs.Content
 
             if (string.IsNullOrEmpty(properties.Title))
             {
-                _log.LogWarning("'{0}' - no title found!", filename);
+                report.ForFile(filename).Warning("No page title found");
             }
 
             return properties;

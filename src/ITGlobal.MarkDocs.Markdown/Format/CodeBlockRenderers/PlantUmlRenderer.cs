@@ -1,7 +1,6 @@
 using System;
 using Markdig.Renderers;
 using Markdig.Syntax;
-using static ITGlobal.MarkDocs.Format.MarkdownRenderingContext;
 
 namespace ITGlobal.MarkDocs.Format.CodeBlockRenderers
 {
@@ -9,18 +8,18 @@ namespace ITGlobal.MarkDocs.Format.CodeBlockRenderers
     {
         public bool Write(HtmlRenderer renderer, FencedCodeBlock block)
         {
-            if (!IsMarkdownRenderingContextPresent || UmlRenderer == null)
+            if (!MarkdownRenderingContext.IsPresent || MarkdownRenderingContext.UmlRenderer == null)
             {
                 return false;
             }
-            
-            var markup = block.GetText();
-            var image = UmlRenderer.Render(markup);
-            var filename = $"uml_{Guid.NewGuid():N}{image.FileType}";
-            
-            var illustration = RenderContext.CreateAttachment(filename, image.Content);
 
-            var resourceUrl = ResourceUrlResolver.ResolveUrl(illustration, RenderContext.Page);
+            var markup = block.GetText();
+            var image = MarkdownRenderingContext.UmlRenderer.Render(markup, block.Line);
+            var filename = $"uml_{Guid.NewGuid():N}{image.FileType}";
+
+            var illustration = MarkdownRenderingContext.RenderContext.CreateAttachment(filename, image.Content);
+
+            var resourceUrl = MarkdownRenderingContext.ResourceUrlResolver.ResolveUrl(illustration, MarkdownRenderingContext.RenderContext.Page);
 
             renderer.Write("<img src=\"");
             renderer.WriteEscapeUrl(resourceUrl);

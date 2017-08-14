@@ -9,7 +9,7 @@ namespace ITGlobal.MarkDocs
     [PublicAPI]
     public class MarkDocsEventCallback : IMarkDocsEventCallback
     {
-        private sealed class EmptyToken: IDisposable
+        private sealed class EmptyToken : IDisposable
         {
             public void Dispose() { }
         }
@@ -35,19 +35,26 @@ namespace ITGlobal.MarkDocs
         public virtual void StorageChanged(string id = null) { }
 
         /// <summary>
-        ///     This method is called when MarkDocs is compiling specified page
+        ///     This method is called when MarkDocs is parsing specified page
         /// </summary>
-        public virtual void CompilingPage(string documentationId, string id, int i, int count) { }
+        [PublicAPI]
+        public virtual void ParsedPage([NotNull] string documentationId, [NotNull] string id, int i, int count) { }
+
+        /// <summary>
+        ///     This method is called when MarkDocs is rendering specified page
+        /// </summary>
+        [PublicAPI]
+        public virtual void RenderedPage([NotNull] string documentationId, [NotNull] string id, int i, int count) { }
 
         /// <summary>
         ///     This method is called when MarkDocs is caching specified attachment
         /// </summary>
-        public virtual void CachingAttachment(string documentationId, string id, int i, int count) { }
+        public virtual void CachedAttachment(string documentationId, string id, int i, int count) { }
 
         /// <summary>
         ///     This method is called when MarkDocs fails to render a page
         /// </summary>
-        public virtual void Warning(string documentationId, string pageId, string message, string location = null) {}
+        public virtual void Warning(string documentationId, string pageId, string message, string location = null) { }
 
         /// <summary>
         ///     This method is called when MarkDocs detects non-fatal issues when rendering a page

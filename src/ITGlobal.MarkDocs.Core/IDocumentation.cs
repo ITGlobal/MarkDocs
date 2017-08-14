@@ -38,6 +38,12 @@ namespace ITGlobal.MarkDocs
         /// </summary>
         [PublicAPI, NotNull]
         IPageTree PageTree { get; }
+        
+        /// <summary>
+        ///     Provides errors and warning for documentation
+        /// </summary>
+        [PublicAPI]
+        ICompilationReport CompilationReport { get; }
 
         /// <summary>
         ///     Documentation attached files

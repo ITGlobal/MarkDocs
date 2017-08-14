@@ -28,6 +28,12 @@ namespace ITGlobal.MarkDocs
         bool IsIndexPage { get; }
 
         /// <summary>
+        ///     Path to resource file with extension (relative to root directory)
+        /// </summary>
+        [PublicAPI, NotNull]
+        string RelativeFilePath { get; }
+
+        /// <summary>
         ///     A reference to a parent node. Null for root nodes
         /// </summary>
         [PublicAPI, CanBeNull]

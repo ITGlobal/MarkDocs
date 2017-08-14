@@ -6,7 +6,7 @@ namespace ITGlobal.MarkDocs.Format
 {
     internal sealed class HeadingMetadataExtractor : IMetadataExtractor
     {
-        public void TryExtract(MarkdownDocument document, Metadata metadata)
+        public void TryExtract(IParsePropertiesContext ctx, MarkdownDocument document, Metadata metadata)
         {
             HeadingBlock header = null;
             string title = null;

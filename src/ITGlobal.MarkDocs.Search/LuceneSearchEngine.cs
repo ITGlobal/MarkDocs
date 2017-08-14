@@ -146,7 +146,7 @@ namespace ITGlobal.MarkDocs.Search
                         var page = documentation.GetPage(id);
                         if (page == null)
                         {
-                            _log.LogWarning("Page [{0}!{1}] has not been found while searching for '{2}'", documentation.Id, id, q);
+                            _log.LogWarning("Page {0}:{1} has not been found while searching for '{2}'", documentation.Id, id, q);
                             continue;
                         }
 
@@ -266,7 +266,7 @@ namespace ITGlobal.MarkDocs.Search
 
         private void IndexPage(IndexWriter writer, IPage page)
         {
-            _log.LogDebug("Indexing page [{0}!{1}]...", page.Documentation.Id, page.Id);
+            _log.LogDebug("Indexing page {0}:{1}...", page.Documentation.Id, page.Id);
 
             // Render page into plain text
             var plainText = page.RenderPlainText();

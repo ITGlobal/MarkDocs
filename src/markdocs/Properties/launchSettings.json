@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "markdocs-lint": {
+      "commandName": "Project",
+      "commandLineArgs": "lint"
+    }
+  }
+}

@@ -17,7 +17,7 @@ namespace ITGlobal.MarkDocs.Cache
         /// </param>
         [PublicAPI]
         void Clear([NotNull] IDocumentation documentation);
-        
+
         /// <summary>
         ///     Caches content
         /// </summary>
@@ -27,8 +27,11 @@ namespace ITGlobal.MarkDocs.Cache
         /// <param name="content">
         ///     Item content
         /// </param>
+        /// <param name="callback">
+        ///     A callback that is called after cache item is written into cache
+        /// </param>
         [PublicAPI]
-        void Write([NotNull] IResource item, [NotNull] IResourceContent content);
+        void Write([NotNull] IResource item, [NotNull] IResourceContent content, [CanBeNull] Action callback);
 
         /// <summary>
         ///     Flushes all cached content changes

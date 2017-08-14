@@ -1,18 +1,13 @@
-[CmdletBinding()]
-Param(
-    [ValidateSet("Release", "Debug")] 
-    [string]   $config = "Release",
-    [switch]   $v,
-    [Parameter(Position=0,Mandatory=$false)]    
-    [string]   $target = "default",
-    [Parameter(Position=1,Mandatory=$false,ValueFromRemainingArguments=$true)]
-    [string[]] $vargs
-)
-
-$Script = "./scripts/build.cake"
-$Verbosity = "Normal"
-if($v) {
-    $Verbosity = "Diagnostic"
+function run($file) {
+    & $file
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "'$file' exited with $LASTEXITCODE"
+        exit $LASTEXITCODE
+    }
 }
 
-& ./scripts/build.ps1 -script $Script -target $target -configuration $config -verbosity $Verbosity -experimental -scriptArgs $vargs
+run ./build-version.ps1
+run ./build-clean.ps1
+run ./build-restore.ps1
+run ./build-packages.ps1
+run ./build-tools.ps1

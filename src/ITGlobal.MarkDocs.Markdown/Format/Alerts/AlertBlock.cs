@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ITGlobal.MarkDocs.Format.ChildrenList;
-using Markdig.Parsers;
+﻿using Markdig.Parsers;
 using Markdig.Syntax;
 
 namespace ITGlobal.MarkDocs.Markdown.Format
