@@ -22,7 +22,8 @@ deploy:
     secure: r5vF3QENzP28+dU6gvmD7Sqbdt5Ti43yhuSye3O7TJxKT+6vuponJ7tVwkGkotH7
   on:
     branch: master
-  skip_symbols: true
+  skip_symbols: false
+  artifact: artifacts\ITGlobal.*.nupkg
 notifications:
 - provider: Slack
   incoming_webhook: a7TE9Xu2mdPphDJSk5r/BQn+2npcVDiJIrzR8tYselHQvWmSleO8NGdGVaLAxVw6yhVyzQh2IT9rEDXYssazCgdoW96THTdfjK2X2e0iLzk=
