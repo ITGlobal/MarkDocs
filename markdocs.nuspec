@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package 
+  xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>markdocs</id>
+    <version>0.0.0-pre</version>
+    <packageSourceUrl>https://github.com/ITGlobal/MarkDocs</packageSourceUrl>
+    <owners>IT Global LLC</owners>
+    <title>markdocs (Install)</title>
+    <authors>IT Global LLC</authors>
+    <projectUrl>https://github.com/ITGlobal/MarkDocs</projectUrl>
+    <copyright>IT Global LLC</copyright>
+    <licenseUrl>https://raw.githubusercontent.com/ITGlobal/MarkDocs/master/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/ITGlobal/MarkDocs</projectSourceUrl>
+    <!--<docsUrl>At what url are the software docs located?</docsUrl>-->
+    <bugTrackerUrl>https://github.com/ITGlobal/MarkDocs/issues</bugTrackerUrl>
+    <tags>markdocs markdown documentation aspnet aspnetcore</tags>
+    <summary>Command line tools for IT Global MarkDocs</summary>
+    <description>Command line tools for IT Global MarkDocs</description>
+    <dependencies></dependencies>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+    <file src="*.dll" target="tools" />
+    <file src="*.exe" target="tools" />
+  </files>
+</package>

@@ -8,10 +8,14 @@ cache:
 - 'C:\projects\MarkDocs\scripts\tools'
 build_script:
 - ps: '& ./build.ps1'
+- ps: '& ./push-choco.ps1'
 test: off
 artifacts:
 - path: artifacts\**\*.nupkg
 - path: artifacts\**\*.zip
+environment:
+  CHOCO_API_KEY:
+    secure: DLPmZhl7Zr4qqU3JIzGsA4opRPGjNZZkH/MSkOQKbL8iYyf7+sSFmG418+QjeUy2
 deploy:
 - provider: NuGet
   api_key:
