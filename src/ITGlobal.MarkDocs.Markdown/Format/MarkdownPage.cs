@@ -195,6 +195,14 @@ namespace ITGlobal.MarkDocs.Format
                         link.Line
                     );
                 }
+                else if (referencedPage == page)
+                {
+                    var text=link.GetText();
+                    MarkdownRenderingContext.RenderContext.Warning(
+                        $"Link [{text}]({url}#{hash}) can be replaced with {text}](#{hash})",
+                        link.Line
+                    );
+                }
                 
                 url += "#" + hash;
             }
