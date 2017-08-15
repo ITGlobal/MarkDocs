@@ -13,10 +13,16 @@ artifacts:
 - path: artifacts\**\*.nupkg
 - path: artifacts\**\*.zip
 environment:
+  CHOCO_PUSH_PUBLIC: 0
+  CHOCO_PUSH_PRIVATE: 1
   CHOCO_API_KEY:
     secure: DLPmZhl7Zr4qqU3JIzGsA4opRPGjNZZkH/MSkOQKbL8iYyf7+sSFmG418+QjeUy2
   NUGET_API_KEY:
     secure: r5vF3QENzP28+dU6gvmD7Sqbdt5Ti43yhuSye3O7TJxKT+6vuponJ7tVwkGkotH7
+  CHOCO_PRIVATE_URL:
+    secure: PbtRYek+AtjgpV7a2nkfX0UzwpAcZhP+xUU9eA3hXo4982NzrZV6/LmvBmANEwFszUupJpKJoeA1FPPJKx6sZA==
+  CHOCO_PRIVATE_API_KEY:
+    secure: +otm426DP2sxI+6uwbY9OKDwwo9GHQOmNjk1AcDgL0nroXmr0YQs7Z8A7Xy6hVPm
 deploy_script:
 - ps: '& ./push.ps1'
 notifications:

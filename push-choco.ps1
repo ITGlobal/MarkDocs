@@ -5,12 +5,6 @@ if (!$VERSION) {
     $VERSION = "0.0.0-dev"
 }
 
-$CHOCO_API_KEY = $env:CHOCO_API_KEY
-if(!$CHOCO_API_KEY) {
-    Write-Host "`$CHOCO_API_KEY is not set" -f yellow
-    return
-}
-
 $package ="markdocs.$VERSION.nupkg"
 $path = Join-Path $ARTIFACTS $package
 if(-not (Test-Path $path)) {
@@ -18,12 +12,21 @@ if(-not (Test-Path $path)) {
     exit 1
 }
 
-Write-host "Pushing package $package"
-
-choco push $path --apikey=$CHOCO_API_KEY -v --source="https://push.chocolatey.org/"
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "'choco push' exited with $LASTEXITCODE"
-    exit 1
+function push-once($url, $apiKey, $isEnabled, $type) {
+    if(-not ([string]::IsNullOrEmpty($url)) -and -not ([string]::IsNullOrEmpty($apiKey)) -and ([int]$isEnabled -ne 0)) {
+        Write-host "Pushing package $package to $type..."
+        
+        choco push $path --apikey=$apiKey -v --source="$url"
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "'choco push' exited with $LASTEXITCODE"
+            exit 1
+        }
+        
+        Write-Host "Success"
+    } else {
+        Write-host "Won't push package to $type"
+    }  
 }
 
-Write-Host "Success"
+push-once "https://push.chocolatey.org/" $env:CHOCO_API_KEY $env:CHOCO_PUSH_PUBLIC "chocolatey.org"
+push-once $env:CHOCO_PRIVATE_URL $env:CHOCO_PRIVATE_API_KEY $env:CHOCO_PUSH_PRIVATE "private chocolatey feed"
