@@ -19,7 +19,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.1" />
     <PackageReference Include="SharpYaml.NetStandard" Version="1.5.4" />
-    <PackageReference Include="Markdig" Version="0.10.5" />
+    <PackageReference Include="Markdig" Version="0.14.8" />
     <PackageReference Include="ColorCode.Netstandard" Version="1.0.4.3" />
     <PackageReference Include="AngleSharp" Version="0.9.9" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.3.0" />
