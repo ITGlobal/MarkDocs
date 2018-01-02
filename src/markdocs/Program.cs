@@ -75,7 +75,7 @@ namespace ITGlobal.MarkDocs.Tools
 
                         SetupLogger(verboseSwitch.IsSet);
                         var path = Path.GetFullPath(pathParameter.Value);
-                        Linter.Run(path, ServiceProvider.Factory, verboseSwitch.IsSet, summarySwitch.IsSet);
+                        Linter.Run(path, verboseSwitch.IsSet, summarySwitch.IsSet);
 
                         return 0;
                     });
@@ -123,8 +123,8 @@ namespace ITGlobal.MarkDocs.Tools
                             : "";
 
                         return Generator.Run(
-                            ServiceProvider.Factory,
-                            path, outputPath,
+                            path, 
+                            outputPath,
                             templateName,
                             verboseSwitch.IsSet
                         );
@@ -258,19 +258,4 @@ namespace ITGlobal.MarkDocs.Tools
             Log.Logger = configuration.CreateLogger();
         }
     }
-
-    public static class CliHelper
-    {
-        public static IDisposable SpinnerSafe(string title)
-        {
-            if (!Console.IsOutputRedirected)
-            {
-                return CLI.Spinner(title);
-            }
-
-            Console.Error.WriteLine(title);
-            return null;
-        }
-    }
-
 }

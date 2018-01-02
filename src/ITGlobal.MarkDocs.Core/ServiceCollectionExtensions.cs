@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Linq;
 using ITGlobal.MarkDocs.Cache;
-using ITGlobal.MarkDocs.Format;
-using ITGlobal.MarkDocs.Storage;
 using JetBrains.Annotations;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ITGlobal.MarkDocs
@@ -27,29 +24,13 @@ namespace ITGlobal.MarkDocs
         [PublicAPI]
         public static void AddMarkDocs(this IServiceCollection services, Action<MarkDocsConfigurationBuilder> configure)
         {
-            var builder = new MarkDocsConfigurationBuilder(services);
+            var builder = new MarkDocsConfigurationBuilder();
             builder.Cache.UseNull();
             configure(builder);
 
-            services.AddSingleton<MarkDocService>();
-            services.AddSingleton<IMarkDocService, MarkDocService>();
+            var factory = builder.Build();
 
-            VerifyService<IStorage>(services);
-            VerifyService<IFormat>(services);
-            VerifyService<ICache>(services);
-        }
-
-        private static IMarkDocService CreateService(IServiceProvider sp)
-        {
-            IMarkDocService service = sp.GetRequiredService<MarkDocService>();
-            var lifetime = sp.GetService<IApplicationLifetime>();
-
-            if (lifetime != null)
-            {
-                lifetime.ApplicationStopping.Register(() => service.Dispose());
-            }
-
-            return service;
+            services.AddSingleton(factory);
         }
 
         private static void VerifyService<T>(IServiceCollection services)

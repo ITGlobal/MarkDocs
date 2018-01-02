@@ -1,8 +1,5 @@
 ﻿using System;
-using ITGlobal.MarkDocs;
-using ITGlobal.MarkDocs.Storage;
 using JetBrains.Annotations;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ITGlobal.MarkDocs.Git
 {
@@ -29,11 +26,7 @@ namespace ITGlobal.MarkDocs.Git
             [NotNull] this MarkDocsStorageConfigurationBuilder config,
             [NotNull] GitStorageOptions options)
         {
-            config.Use(services =>
-            {
-                services.AddSingleton(options);
-                services.AddSingleton<IStorage, GitStorage>();
-            });
+            config.Use(ctx => new GitStorage(ctx.LoggerFactory, options));
             return config;
         }
 

@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ITGlobal.MarkDocs.Cache
 {
@@ -21,7 +20,7 @@ namespace ITGlobal.MarkDocs.Cache
         [PublicAPI, NotNull]
         public static MarkDocsCacheConfigurationBuilder UseNull([NotNull] this MarkDocsCacheConfigurationBuilder config)
         {
-            config.Use(services => services.AddSingleton<ICache, NullCache>());
+            config.Use(services => new NullCache());
             return config;
         }
 
@@ -70,11 +69,7 @@ namespace ITGlobal.MarkDocs.Cache
             [NotNull] this MarkDocsCacheConfigurationBuilder config,
             [NotNull] DiskCacheOptions options)
         {
-            config.Use(services =>
-            {
-                services.AddSingleton(options);
-                services.AddSingleton<ICache, DiskCache>();
-            });
+            config.Use(ctx => new DiskCache(ctx.LoggerFactory, options));
             return config;
         }
     }

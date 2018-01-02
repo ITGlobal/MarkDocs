@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ITGlobal.MarkDocs.Extensions
 {
@@ -10,37 +11,21 @@ namespace ITGlobal.MarkDocs.Extensions
     [PublicAPI]
     public sealed class MarkDocsExtensionConfigurationBuilder
     {
-        private readonly IServiceCollection _services;
-
-        internal MarkDocsExtensionConfigurationBuilder(IServiceCollection services)
-        {
-            _services = services;
-        }
+        private readonly List<Func<MarkdocsFactoryContext, IExtensionFactory>> _extensions = new List<Func<MarkdocsFactoryContext, IExtensionFactory>>();
 
         /// <summary>
         ///     Adds an extension
         /// </summary>
         [PublicAPI, NotNull]
-        public MarkDocsExtensionConfigurationBuilder Add([NotNull] Func<IServiceCollection, Func<IServiceProvider, IExtensionFactory>> factory)
+        public MarkDocsExtensionConfigurationBuilder Add([NotNull] Func<MarkdocsFactoryContext, IExtensionFactory> func)
         {
-            _services.AddSingleton(factory(_services));
+            _extensions.Add(func);
             return this;
         }
 
-        /// <summary>
-        ///     Adds an extension
-        /// </summary>
-        [PublicAPI, NotNull]
-        public MarkDocsExtensionConfigurationBuilder Add<TExtensionFactory>(Action<IServiceCollection> configureServices = null)
-            where TExtensionFactory : IExtensionFactory
+        internal IExtensionFactory[] Build(MarkdocsFactoryContext context)
         {
-            if (configureServices != null)
-            {
-                configureServices(_services);
-            }
-
-            _services.AddSingleton(typeof(IExtensionFactory), typeof(TExtensionFactory));
-            return this;
+            return _extensions.Select(factory => factory(context)).ToArray();
         }
     }
 }

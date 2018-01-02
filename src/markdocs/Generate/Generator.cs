@@ -1,18 +1,16 @@
 ﻿using System;
 using System.IO;
 using ITGlobal.CommandLine;
-using ITGlobal.MarkDocs.Cache;
 using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Storage;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace ITGlobal.MarkDocs.Tools.Generate
 {
     public static class Generator
     {
         public static int Run(
-            Func<Action<IServiceCollection>, ServiceProvider> factory,
             string sourceDir,
             string targetDir,
             string templateName,
@@ -36,15 +34,13 @@ namespace ITGlobal.MarkDocs.Tools.Generate
                     }
                     return 1;
             }
-
-            ServiceProvider provider;
+            
             IMarkDocService markdocs;
             
             using (CliHelper.SpinnerSafe("Initializing..."))
             {
-                provider = factory(services =>
-                {
-                    services.AddMarkDocs(config =>
+                markdocs = MarkDocsFactory.Create(
+                    config =>
                     {
                         if (verbose)
                         {
@@ -52,7 +48,7 @@ namespace ITGlobal.MarkDocs.Tools.Generate
                         }
 
                         config.Storage.UseStaticDirectory(sourceDir);
-                        config.Cache.Use(sp => sp.AddSingleton<ICache>(new OutputCache(targetDir, template)));
+                        config.Cache.Use(_ => new OutputCache(targetDir, template));
                         config.Format.UseMarkdown(new MarkdownOptions
                         {
                             ResourceUrlResolver = new GeneratorResourceUrlResolver(),
@@ -60,10 +56,9 @@ namespace ITGlobal.MarkDocs.Tools.Generate
                                 new ServerHighlightJsSyntaxColorizer(Path.Combine(Path.GetTempPath(),
                                     $"markdocs-build-{Guid.NewGuid():N}"))
                         });
-                    });
-                });
-
-                markdocs = provider.GetRequiredService<IMarkDocService>();
+                    },
+                    new LoggerFactory().AddSerilog()
+                );
             }
 
             Console.WriteLine();
@@ -84,9 +79,8 @@ namespace ITGlobal.MarkDocs.Tools.Generate
             }
             Console.WriteLine(" template");
 
-            using (provider)
+            using (markdocs)
             {
-                
                 markdocs.Initialize();
 
                 Program.PrintReport(markdocs.Documentations[0].CompilationReport, verbose);

@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ITGlobal.MarkDocs.Format
 {
@@ -20,11 +19,7 @@ namespace ITGlobal.MarkDocs.Format
         {
             options = options ?? new MarkdownOptions();
 
-            config.Use(services =>
-            {
-                services.AddSingleton(options);
-                services.AddSingleton<IFormat, MarkdownFormat>();
-            });
+            config.Use(ctx => new MarkdownFormat(options, ctx.LoggerFactory, ctx.Callback));
             return config;
         }
     }

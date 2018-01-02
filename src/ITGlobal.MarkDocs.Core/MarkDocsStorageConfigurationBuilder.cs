@@ -1,6 +1,6 @@
 ﻿using System;
+using ITGlobal.MarkDocs.Storage;
 using JetBrains.Annotations;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ITGlobal.MarkDocs
 {
@@ -10,21 +10,26 @@ namespace ITGlobal.MarkDocs
     [PublicAPI]
     public sealed class MarkDocsStorageConfigurationBuilder
     {
-        private readonly IServiceCollection _services;
-
-        internal MarkDocsStorageConfigurationBuilder(IServiceCollection services)
-        {
-            _services = services;
-        }
-
+        private Func<MarkdocsFactoryContext, IStorage> _factory;
+        
         /// <summary>
         ///     Applies specified configuration functions
         /// </summary>
         [PublicAPI, NotNull]
-        public MarkDocsStorageConfigurationBuilder Use([NotNull] Action<IServiceCollection> func)
+        public MarkDocsStorageConfigurationBuilder Use([NotNull] Func<MarkdocsFactoryContext, IStorage> func)
         {
-            func(_services);
+            _factory = func;
             return this;
+        }
+        
+        internal IStorage Build(MarkdocsFactoryContext context)
+        {
+            if (_factory == null)
+            {
+                throw new Exception($"Service {typeof(IStorage).FullName} is not configured");
+            }
+
+            return _factory(context);
         }
     }
 }

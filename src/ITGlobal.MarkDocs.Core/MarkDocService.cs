@@ -152,6 +152,10 @@ namespace ITGlobal.MarkDocs
         /// <inheritdoc />
         TExtension IMarkDocService.GetExtension<TExtension>() => _extensions.GetExtension<TExtension>();
 
+        #endregion
+
+        #region IDisposable
+
         /// <inheritdoc />
         void IDisposable.Dispose()
         {
@@ -161,6 +165,7 @@ namespace ITGlobal.MarkDocs
             _extensions.Dispose();
 
             // Dispose services
+            (Callback as IDisposable)?.Dispose();
             (Storage as IDisposable)?.Dispose();
             (Cache as IDisposable)?.Dispose();
             (Format as IDisposable)?.Dispose();

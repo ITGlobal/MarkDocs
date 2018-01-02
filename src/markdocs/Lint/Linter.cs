@@ -1,10 +1,10 @@
 using System;
 using System.IO;
 using System.Linq;
-using ITGlobal.MarkDocs.Cache;
 using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Storage;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace ITGlobal.MarkDocs.Tools.Lint
 {
@@ -12,18 +12,15 @@ namespace ITGlobal.MarkDocs.Tools.Lint
     {
         public static void Run(
             string path,
-            Func<Action<IServiceCollection>, ServiceProvider> factory,
             bool verbose,
             bool summary)
         {
-            ServiceProvider provider;
             IMarkDocService markdocs;
 
             using (CliHelper.SpinnerSafe("Initializing..."))
             {
-                provider = factory(services =>
-                {
-                    services.AddMarkDocs(config =>
+                markdocs = MarkDocsFactory.Create(
+                    config =>
                     {
                         if (verbose)
                         {
@@ -31,7 +28,7 @@ namespace ITGlobal.MarkDocs.Tools.Lint
                         }
 
                         config.Storage.UseStaticDirectory(path);
-                        config.Cache.Use(sp => sp.AddSingleton<ICache>(new LinterCache()));
+                        config.Cache.Use(_ => new LinterCache());
                         config.Format.UseMarkdown(new MarkdownOptions
                         {
                             ResourceUrlResolver = new ResourceUrlResolver(),
@@ -39,13 +36,13 @@ namespace ITGlobal.MarkDocs.Tools.Lint
                                 new ServerHighlightJsSyntaxColorizer(Path.Combine(Path.GetTempPath(),
                                     $"markdocs-lint-{Guid.NewGuid():N}"))
                         });
-                    });
-                });
 
-                markdocs = provider.GetRequiredService<IMarkDocService>();
+                    },
+                    new LoggerFactory().AddSerilog()
+                );
             }
 
-            using (provider)
+            using (markdocs)
             {
                 using (CliHelper.SpinnerSafe("Running linter..."))
                 {

@@ -18,7 +18,7 @@ namespace ITGlobal.MarkDocs.Tags
         [PublicAPI]
         public static void AddTags([NotNull] this MarkDocsExtensionConfigurationBuilder configuration)
         {
-            configuration.Add<TagsExtensionFactory>();
+            configuration.Add(_ => new TagsExtensionFactory());
         }
     }
 }

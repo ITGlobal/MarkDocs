@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using ITGlobal.MarkDocs.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ITGlobal.MarkDocs.Search
 {
@@ -42,10 +41,10 @@ namespace ITGlobal.MarkDocs.Search
             [NotNull] this MarkDocsExtensionConfigurationBuilder configuration,
             [NotNull] SearchOptions options)
         {
-            configuration.Add<SearchExtensionFactory>(services =>
+            configuration.Add(ctx =>
             {
-                services.AddSingleton(options);
-                services.AddSingleton<LuceneSearchEngine>();
+                var searchEngine = new LuceneSearchEngine(ctx.LoggerFactory, options);
+                return new SearchExtensionFactory(searchEngine);
             });
         }
     }

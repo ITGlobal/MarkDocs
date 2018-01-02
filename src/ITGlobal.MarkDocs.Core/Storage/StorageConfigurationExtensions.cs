@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ITGlobal.MarkDocs.Storage
 {
@@ -59,18 +58,14 @@ namespace ITGlobal.MarkDocs.Storage
             [NotNull] this MarkDocsStorageConfigurationBuilder config,
             [NotNull] StaticStorageOptions options)
         {
-            config.Use(services =>
+            if (options.UseSubdirectories)
             {
-                services.AddSingleton(options);
-                if (options.UseSubdirectories)
-                {
-                    services.AddSingleton<IStorage, StaticMultiStorage>();
-                }
-                else
-                {
-                    services.AddSingleton<IStorage, StaticStorage>();
-                }
-            });
+                config.Use(_ => new StaticMultiStorage(options));
+            }
+            else
+            {
+                config.Use(_ => new StaticStorage(options));
+            }
             return config;
         }
     }
