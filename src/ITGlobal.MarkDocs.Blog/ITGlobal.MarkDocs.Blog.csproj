@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
+  </PropertyGroup>
+  <Import Project="../common.props" />
+  <PropertyGroup>
+    <AssemblyTitle>MarkDocs</AssemblyTitle>
+    <AssemblyName>ITGlobal.MarkDocs.Blog</AssemblyName>
+    <PackageId>ITGlobal.MarkDocs.Blog</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.csproj" />
+    <ProjectReference Include="..\ITGlobal.MarkDocs.Markdown\ITGlobal.MarkDocs.Markdown.csproj" />
+    <ProjectReference Include="..\ITGlobal.MarkDocs.Git\ITGlobal.MarkDocs.Git.csproj" />
+    <ProjectReference Include="..\ITGlobal.MarkDocs.Search\ITGlobal.MarkDocs.Search.csproj" />
+    <ProjectReference Include="..\ITGlobal.MarkDocs.Tags\ITGlobal.MarkDocs.Tags.csproj" />
+  </ItemGroup>
+</Project>

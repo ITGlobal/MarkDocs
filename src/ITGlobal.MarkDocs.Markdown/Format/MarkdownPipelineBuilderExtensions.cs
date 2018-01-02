@@ -29,9 +29,9 @@ namespace ITGlobal.MarkDocs.Format
             return pipeline;
         }
 
-        public static MarkdownPipelineBuilder UseCustomHeading(this MarkdownPipelineBuilder pipeline)
+        public static MarkdownPipelineBuilder UseCustomHeading(this MarkdownPipelineBuilder pipeline, bool dontRenderFirstHeading)
         {
-            pipeline.Extensions.AddIfNotAlready<CustomHeadingExtension>();
+            pipeline.Extensions.AddIfNotAlready(new CustomHeadingExtension(dontRenderFirstHeading));
             return pipeline;
         }
 

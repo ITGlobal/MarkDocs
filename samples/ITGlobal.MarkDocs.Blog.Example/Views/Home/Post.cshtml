@@ -1,0 +1,41 @@
+﻿@model IBlogPost
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="page-header">
+    <h1>@Model.Title</h1>
+
+    <div>@Model.Date.ToString("D")</div>
+
+    <ul class="list-inline">
+        <li><strong>Tags:</strong></li>
+        @foreach (var tag in Model.Tags)
+        {
+            <li>
+                <a href="@Url.Action("ByTag", new {name = tag})">@tag</a>
+            </li>
+        }
+    </ul>
+    <dl>
+        <dt>Id</dt>
+        <dd>@Model.Id</dd>
+
+        <dt>Date</dt>
+        <dd>@Model.Date.ToString("s")</dd>
+
+        <dt>ContentId</dt>
+        <dd>@Model.ContentId</dd>
+
+        <dt>Title</dt>
+        <dd>@Model.Title</dd>
+
+        <dt>Permalink</dt>
+        <dd>@(Model.Permalink?.Id ?? "-")</dd>
+    </dl>
+</div>
+
+<div>
+    @Html.Raw(Model.ReadHtmlString())
+</div>

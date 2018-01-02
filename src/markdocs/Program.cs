@@ -30,7 +30,7 @@ namespace ITGlobal.MarkDocs.Tools
                 var helpSwitch = parser.Switch("help").HelpText("Display help");
                 var versionSwitch = parser.Switch("version").HelpText("Display version number");
 
-                parser.Callback(_ =>
+                parser.Handler(_ =>
                 {
                     if (versionSwitch.IsSet)
                     {
@@ -59,7 +59,7 @@ namespace ITGlobal.MarkDocs.Tools
                         .HelpText("Path to documentation root directory");
                     var summarySwitch = lintCommand.Switch("summary").HelpText("Display summary");
 
-                    lintCommand.Callback(_ =>
+                    lintCommand.Handler(_ =>
                     {
                         if (versionSwitch.IsSet)
                         {
@@ -98,7 +98,7 @@ namespace ITGlobal.MarkDocs.Tools
                         .Alias("template")
                         .HelpText("Template name");
 
-                    buildCommand.Callback(_ =>
+                    buildCommand.Handler(_ =>
                     {
                         if (versionSwitch.IsSet)
                         {

@@ -1,0 +1,18 @@
+﻿@model IReadOnlyList<ITag>
+
+@{
+    ViewData["Title"] = "Tags";
+}
+
+<h2>
+    Tags
+</h2>
+
+<ul>
+    @foreach (var tag in Model)
+    {
+        <li>
+            <a href="@Url.Action("ByTag", new { name = tag.Name})">@tag.Name (@tag.Count)</a>
+        </li>
+    }
+</ul>

@@ -1,0 +1,23 @@
+﻿@model ListModel
+
+@{
+    ViewData["Title"] = $"Blog (page {Model.Page})";
+}
+
+@{
+    Html.RenderPartial("_List", Model.Posts);
+}
+
+<nav>
+    <ul class="pager">
+        @if (Model.Page > 1)
+        {
+            <li><a href="@Url.Action("List", new { page = Model.Page-1})">Previous</a></li>
+        }
+
+        @if (Model.Page < Model.TotalPages)
+        {
+            <li><a href="@Url.Action("List", new { page = Model.Page+1})">Next</a></li>
+        }
+    </ul>
+</nav>

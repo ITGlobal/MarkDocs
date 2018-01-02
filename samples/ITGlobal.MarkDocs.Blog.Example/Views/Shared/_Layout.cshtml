@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MarkDocs.Blog.Example</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mermaid/6.0.0/mermaid.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mermaid/6.0.0/mermaid.forest.css" />
+    <style>
+        .contains-task-list {
+            list-style-type: none;
+        }
+    </style>
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @RenderSection("head", required: false)
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/6.0.0/mermaid.min.js"></script>
+    <script>
+        $(document).load(function () { mermaid.initialize(); });
+    </script>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="@Url.Action("List", "Home")" class="navbar-brand">MarkDocs Blog Engine</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="@Url.Action("List", "Home")">Home</a></li>
+                    <li><a href="@Url.Action("Tags", "Home")">Tags</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container body-content" style="margin-top: 60px;">
+        <div class="blog-header">
+            <h1 class="blog-title">Markdocs Blog Engine</h1>
+            <p class="lead blog-description">An example for Markdocs Blog Engine.</p>
+        </div>
+        <div class="row">
+            <div class="col-sm-8 blog-main">
+                @RenderBody()
+            </div>
+            <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+                @{ Html.RenderPartial("_Sidebar"); }
+            </div>
+        </div>
+
+        <hr />
+        <footer>
+            <p>&copy; @(DateTime.Today.Year) - ITGlobal.MarkDocs.Blog.Example</p>
+        </footer>
+    </div>
+
+    <environment names="Development">
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

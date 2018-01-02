@@ -1,0 +1,13 @@
+﻿@model IReadOnlyList<IBlogPost>
+    
+@foreach (var post in Model)
+{
+    <div class="blog-post">
+        <h2 class="blog-post-title">
+            <a href="@post.Id">@post.Title</a>
+        </h2>
+        <p class="blog-post-meta">
+            @post.Date.ToString("D") by <strong>Mark</strong>
+        </p>
+    </div>
+}

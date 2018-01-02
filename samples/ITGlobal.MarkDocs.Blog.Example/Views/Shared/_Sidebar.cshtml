@@ -1,0 +1,52 @@
+﻿@using Microsoft.Extensions.DependencyInjection
+@{
+    var engine = Context.RequestServices.GetRequiredService<IBlogEngine>();
+}
+
+<div class="sidebar-module">
+    <h4>Recent posts</h4>
+    <ol class="list-unstyled">
+        @foreach (var post in engine.Index.List(0, 10))
+        {
+            <li><a href="@post.Id">@post.Title</a></li>
+        }
+    </ol>
+</div>
+
+
+<div class="sidebar-module">
+    <h4>Archives</h4>
+    <select class="form-control" onchange="if (this.value) { window.location = this.value; }">
+        <option selected="selected">Select month...</option>
+        @foreach (var year in engine.Index.Years.OrderByDescending(_ => _.Key))
+        {
+            foreach (var month in year.Value.Months.OrderByDescending(_ => _.Key))
+            {
+                var date = new DateTime(year.Key, month.Key, 1);
+
+                <option value="@Url.Action("Month", "Home", new {year = year.Key, month = month.Key})">
+                    @date.ToString("MMM yyyy") (@year.Value.Count)
+                </option>
+            }
+        }
+    </select>
+</div>
+
+<div class="sidebar-module">
+    <h4>Search</h4>
+    <form action="@Url.Action("Search", "Home")">
+        <input type="text" name="q" class="form-control" placeholder="Search..." />
+        <input type="submit" style="display: none;" />
+    </form>
+</div>
+
+<div class="sidebar-module">
+    <h4>Tags</h4>
+    <ol class="list-unstyled">
+        @foreach (var tag in engine.Index.Tags.Take(10))
+        {
+            <li><a href="@Url.Action("ByTag", "Home", new { name = tag.Name})">@tag.Name (@tag.Count)</a></li>
+        }
+        <li><a href="@Url.Action("Tags", "Home")">more...</a></li>
+    </ol>
+</div>

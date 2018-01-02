@@ -1,0 +1,86 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+
+namespace ITGlobal.MarkDocs.Blog.Implementation
+{
+    internal static class BlogPostMetadataProvider
+    {
+        private static readonly DateTimeFormatInfo InvariantFormat = CultureInfo.InvariantCulture.DateTimeFormat;
+        private static readonly char[] PathSeparators = { '/', '\\' };
+
+        public static bool TryParse(IPage page, BlogCompilationReport report, out DateTime date, out string slug)
+        {
+            date = default(DateTime);
+            slug = null;
+
+            // Expected page path in one of the following formats:
+            // /YYYY/MM/DD
+            // /YYYY/MM/DD/SLUG
+            // /YYYY/MMM/DD
+            // /YYYY/MMM/DD/SLUG
+
+            var parts = page.Id.Split(PathSeparators, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 3 || parts.Length > 4)
+            {
+                report.AddWarning($"Page \"{page.Id}\" skipped - wrong path format");
+                return false;
+            }
+
+            if (!int.TryParse(parts[0], out var year) || year < 0)
+            {
+                report.AddWarning($"Page \"{page.Id}\" skipped - \"{parts[0]}\" is not a valid year");
+                return false;
+            }
+
+            if (!int.TryParse(parts[1], out var month))
+            {
+                IEnumerable<string[]> EnumerateMonthNames()
+                {
+                    yield return InvariantFormat.AbbreviatedMonthNames;
+                    yield return InvariantFormat.MonthNames;
+                    yield return InvariantFormat.AbbreviatedMonthGenitiveNames;
+                    yield return InvariantFormat.MonthGenitiveNames;
+                }
+
+                foreach (var array in EnumerateMonthNames())
+                {
+                    month = Array.FindIndex(array, s => StringComparer.OrdinalIgnoreCase.Equals(s, parts[1]));
+                    if (month >= 0)
+                    {
+                        break;
+                    }
+                }
+                
+                if (month >= 0)
+                {
+                    month++;
+                }
+            }
+
+            if (month <= 0 || month > 12)
+            {
+                report.AddWarning($"Page \"{page.Id}\" skipped - \"{parts[1]}\" is not a valid month");
+                return false;
+            }
+
+            if (int.TryParse(parts[2], out var day))
+            {
+                var daysInMonth = DateTime.DaysInMonth(year, month);
+                if (day > 0 && day <= daysInMonth)
+                {
+                    // TODO use time override from page metadata
+                    // TODO use slug override from page metadata
+                    slug = parts.Length > 3 ? parts[3] : "";
+
+                    date = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc);
+                    return true;
+                }
+            }
+
+            report.AddWarning($"Page \"{page.Id}\" skipped - \"{parts[2]}\" is not a valid day of {year}/{month}");
+            return false;
+        }
+    }
+}

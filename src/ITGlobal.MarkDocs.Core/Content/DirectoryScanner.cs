@@ -91,7 +91,7 @@ namespace ITGlobal.MarkDocs.Content
                 metadata: metadata,
                 rootDirectory: directory,
                 filename: indexPageFileName,
-                relativeFileName: GetRelativePath(directory, indexPageFileName),
+                relativeFileName: indexPageFileName != null ? GetRelativePath(directory, indexPageFileName) : null,
                 nodes: nodes,
                 attachments: attachments);
 

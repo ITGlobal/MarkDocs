@@ -32,14 +32,5 @@ namespace ITGlobal.MarkDocs
 
             services.AddSingleton(factory);
         }
-
-        private static void VerifyService<T>(IServiceCollection services)
-        {
-            var service = services.FirstOrDefault(_ => _.ServiceType == typeof(T));
-            if (service == null)
-            {
-                throw new Exception($"Service {typeof(T).FullName} is not configured");
-            }
-        }
     }
 }

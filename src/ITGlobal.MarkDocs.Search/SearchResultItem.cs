@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using ITGlobal.MarkDocs.Extensions;
+﻿using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Search
 {

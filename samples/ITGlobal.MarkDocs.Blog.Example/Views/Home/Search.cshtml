@@ -1,0 +1,55 @@
+﻿@model SearchModel
+
+@{
+    ViewData["Title"] = $"Search for \"{Model.Query}\"";
+}
+
+<div class="page-header">
+    <h1>
+        Search
+        <small>@Model.Query</small>
+    </h1>
+</div>
+
+<form action="@Url.Action("Search", "Home")">
+    <input type="text" name="q" class="form-control" placeholder="Search..." value="@Model.Query" />
+    <input type="submit" style="display: none;" />
+</form>
+
+@foreach (var item in Model.Items)
+{
+    <div class="blog-post">
+        <h2 class="blog-post-title">
+            <a href="@item.Post.Id">@item.Post.Title</a>
+        </h2>
+        <p class="blog-post-meta">
+            @item.Post.Date.ToString("D") by <strong>Mark</strong>
+        </p>
+        <div>
+            @Html.Raw(item.Preview)
+        </div>
+    </div>
+}
+
+@if (Model.Items.Count == 0)
+{
+    <p>
+        Nothing is found
+    </p>
+}
+else
+{
+    <nav>
+        <ul class="pager">
+            @if (Model.Page > 1)
+            {
+                <li><a href="@Url.Action("Search", new { q = Model.Query, page = Model.Page-1})">Previous</a></li>
+            }
+
+            @if (Model.Page < Model.TotalPages)
+            {
+                <li><a href="@Url.Action("Search", new { q = Model.Query, page = Model.Page+1})">Next</a></li>
+            }
+        </ul>
+    </nav>
+}

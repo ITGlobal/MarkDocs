@@ -106,7 +106,6 @@ namespace ITGlobal.MarkDocs.Format
         public IParsedPage ParsePage(IParseContext ctx, string markup)
         {
             using (MarkdownParseContext.SetCurrentParseContext(ctx))
-          //  using (MarkdownRenderingContext.SetCurrentRenderingContext(new FakeRenderContext(ctx), _options, _resourceUrlResolver))
             {
                 // Parse markdown
                 var ast = Markdig.Markdown.Parse(markup, _pipeline);
@@ -248,7 +247,7 @@ namespace ITGlobal.MarkDocs.Format
             builder.UseYamlFrontMatter();
             builder.UseTableOfContents();
             builder.UseChildrenList();
-            builder.UseCustomHeading();
+            builder.UseCustomHeading(options.DontRenderFirstHeading);
             builder.UseCustomCodeBlockRendering(options);
             builder.UseAdmonitions();
             builder.UseAlerts();

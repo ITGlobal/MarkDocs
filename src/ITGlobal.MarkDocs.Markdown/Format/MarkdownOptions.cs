@@ -46,7 +46,7 @@ namespace ITGlobal.MarkDocs.Format
         public IChildrenListRenderer ChildrenListRenderer { get; set; } = new DefaultChildrenListRenderer();
 
         /// <summary>
-        ///     ptions for rendering markdown into HTML
+        ///     Options for rendering markdown into HTML
         /// </summary>
         [PublicAPI]
         public MarkdownRenderingOptions Rendering { get; } = new MarkdownRenderingOptions();
@@ -164,5 +164,11 @@ namespace ITGlobal.MarkDocs.Format
         /// </summary>
         [PublicAPI]
         public bool UseIcons { get; set; } = true;
+
+        /// <summary>
+        ///     Disable rendering of the first heading in the document
+        /// </summary>
+        [PublicAPI]
+        public bool DontRenderFirstHeading { get; set; } = false;
     }
 }
