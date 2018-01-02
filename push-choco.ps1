@@ -28,5 +28,5 @@ function push-once($url, $apiKey, $isEnabled, $type) {
     }  
 }
 
-push-once "https://push.chocolatey.org/" $env:CHOCO_API_KEY $env:CHOCO_PUSH_PUBLIC "chocolatey.org"
+# push-once "https://push.chocolatey.org/" $env:CHOCO_API_KEY $env:CHOCO_PUSH_PUBLIC "chocolatey.org"
 push-once $env:CHOCO_PRIVATE_URL $env:CHOCO_PRIVATE_API_KEY $env:CHOCO_PUSH_PRIVATE "private chocolatey feed"
