@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using ITGlobal.MarkDocs.Format;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Blog
@@ -50,7 +49,7 @@ namespace ITGlobal.MarkDocs.Blog
         ///     Blog post meta tags
         /// </summary>
         [PublicAPI]
-        IReadOnlyList<MetaTag> MetaTags { get; }
+        IReadOnlyDictionary<string, string> MetaTags { get; }
 
         /// <summary>
         ///     Reads blog post source markup

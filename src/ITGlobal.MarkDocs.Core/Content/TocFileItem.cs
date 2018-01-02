@@ -39,9 +39,10 @@ namespace ITGlobal.MarkDocs.Content
             {
                 properties.Tags = Tags;
             }
+
             if (MetaTags != null)
             {
-                properties.MetaTags = MetaTags.Select(_ => new MetaTag {Name = _.Key, Content = _.Value}).ToArray();
+                properties.MetaTags = MetaTags;
             }
             
             return properties;

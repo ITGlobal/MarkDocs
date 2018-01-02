@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Tags;
 
 namespace ITGlobal.MarkDocs.Blog.Implementation
@@ -71,7 +70,7 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
         /// <summary>
         ///     Blog post permalink
         /// </summary>
-        public IBlogPermalink Permalink { get; }
+        public IBlogPermalink Permalink { get; set; }
 
         /// <summary>
         ///     Blog post anchors (with names)
@@ -86,7 +85,7 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
         /// <summary>
         ///     Blog post meta tags
         /// </summary>
-        public IReadOnlyList<MetaTag> MetaTags => Page.Metadata.MetaTags;
+        public IReadOnlyDictionary<string, string> MetaTags => Page.Metadata.MetaTags;
 
         /// <summary>
         ///     Reads blog post source markup

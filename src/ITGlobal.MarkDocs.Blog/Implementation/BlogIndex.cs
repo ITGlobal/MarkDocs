@@ -62,7 +62,20 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
             // Collect permalinks
             foreach (var post in Posts.Values)
             {
-                // TODO BlogPermalink
+                var address = post.Page.Metadata.GetString("permalink");
+                if (!string.IsNullOrEmpty(address))
+                {
+                    address = "/" + address;
+                    if (Resources.ContainsKey(address))
+                    {
+                        report.AddError($"Non-unique resource: \"{post.Id}\" (permalink to \"{post.Id}\"");
+                        continue;
+                    }
+
+                    var permalink = new BlogPermalink(post, address);
+                    Resources.Add(permalink.Id, permalink);
+                    post.Permalink = permalink;
+                }
             }
 
             // Collect tags

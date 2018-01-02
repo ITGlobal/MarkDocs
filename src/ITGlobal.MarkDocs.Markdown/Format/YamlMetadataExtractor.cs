@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Markdig.Extensions.Yaml;
@@ -50,74 +51,131 @@ namespace ITGlobal.MarkDocs.Format
             switch (key)
             {
                 case "id":
-                    var id = (node as YamlScalarNode)?.Value ?? "";
-                    if (!string.IsNullOrEmpty(id))
-                    {
-                        metadata.ContentId = id;
-                    }
+                    SetStringMetadata(nameof(Metadata.ContentId), node, metadata);
                     break;
                 case "title":
-                    var title = (node as YamlScalarNode)?.Value ?? "";
-                    if (!string.IsNullOrEmpty(title))
-                    {
-                        metadata.Title = title;
-                    }
+                    SetStringMetadata(nameof(Metadata.Title), node, metadata);
                     break;
                 case "order":
-                    var raw = (node as YamlScalarNode)?.Value ?? "";
-                    int order;
-                    if (int.TryParse(raw, out order))
-                    {
-                        metadata.Order = order;
-                    }
+                    SetIntegerMetadata(nameof(Metadata.Order), node, metadata);
                     break;
-
                 case "tags":
-                    var list = node as YamlSequenceNode;
-                    if (list != null)
-                    {
-                        var tags = list.Children.OfType<YamlScalarNode>().Select(_ => _.Value).ToArray();
-                        metadata.Tags = tags;
-                    }
+                    SetArrayMetadata(nameof(Metadata.Tags), node, metadata, merge: true);
                     break;
-
                 case "description":
-                    var description = (node as YamlScalarNode)?.Value ?? "";
-                    if (!string.IsNullOrEmpty(description))
+                    SetStringMetadata(node, str =>
                     {
-                        CombineMetaTags(metadata, "description", description);
-                    }
+                        metadata.SetDictionary(
+                            nameof(Metadata.MetaTags),
+                            new Dictionary<string, string>
+                            {
+                                {"description", str}
+                            }, merge: true);
+                    });
                     break;
 
                 case "meta":
-                    var map = node as YamlMappingNode;
-                    if (map != null)
+                    SetDictionaryMetadata(nameof(Metadata.MetaTags), node, metadata, merge: true);
+                    break;
+
+                default:
+                    switch (node)
                     {
-                        var metaTags = map.Children
-                            .Select(pair => new
-                            {
-                                Name = (pair.Key as YamlScalarNode)?.Value,
-                                Content = (pair.Value as YamlScalarNode)?.Value
-                            })
-                            .Where(_ => !string.IsNullOrEmpty(_.Name));
-                        foreach (var metaTag in metaTags)
-                        {
-                            CombineMetaTags(metadata, metaTag.Name, metaTag.Content);
-                        }
+                        case YamlScalarNode _:
+                            SetStringMetadata(key, node, metadata);
+                            break;
+
+                        case YamlSequenceNode _:
+                            SetArrayMetadata(key, node, metadata, merge: true);
+                            break;
+
+                        case YamlMappingNode _:
+                            SetDictionaryMetadata(key, node, metadata, merge: true);
+                            break;
                     }
                     break;
             }
         }
 
-        private static void CombineMetaTags(Metadata metadata, string name, string content)
+        private static void SetStringMetadata(string key, YamlNode node, Metadata metadata)
         {
-            var existing = metadata.MetaTags.FirstOrDefault(_ => _.Name == name);
-            if (existing != null)
+            switch (node)
             {
-                existing.Content = content;
+                case YamlScalarNode scalar:
+                    if (!string.IsNullOrEmpty(scalar.Value))
+                    {
+                        metadata.SetString(key, scalar.Value);
+                    }
+                    break;
             }
+        }
 
-            metadata.MetaTags = metadata.MetaTags.Concat(new[] { new MetaTag { Name = name, Content = content } }).ToArray();
+        private static void SetStringMetadata(YamlNode node, Action<string> func)
+        {
+            switch (node)
+            {
+                case YamlScalarNode scalar:
+                    if (!string.IsNullOrEmpty(scalar.Value))
+                    {
+                        func(scalar.Value);
+                    }
+                    break;
+            }
+        }
+
+        private static void SetIntegerMetadata(string key, YamlNode node, Metadata metadata)
+        {
+            switch (node)
+            {
+                case YamlScalarNode scalar:
+                    if (!string.IsNullOrEmpty(scalar.Value) && int.TryParse(scalar.Value, out var value))
+                    {
+                        metadata.SetInteger(key, value);
+                    }
+                    break;
+            }
+        }
+
+        private static void SetArrayMetadata(string key, YamlNode node, Metadata metadata, bool merge)
+        {
+            switch (node)
+            {
+                case YamlSequenceNode sequence:
+                    var values = sequence.Children.OfType<YamlScalarNode>().Select(_ => _.Value).ToArray();
+                    if (values.Length > 0)
+                    {
+                        metadata.SetArray(key, values, merge);
+                    }
+                    break;
+            }
+        }
+
+        private static void SetDictionaryMetadata(string key, YamlNode node, Metadata metadata, bool merge)
+        {
+            switch (node)
+            {
+                case YamlMappingNode mapping:
+                    {
+                        var dict = new Dictionary<string, string>();
+                        foreach (var pair in mapping.Children)
+                        {
+                            var pairKey = (pair.Key as YamlScalarNode)?.Value;
+                            var pairValue = (pair.Value as YamlScalarNode)?.Value;
+                            if (!string.IsNullOrEmpty(pairKey) &&
+                                !string.IsNullOrEmpty(pairValue))
+                            {
+                                dict[pairKey] = pairValue;
+                            }
+                        }
+
+                        if (dict.Count > 0)
+                        {
+                            metadata.SetDictionary(key, dict, merge);
+                        }
+                    }
+                    break;
+
+            }
         }
     }
 }

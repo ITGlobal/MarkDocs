@@ -10,7 +10,7 @@
 {
     @foreach (var metaTag in Model.Page.Metadata.MetaTags)
     {
-        <meta name="@metaTag.Name" content="@metaTag.Content" />
+        <meta name="@metaTag.Key" content="@metaTag.Value" />
     }
 }
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 
 namespace ITGlobal.MarkDocs.Blog.Implementation
 {
@@ -9,6 +8,7 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
     {
         private static readonly DateTimeFormatInfo InvariantFormat = CultureInfo.InvariantCulture.DateTimeFormat;
         private static readonly char[] PathSeparators = { '/', '\\' };
+        private static readonly string[] TimeFormats = { "HH:mm:ss", "HH:mm" };
 
         public static bool TryParse(IPage page, BlogCompilationReport report, out DateTime date, out string slug)
         {
@@ -52,7 +52,7 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
                         break;
                     }
                 }
-                
+
                 if (month >= 0)
                 {
                     month++;
@@ -70,11 +70,20 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
                 var daysInMonth = DateTime.DaysInMonth(year, month);
                 if (day > 0 && day <= daysInMonth)
                 {
-                    // TODO use time override from page metadata
-                    // TODO use slug override from page metadata
-                    slug = parts.Length > 3 ? parts[3] : "";
+                    var timeStr = page.Metadata.GetString("time");
+                    if (string.IsNullOrEmpty(timeStr) ||
+                       !DateTime.TryParseExact(timeStr, TimeFormats, InvariantFormat, DateTimeStyles.None, out var time))
+                    {
+                        time = new DateTime(1970, 1, 1, 0, 0, 0);
+                    }
+                    
+                    slug = page.Metadata.GetString("slug");
+                    if (string.IsNullOrEmpty(slug))
+                    {
+                        slug = parts.Length > 3 ? parts[3] : "";
+                    }
 
-                    date = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc);
+                    date = new DateTime(year, month, day, time.Hour, time.Minute, time.Second, DateTimeKind.Utc);
                     return true;
                 }
             }
