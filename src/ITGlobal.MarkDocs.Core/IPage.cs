@@ -18,6 +18,12 @@ namespace ITGlobal.MarkDocs
         string Title { get; }
 
         /// <summary>
+        ///     Page description
+        /// </summary>
+        [PublicAPI, CanBeNull]
+        string Description { get; }
+
+        /// <summary>
         ///     Page tree node that refers to this page
         /// </summary>
         [PublicAPI, NotNull]

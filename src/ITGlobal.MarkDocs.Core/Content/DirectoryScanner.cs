@@ -38,9 +38,9 @@ namespace ITGlobal.MarkDocs.Content
             _metadataProviders = new IMetadataProvider[]
             {
                 new TocMetadataProvider(),
-                new ContentMetadataProvider(format),
                 new ContentIdMetadataProvider(storage),
-                new LastChangedByMetadataProvider(storage), 
+                new LastChangedByMetadataProvider(storage),
+                new ContentMetadataProvider(format),
             };
         }
 

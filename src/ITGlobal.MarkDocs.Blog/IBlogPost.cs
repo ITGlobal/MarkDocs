@@ -35,6 +35,12 @@ namespace ITGlobal.MarkDocs.Blog
         string Title { get; }
 
         /// <summary>
+        ///     Blog post description
+        /// </summary>
+        [PublicAPI, CanBeNull]
+        string Description { get; }
+
+        /// <summary>
         ///     Blog post permalink
         /// </summary>
         IBlogPermalink Permalink { get; }

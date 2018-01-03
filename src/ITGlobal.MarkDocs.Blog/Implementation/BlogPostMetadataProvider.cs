@@ -9,6 +9,7 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
         private static readonly DateTimeFormatInfo InvariantFormat = CultureInfo.InvariantCulture.DateTimeFormat;
         private static readonly char[] PathSeparators = { '/', '\\' };
         private static readonly string[] TimeFormats = { "HH:mm:ss", "HH:mm" };
+        private static readonly string[] DateFormats = { "yyyyMMdd", "yyyy-MM-dd", "yyyy/MM/dd" };
 
         public static bool TryParse(IPage page, BlogCompilationReport report, out DateTime date, out string slug)
         {
@@ -81,6 +82,15 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
                     if (string.IsNullOrEmpty(slug))
                     {
                         slug = parts.Length > 3 ? parts[3] : "";
+                    }
+
+                    var dateStr = page.Metadata.GetString("date");
+                    if (!string.IsNullOrEmpty(dateStr) &&
+                        DateTime.TryParseExact(dateStr, DateFormats, InvariantFormat, DateTimeStyles.None, out var dateOverride))
+                    {
+                        year = dateOverride.Year;
+                        month = dateOverride.Month;
+                        day = dateOverride.Day;
                     }
 
                     date = new DateTime(year, month, day, time.Hour, time.Minute, time.Second, DateTimeKind.Utc);

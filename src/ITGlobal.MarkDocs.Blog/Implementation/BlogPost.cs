@@ -73,6 +73,11 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
         public string Title => Page.Title;
 
         /// <summary>
+        ///     Blog post description
+        /// </summary>
+        public string Description => Page.Description;
+
+        /// <summary>
         ///     Blog post permalink
         /// </summary>
         public IBlogPermalink Permalink { get; set; }

@@ -52,6 +52,16 @@ namespace ITGlobal.MarkDocs.Format
         }
 
         /// <summary>
+        ///     Page description
+        /// </summary>
+        [PublicAPI]
+        public string Description
+        {
+            get => GetString(nameof(Description), "");
+            set => SetString(nameof(Description), value);
+        }
+
+        /// <summary>
         ///     Page order
         /// </summary>
         [PublicAPI]

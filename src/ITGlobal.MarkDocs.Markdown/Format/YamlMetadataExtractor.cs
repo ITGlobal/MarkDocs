@@ -56,6 +56,9 @@ namespace ITGlobal.MarkDocs.Format
                 case "title":
                     SetStringMetadata(nameof(Metadata.Title), node, metadata);
                     break;
+                case "author":
+                    SetStringMetadata(nameof(Metadata.LastChangedBy), node, metadata);
+                    break;
                 case "order":
                     SetIntegerMetadata(nameof(Metadata.Order), node, metadata);
                     break;
@@ -65,6 +68,7 @@ namespace ITGlobal.MarkDocs.Format
                 case "description":
                     SetStringMetadata(node, str =>
                     {
+                        metadata.SetString(nameof(Metadata.Description), str);
                         metadata.SetDictionary(
                             nameof(Metadata.MetaTags),
                             new Dictionary<string, string>

@@ -78,6 +78,11 @@ namespace ITGlobal.MarkDocs.Content
         public string Title => _node.Title;
 
         /// <summary>
+        ///     Page description
+        /// </summary>
+        public string Description => _node.Metadata.Description;
+
+        /// <summary>
         ///     Page tree node that refers to this page
         /// </summary>
         public IPageTreeNode PageTreeNode => _node;
