@@ -1,5 +1,4 @@
 ﻿using System;
-using ITGlobal.MarkDocs.Format;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 
@@ -16,12 +15,11 @@ namespace ITGlobal.MarkDocs.Blog
         [PublicAPI, NotNull]
         public static IBlogEngine Create(
             [NotNull] string workingDirectory,
-            [NotNull] IResourceUrlResolver urlResolver,
             [NotNull] Action<BlogEngineConfigurationBuilder> configure,
             ILoggerFactory loggerFactory = null
         )
         {
-            var builder = new BlogEngineConfigurationBuilder(workingDirectory, urlResolver);
+            var builder = new BlogEngineConfigurationBuilder(workingDirectory);
             configure(builder);
 
             var engine = builder.BuildInstance(loggerFactory ?? new LoggerFactory());

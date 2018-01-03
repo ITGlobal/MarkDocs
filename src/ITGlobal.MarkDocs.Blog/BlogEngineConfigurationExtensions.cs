@@ -1,5 +1,4 @@
 ﻿using System;
-using ITGlobal.MarkDocs.Format;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,9 +18,6 @@ namespace ITGlobal.MarkDocs.Blog
         /// <param name="workingDirectory">
         ///     Path to blog engine working directory
         /// </param>
-        /// <param name="urlResolver">
-        ///     URL resolver
-        /// </param>
         /// <param name="configure">
         ///     Configuration function
         /// </param>
@@ -29,10 +25,9 @@ namespace ITGlobal.MarkDocs.Blog
         public static void AddMarkdocsBlogEngine(
             [NotNull] this IServiceCollection services,
             [NotNull] string workingDirectory,
-            [NotNull] IResourceUrlResolver urlResolver,
             [NotNull] Action<BlogEngineConfigurationBuilder> configure)
         {
-            var builder = new BlogEngineConfigurationBuilder(workingDirectory, urlResolver);
+            var builder = new BlogEngineConfigurationBuilder(workingDirectory);
             configure(builder);
 
             var factory = builder.Build();

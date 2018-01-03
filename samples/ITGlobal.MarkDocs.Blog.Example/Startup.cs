@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
-using ITGlobal.MarkDocs.Format;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,9 +21,9 @@ namespace ITGlobal.MarkDocs.Blog.Example
 
             services.AddMarkdocsBlogEngine(
                 Path.Combine(Env.ContentRootPath, "Data"),
-                new ResourceUrlResolver(),
                 config =>
                 {
+                    config.UseRootUrl("/");
                     config.UseSourceDirectory(Path.Combine(Env.ContentRootPath, "Blog"));
                 });
         }
@@ -50,11 +49,6 @@ namespace ITGlobal.MarkDocs.Blog.Example
             });
 
             Task.Factory.StartNew(engine.Initialize);
-        }
-
-        private sealed class ResourceUrlResolver : IResourceUrlResolver
-        {
-            public string ResolveUrl(IResource resource, IResource relativeTo) => $"{resource.Id}";
         }
     }
 }

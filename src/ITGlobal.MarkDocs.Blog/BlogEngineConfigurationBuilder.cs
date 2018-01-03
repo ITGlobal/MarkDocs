@@ -36,16 +36,45 @@ namespace ITGlobal.MarkDocs.Blog
             }
         }
 
+        private sealed class ResourceUrlResolver : IResourceUrlResolver
+        {
+            private readonly string _rootUrl;
+
+            public ResourceUrlResolver(string rootUrl)
+            {
+                while (rootUrl.EndsWith("/"))
+                {
+                    rootUrl = rootUrl.Substring(0, rootUrl.Length - 1);
+                }
+                _rootUrl = rootUrl;
+            }
+
+            public string ResolveUrl(IResource resource, IResource relativeTo = null)
+            {
+                var url = _rootUrl + resource.Id;
+                return url;
+            }
+        }
+
         private readonly MarkDocsConfigurationBuilder _builder;
         private readonly string _dataDirectory;
-        private readonly IResourceUrlResolver _urlResolver;
+        private string _rootUrl = "";
 
-        internal BlogEngineConfigurationBuilder(string dataDirectory, IResourceUrlResolver urlResolver)
+        internal BlogEngineConfigurationBuilder(string dataDirectory)
         {
             _builder = new MarkDocsConfigurationBuilder();
             _dataDirectory = dataDirectory;
-            _urlResolver = urlResolver;
             SetupRequiredServices();
+        }
+
+        /// <summary>
+        ///     Sets blog root URL
+        /// </summary>
+        [PublicAPI, NotNull]
+        public BlogEngineConfigurationBuilder UseRootUrl([NotNull] string url)
+        {
+            _rootUrl = url;
+            return this;
         }
 
         /// <summary>
@@ -61,6 +90,18 @@ namespace ITGlobal.MarkDocs.Blog
                 UseSubdirectories = false
             });
             return this;
+        }
+
+        /// <summary>
+        ///     Configures blog engine to use git as blog data source
+        /// </summary>
+        [PublicAPI, NotNull]
+        public BlogEngineConfigurationBuilder UseGitSource([NotNull] string repositoryUrl)
+        {
+            return UseGitSource(options =>
+            {
+                options.FetchUrl = repositoryUrl;
+            });
         }
 
         /// <summary>
@@ -115,7 +156,7 @@ namespace ITGlobal.MarkDocs.Blog
 
             _builder.Format.UseMarkdown(new MarkdownOptions
             {
-                ResourceUrlResolver = _urlResolver,
+                ResourceUrlResolver = new ResourceUrlResolver(_rootUrl),
                 SyntaxColorizer = new ServerHighlightJsSyntaxColorizer(Path.Combine(_dataDirectory, "temp")),
                 ChildrenListRenderer = new NoneChildrenListRenderer(),
                 DontRenderFirstHeading = true
