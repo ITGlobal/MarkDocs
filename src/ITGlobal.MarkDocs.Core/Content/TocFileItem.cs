@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.Encodings.Web;
 using ITGlobal.MarkDocs.Format;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -42,7 +43,7 @@ namespace ITGlobal.MarkDocs.Content
 
             if (MetaTags != null)
             {
-                properties.MetaTags = MetaTags;
+                properties.MetaTags = MetaTags.Select(p => $"<meta name=\"{p.Key}\" content=\"{HtmlEncoder.Default.Encode(p.Value)}\" />").ToArray();
             }
             
             return properties;

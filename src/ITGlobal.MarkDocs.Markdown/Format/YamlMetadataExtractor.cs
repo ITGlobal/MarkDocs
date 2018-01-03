@@ -69,17 +69,11 @@ namespace ITGlobal.MarkDocs.Format
                     SetStringMetadata(node, str =>
                     {
                         metadata.SetString(nameof(Metadata.Description), str);
-                        metadata.SetDictionary(
-                            nameof(Metadata.MetaTags),
-                            new Dictionary<string, string>
-                            {
-                                {"description", str}
-                            }, merge: true);
                     });
                     break;
 
                 case "meta":
-                    SetDictionaryMetadata(nameof(Metadata.MetaTags), node, metadata, merge: true);
+                    SetArrayMetadata(nameof(Metadata.MetaTags), node, metadata, merge: true);
                     break;
 
                 default:

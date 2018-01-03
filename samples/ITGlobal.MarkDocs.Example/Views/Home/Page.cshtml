@@ -1,5 +1,4 @@
-﻿@using System.Threading.Tasks
-@using ITGlobal.MarkDocs
+﻿@using ITGlobal.MarkDocs
 @using ITGlobal.MarkDocs.Example.Model
 @model PageModel
 @{
@@ -10,7 +9,7 @@
 {
     @foreach (var metaTag in Model.Page.Metadata.MetaTags)
     {
-        <meta name="@metaTag.Key" content="@metaTag.Value" />
+        @Html.Raw(metaTag)
     }
 }
 

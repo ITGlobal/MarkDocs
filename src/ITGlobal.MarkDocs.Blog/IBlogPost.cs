@@ -58,10 +58,10 @@ namespace ITGlobal.MarkDocs.Blog
         IReadOnlyList<string> Tags { get; }
 
         /// <summary>
-        ///     Blog post meta tags
+        ///     Blog post meta tags (HTML)
         /// </summary>
         [PublicAPI]
-        IReadOnlyDictionary<string, string> MetaTags { get; }
+        IReadOnlyList<string> MetaTags { get; }
 
         /// <summary>
         ///     Reads blog post source markup

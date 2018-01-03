@@ -93,9 +93,9 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
         public IReadOnlyList<string> Tags { get; }
 
         /// <summary>
-        ///     Blog post meta tags
+        ///     Blog post meta tags (HTML)
         /// </summary>
-        public IReadOnlyDictionary<string, string> MetaTags => Page.Metadata.MetaTags;
+        public IReadOnlyList<string> MetaTags => Page.Metadata.MetaTags;
 
         /// <summary>
         ///     Reads blog post source markup

@@ -12,8 +12,8 @@ namespace ITGlobal.MarkDocs.Format
     {
         #region fields
         
-        private static readonly string[] EmptyTags = new string[0];
-        private static readonly Dictionary<string, string> EmptyMetaTags = new Dictionary<string, string>();
+        private static readonly string[] EmptyArray = new string[0];
+        private static readonly Dictionary<string, string> EmptyDictionary = new Dictionary<string, string>();
         
         private readonly Dictionary<string, object> _data = new Dictionary<string, object>();
 
@@ -77,18 +77,18 @@ namespace ITGlobal.MarkDocs.Format
         [PublicAPI]
         public IReadOnlyList<string> Tags
         {
-            get => GetArray(nameof(Tags), EmptyTags);
+            get => GetArray(nameof(Tags), EmptyArray);
             set => SetArray(nameof(Tags), value, merge: false);
         }
 
         /// <summary>
-        ///     Page meta tags
+        ///     Page meta tags (HTML)
         /// </summary>
         [PublicAPI]
-        public IReadOnlyDictionary<string, string> MetaTags
+        public IReadOnlyList<string> MetaTags
         {
-            get => GetDictionary(nameof(MetaTags), EmptyMetaTags);
-            set => SetDictionary(nameof(MetaTags), value, merge: false);
+            get => GetArray(nameof(MetaTags), EmptyArray);
+            set => SetArray(nameof(MetaTags), value, merge: false);
         }
 
         #endregion

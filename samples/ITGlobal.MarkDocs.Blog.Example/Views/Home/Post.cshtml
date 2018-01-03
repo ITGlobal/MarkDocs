@@ -18,28 +18,69 @@
             </li>
         }
     </ul>
-    <dl>
-        <dt>Id</dt>
-        <dd>@Model.Id</dd>
 
-        <dt>Date</dt>
-        <dd>@Model.Date.ToString("s")</dd>
-
-        <dt>ContentId</dt>
-        <dd>@Model.ContentId</dd>
-
-        <dt>Title</dt>
-        <dd>@Model.Title</dd>
-
-        <dt>Description</dt>
-        <dd>@Model.Description</dd>
-
-        <dt>Author</dt>
-        <dd>@(Model.Author ?? "?")</dd>
-
-        <dt>Permalink</dt>
-        <dd>@(Model.Permalink?.Id ?? "-")</dd>
-    </dl>
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <th>Property</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>ID</td>
+                <td>
+                    <a href="@Model.Id"><samp>@Model.Id</samp></a>
+                </td>
+            </tr>
+            <tr>
+                <td>Date</td>
+                <td><samp>@Model.Date.ToString("s")</samp></td>
+            </tr>
+            <tr>
+                <td>ContentId</td>
+                <td><samp>@Model.ContentId</samp></td>
+            </tr>
+            <tr>
+                <td>Author</td>
+                <td><samp>@Model.Author</samp></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td><samp>@Model.Description</samp></td>
+            </tr>
+            <tr>
+                <td>Permalink</td>
+                <td>
+                    @if (Model.Permalink != null)
+                    {
+                        <a href="@Model.Permalink.Id"><samp>@Model.Permalink.Id</samp></a>
+                    }
+                    
+                </td>
+            </tr>
+            <tr>
+                <td>Tags</td>
+                <td>
+                    @foreach (var tag in Model.Tags)
+                    {
+                        <a href="@Url.Action("ByTag", new {name = tag})" style="margin-right: 1em;"><samp>@tag</samp></a>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>Meta tags</td>
+                <td>
+                    @foreach (var metatag in Model.MetaTags)
+                    {
+                    <div>
+                        <samp>@metatag</samp>
+                    </div>
+                    }
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 
 <div>

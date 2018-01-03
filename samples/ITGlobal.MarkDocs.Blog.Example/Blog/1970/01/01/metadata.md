@@ -20,7 +20,9 @@ tags:
 author: Test Author
 # Set page metatags
 meta:
-    keywords: HTML,CSS,XML,JavaScript
+- <meta name="author" content="Blog post autho" />
+- <meta name="copyright" lang="en" content="MarkDocs" />
+- <meta name="description" content="MarkDocs Blog Engine" />
 ---
 
 # Blog post metadata
@@ -50,7 +52,9 @@ tags:
 author: Test Author
 # Set page metatags
 meta:
-    keywords: HTML,CSS,XML,JavaScript
+- <meta name="author" content="Blog post autho" />
+- <meta name="copyright" lang="en" content="MarkDocs" />
+- <meta name="description" content="MarkDocs Blog Engine" />
 ---
 ```
 
