@@ -1,5 +1,5 @@
 ﻿@model IReadOnlyList<IBlogPost>
-    
+
 @foreach (var post in Model)
 {
     <div class="blog-post">
@@ -7,7 +7,7 @@
             <a href="@post.Id">@post.Title</a>
         </h2>
         <p class="blog-post-meta">
-            @post.Date.ToString("D") by <strong>Mark</strong>
+            @post.Date.ToString("D") by <strong>@(post.Author ?? "unknown")</strong>
         </p>
     </div>
 }

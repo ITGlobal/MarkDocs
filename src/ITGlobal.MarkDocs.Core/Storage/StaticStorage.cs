@@ -129,6 +129,11 @@ namespace ITGlobal.MarkDocs.Storage
         /// </summary>
         public string GetContentId(string rootDirectory, string path) => FileHasher.ComputeFileHash(path);
 
+        /// <summary>
+        ///     Retreives a value for <see cref="Metadata.LastChangedBy"/> from a file path
+        /// </summary>
+        public string GetLastChangeAuthor(string rootDirectory, string path) => null;
+
         #endregion
 
         #region methods

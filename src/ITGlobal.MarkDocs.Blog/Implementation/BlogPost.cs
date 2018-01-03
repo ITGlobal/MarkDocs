@@ -58,6 +58,11 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
         public string ContentId => Page.Metadata.ContentId;
 
         /// <summary>
+        ///     Blog post author
+        /// </summary>
+        public string Author => Page.Metadata.LastChangedBy;
+
+        /// <summary>
         ///     Blog post date
         /// </summary>
         public DateTime Date { get; }

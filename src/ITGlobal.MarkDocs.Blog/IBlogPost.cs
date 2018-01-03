@@ -13,8 +13,14 @@ namespace ITGlobal.MarkDocs.Blog
         /// <summary>
         ///     Blog post permanent identifier
         /// </summary>
-        [PublicAPI]
+        [PublicAPI, CanBeNull]
         string ContentId { get; }
+
+        /// <summary>
+        ///     Blog post author
+        /// </summary>
+        [PublicAPI, CanBeNull]
+        string Author { get; }
 
         /// <summary>
         ///     Blog post date

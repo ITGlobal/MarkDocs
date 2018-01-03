@@ -31,6 +31,9 @@
         <dt>Title</dt>
         <dd>@Model.Title</dd>
 
+        <dt>Author</dt>
+        <dd>@(Model.Author ?? "?")</dd>
+
         <dt>Permalink</dt>
         <dd>@(Model.Permalink?.Id ?? "-")</dd>
     </dl>

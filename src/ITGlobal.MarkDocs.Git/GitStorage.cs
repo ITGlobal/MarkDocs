@@ -170,9 +170,7 @@ namespace ITGlobal.MarkDocs.Git
         {
             try
             {
-                string commit, name;
-
-                if (!_git.FindOriginalFileInfo(rootDirectory, path, out commit, out name))
+                if (!_git.FindOriginalFileInfo(rootDirectory, path, out var commit, out var name))
                 {
                     return null;
                 }
@@ -183,6 +181,24 @@ namespace ITGlobal.MarkDocs.Git
             catch (Exception e)
             {
                 _log.LogWarning(0, e, "Failed to retreive content ID for \"{0}\"", path);
+                return null;
+            }
+        }
+
+        /// <summary>
+        ///     Retreives a value for <see cref="Metadata.LastChangedBy"/> from a file path
+        /// </summary>
+        public string GetLastChangeAuthor(string rootDirectory, string path)
+        {
+            try
+            {
+                var author = _git.GetLastChangeAutor(rootDirectory, path);
+                
+                return author;
+            }
+            catch (Exception e)
+            {
+                _log.LogWarning(0, e, "Failed to retreive last change author for \"{0}\"", path);
                 return null;
             }
         }
@@ -217,8 +233,7 @@ namespace ITGlobal.MarkDocs.Git
                 var remotes = FetchRemotes().ToArray();
 
                 // Actualize content descriptor
-                List<WorkingCopy> workingCopies;
-                CategorizeWorkingCopies(remotes, ref contentDescriptor, out workingCopies);
+                CategorizeWorkingCopies(remotes, ref contentDescriptor, out var workingCopies);
 
                 // Checkout every branch/tag
                 for (var i = 0; i < workingCopies.Count; i++)

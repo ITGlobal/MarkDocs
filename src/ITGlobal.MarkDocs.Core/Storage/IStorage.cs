@@ -59,5 +59,11 @@ namespace ITGlobal.MarkDocs.Storage
         /// </summary>
         [PublicAPI, CanBeNull]
         string GetContentId([NotNull] string rootDirectory, [NotNull] string path);
+
+        /// <summary>
+        ///     Retreives a value for <see cref="Metadata.LastChangedBy"/> from a file path
+        /// </summary>
+        [PublicAPI, CanBeNull]
+        string GetLastChangeAuthor([NotNull] string rootDirectory, [NotNull] string path);
     }
 }

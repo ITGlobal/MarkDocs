@@ -380,6 +380,38 @@ namespace ITGlobal.MarkDocs.Git
             }
         }
 
+        public string GetLastChangeAutor(string directory, string path)
+        {
+            // $ git log -n 1 --format=%an {path}
+
+            var args = new[]
+            {
+                "log",
+                "-n",
+                "1",
+                "--format=\"%an\"",
+                "--follow",
+                path
+            };
+
+            using (var exec = ExecuteNonVerbose(directory, args))
+            {
+                exec.ThrowIfFailed();
+
+                try
+                {
+                    var authorName= exec.StandardOutput.FirstOrDefault(s => !string.IsNullOrEmpty(s));
+                    
+                    return authorName;
+                }
+                catch (Exception e)
+                {
+                    _log.LogWarning(0, e, "Unable to parse output of \"git log\"");
+                    return null;
+                }
+            }
+        }
+
         private ExecuteHelper Execute(string workDirectory, params string[] args)
         {
             var execute = new ExecuteHelper(_log, EXECUTABLE_NAME, workDirectory, true);

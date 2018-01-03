@@ -32,6 +32,16 @@ namespace ITGlobal.MarkDocs.Format
         }
 
         /// <summary>
+        ///     Page's last change author
+        /// </summary>
+        [PublicAPI]
+        public string LastChangedBy
+        {
+            get => GetString(nameof(LastChangedBy));
+            set => SetString(nameof(LastChangedBy), value);
+        }
+
+        /// <summary>
         ///     Page title
         /// </summary>
         [PublicAPI]
