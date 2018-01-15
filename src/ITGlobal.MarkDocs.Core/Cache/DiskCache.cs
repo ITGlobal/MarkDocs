@@ -231,7 +231,7 @@ namespace ITGlobal.MarkDocs.Cache
 
             descriptor.Version = item.Documentation.ContentVersion.LastChangeId;
 
-            var name = item.Id == "/" ? "index.html" : item.Id.Substring(1);
+            var name = item.Id == "/" ? "index" : item.Id.Substring(1);
             if (item.Type == ResourceType.Page)
             {
                 name = name + ".html";
