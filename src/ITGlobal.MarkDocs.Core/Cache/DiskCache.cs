@@ -192,10 +192,15 @@ namespace ITGlobal.MarkDocs.Cache
         /// </summary>
         public void ReleaseDescriptor(DiskCacheDescriptor oldDescriptor)
         {
-            var oldDirectories = Directory
-                .EnumerateDirectories(RootDirectory, "*", SearchOption.TopDirectoryOnly)
-                .Where(_ => !_descriptor.Items.Any(c => string.Equals(c.Value.Directory, Path.GetFileName(_))))
-                .ToArray();
+            string[] oldDirectories;
+
+            lock (_descriptorLock)
+            {
+                oldDirectories = Directory
+                    .EnumerateDirectories(RootDirectory, "*", SearchOption.TopDirectoryOnly)
+                    .Where(_ => !_descriptor.Items.Any(c => string.Equals(c.Value.Directory, Path.GetFileName(_))))
+                    .ToArray();
+            }
 
             foreach (var path in oldDirectories)
             {
@@ -214,8 +219,7 @@ namespace ITGlobal.MarkDocs.Cache
 
         internal string GetCachedFileName(DiskCacheDescriptor currentDescriptor, IResource item)
         {
-            DiskCacheDocumentationDescriptor descriptor;
-            if (!currentDescriptor.Items.TryGetValue(item.Documentation.Id, out descriptor))
+            if (!currentDescriptor.Items.TryGetValue(item.Documentation.Id, out var descriptor))
             {
                 descriptor = new DiskCacheDocumentationDescriptor
                 {
@@ -241,7 +245,13 @@ namespace ITGlobal.MarkDocs.Cache
             return path;
         }
 
-        private string GetCachedFileName(IResource item) => GetCachedFileName(_descriptor, item);
+        private string GetCachedFileName(IResource item)
+        {
+            lock (_descriptorLock)
+            {
+                return GetCachedFileName(_descriptor, item);
+            }
+        }
 
         private static string GetPathPrefix(IResource item)
         {

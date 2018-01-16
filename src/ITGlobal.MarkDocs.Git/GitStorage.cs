@@ -105,8 +105,7 @@ namespace ITGlobal.MarkDocs.Git
 
             lock (_stateLock)
             {
-                IContentDirectory contentDirectory;
-                if (!_state.ContentDirectoriesById.TryGetValue(documentationId, out contentDirectory))
+                if (!_state.ContentDirectoriesById.TryGetValue(documentationId, out var contentDirectory))
                 {
                     throw new ArgumentOutOfRangeException(nameof(documentationId),
                         $"No such documentation branch - '{documentationId}'");
@@ -136,8 +135,7 @@ namespace ITGlobal.MarkDocs.Git
                     pair.Key
                 )).ToDictionary(_ => _.BranchOrTag, StringComparer.OrdinalIgnoreCase);
 
-                WorkingCopy workingCopy;
-                if (!workingCopies.TryGetValue(documentationId, out workingCopy))
+                if (!workingCopies.TryGetValue(documentationId, out var workingCopy))
                 {
                     throw new ArgumentOutOfRangeException(nameof(documentationId),
                         $"No such documentation branch - '{documentationId}'");
@@ -180,7 +178,7 @@ namespace ITGlobal.MarkDocs.Git
             }
             catch (Exception e)
             {
-                _log.LogWarning(0, e, "Failed to retreive content ID for \"{0}\"", path);
+                _log.LogWarning(0, e, "Failed to retrieve content ID for \"{0}\"", path);
                 return null;
             }
         }
@@ -198,7 +196,7 @@ namespace ITGlobal.MarkDocs.Git
             }
             catch (Exception e)
             {
-                _log.LogWarning(0, e, "Failed to retreive last change author for \"{0}\"", path);
+                _log.LogWarning(0, e, "Failed to retrieve last change author for \"{0}\"", path);
                 return null;
             }
         }

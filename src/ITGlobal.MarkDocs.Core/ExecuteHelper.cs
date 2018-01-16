@@ -26,18 +26,6 @@ namespace ITGlobal.MarkDocs
 
             public OutputStream Stream { get; }
             public string Line { get; }
-
-            public void Print(ILogger log)
-            {
-                if (Stream != OutputStream.Stdin)
-                {
-                    log.LogDebug("\t{0}> {1}", (int) Stream, Line);
-                }
-                else
-                {
-                    log.LogDebug("\t{0}< {1}", (int)Stream, Line);
-                }
-            }
         }
 
         private readonly object _outputLock = new object();
@@ -91,6 +79,9 @@ namespace ITGlobal.MarkDocs
 
             var w = Stopwatch.StartNew();
             _process.Start();
+
+            _log.LogDebug($"{_programName} {_process.StartInfo.Arguments} (PID {_process.Id})");
+
             _process.BeginErrorReadLine();
             _process.BeginOutputReadLine();
 
@@ -110,20 +101,7 @@ namespace ITGlobal.MarkDocs
             ExitCode = _process.ExitCode;
             w.Stop();
 
-            if (ExitCode != 0 || _verboseOutput)
-            {
-                using (_log.BeginScope($"{_programName}:{_process.Id}"))
-                {
-                    _log.LogDebug($"{_programName} {_process.StartInfo.Arguments} (PID {_process.Id})");
-
-                    foreach (var line in _output)
-                    {
-                        line.Print(_log);
-                    }
-
-                    _log.LogDebug($"{_programName} exited with {_process.ExitCode} in {w.ElapsedMilliseconds}ms");
-                }
-            }
+            _log.LogDebug($"{_programName} exited with {_process.ExitCode} in {w.ElapsedMilliseconds}ms");
         }
 
         public void ThrowIfFailed()
@@ -155,6 +133,8 @@ namespace ITGlobal.MarkDocs
                 {
                     _output.Add(new OutputLine(OutputStream.Stdin, line));
                 }
+
+                _log.LogDebug("\t< {0}", line);
             }
         }
 
@@ -166,6 +146,8 @@ namespace ITGlobal.MarkDocs
                 {
                     _output.Add(new OutputLine(OutputStream.Stdout, line));
                 }
+
+                _log.LogDebug("\t1> {0}", line);
             }
         }
 
@@ -177,6 +159,8 @@ namespace ITGlobal.MarkDocs
                 {
                     _output.Add(new OutputLine(OutputStream.Stderr, line));
                 }
+
+                _log.LogDebug("\t1> {0}", line);
             }
         }
     }

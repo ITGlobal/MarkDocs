@@ -93,8 +93,7 @@ namespace ITGlobal.MarkDocs.Content
         {
             ResourceId.Normalize(ref id);
 
-            Page page;
-            if (!_pages.TryGetValue(id, out page))
+            if (!_pages.TryGetValue(id, out var page))
             {
                 return null;
             }
@@ -115,8 +114,7 @@ namespace ITGlobal.MarkDocs.Content
         {
             ResourceId.Normalize(ref id);
 
-            Attachment attachment;
-            if (!_attachmentsById.TryGetValue(id, out attachment))
+            if (!_attachmentsById.TryGetValue(id, out var attachment))
             {
                 return null;
             }

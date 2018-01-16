@@ -100,22 +100,12 @@ namespace ITGlobal.MarkDocs
                     var result = Cache.Verify(contentDirectories);
                     if (result == CacheVerifyResult.UpToDate)
                     {
-                        using (Callback.CompilationStarted())
-                        {
-                            Recompile();
-                        }
-
-                        Task.Factory.StartNew(() =>
-                        {
-                            _initialized.Wait();
-                            Log.LogInformation("Checking for updates...");
-                            Resync();
-                        });
+                        // TODO restore state from cache instead of recompiling
                     }
-                    else
+
+                    using (Callback.CompilationStarted())
                     {
-                        Log.LogInformation("Checking out documentation...");
-                        Resync();
+                        Recompile();
                     }
 
                     _extensions.CreateExtensions(this, _state);
@@ -137,8 +127,7 @@ namespace ITGlobal.MarkDocs
         {
             Documentation.NormalizeId(ref id);
 
-            IDocumentation doc;
-            if (!State.ById.TryGetValue(id, out doc))
+            if (!State.ById.TryGetValue(id, out var doc))
             {
                 return null;
             }

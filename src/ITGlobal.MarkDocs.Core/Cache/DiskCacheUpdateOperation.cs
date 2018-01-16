@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace ITGlobal.MarkDocs.Cache
 {
@@ -11,9 +12,9 @@ namespace ITGlobal.MarkDocs.Cache
     internal sealed class DiskCacheUpdateOperation : ICacheUpdateOperation
     {
         #region fields
-        
+
         private readonly DiskCache _cache;
-        private readonly DiskCacheDescriptor _descriptor = new DiskCacheDescriptor();
+        private readonly DiskCacheDescriptor _descriptor;
 
         private readonly object _contentWriteTasksLock = new object();
         private readonly List<Task> _contentWriteTasks = new List<Task>();
@@ -69,28 +70,38 @@ namespace ITGlobal.MarkDocs.Cache
             {
                 Directory.CreateDirectory(directory);
             }
-
-            var contentWriteTask = Task.Run(async () =>
-            {
-                using (var fileStream = File.OpenWrite(filename))
-                using (var contentStream = content.GetContent())
-                {
-                    await contentStream.CopyToAsync(fileStream);
-                }
-
-                callback();
-            });
-
+            
             if (_cache.Options.EnableConcurrentWrites)
             {
+                var task = Task.Run(() => WriteImpl(content, filename, callback));
                 lock (_contentWriteTasksLock)
                 {
-                    _contentWriteTasks.Add(contentWriteTask);
+                    _contentWriteTasks.Add(task);
                 }
             }
             else
             {
-                contentWriteTask.Wait();
+                WriteImpl(content, filename, callback);
+            }
+        }
+
+        private void WriteImpl(IResourceContent content, string filename, Action callback)
+        {
+            try
+            {
+                using (var fileStream = File.OpenWrite(filename))
+                using (var contentStream = content.GetContent())
+                {
+                    contentStream.CopyTo(fileStream);
+                }
+                callback?.Invoke();
+
+                _cache.Log.LogDebug("Stored cache file '{0}'", filename);
+            }
+            catch (Exception e)
+            {
+                _cache.Log.LogError(0, e, "Failed to store cache file '{0}'", filename);
+                throw;
             }
         }
 
@@ -107,7 +118,7 @@ namespace ITGlobal.MarkDocs.Cache
                     _contentWriteTasks.Clear();
                 }
             }
-            
+
             _descriptor.LastUpdateTime = DateTime.UtcNow;
             _descriptor.Save(_cache.DescriptorFileName, _cache.Log);
         }
