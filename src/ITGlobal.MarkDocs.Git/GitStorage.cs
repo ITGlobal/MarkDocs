@@ -74,13 +74,19 @@ namespace ITGlobal.MarkDocs.Git
             }
 
             Refresh();
+            
+            _initialized.Set();
+        }
 
+        /// <summary>
+        ///     Enables <see cref="IStorage.Changed"/> event
+        /// </summary>
+        public void EnableChangeNotifications()
+        {
             if (_options.EnablePolling)
             {
-                _pollTimer = new Timer(PollTimerCallback, null, TimeSpan.Zero, _options.PollingInterval);
+                _pollTimer = new Timer(PollTimerCallback, null, _options.PollingInterval, _options.PollingInterval);
             }
-
-            _initialized.Set();
         }
 
         /// <summary>

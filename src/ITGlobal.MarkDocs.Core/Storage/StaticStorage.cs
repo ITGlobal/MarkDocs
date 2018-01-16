@@ -50,7 +50,7 @@ namespace ITGlobal.MarkDocs.Storage
                 _watcher.Deleted += FileSystemChangeHandler;
                 _watcher.Renamed += FileSystemChangeHandler;
                 _watcher.IncludeSubdirectories = true;
-                _watcher.EnableRaisingEvents = true;
+                _watcher.EnableRaisingEvents = false;
             }
         }
 
@@ -71,6 +71,14 @@ namespace ITGlobal.MarkDocs.Storage
         ///     Initializes storage provider
         /// </summary>
         public void Initialize() => RefreshAll();
+
+        /// <summary>
+        ///     Enables <see cref="IStorage.Changed"/> event
+        /// </summary>
+        public void EnableChangeNotifications()
+        {
+            _watcher.EnableRaisingEvents = true;
+        }
 
         /// <summary>
         ///     Gets a list of available documentations

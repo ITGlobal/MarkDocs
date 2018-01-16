@@ -23,7 +23,7 @@ namespace ITGlobal.MarkDocs.Format
             {
                 try
                 {
-                    using (var exec = new ExecuteHelper(_log, _npmPath))
+                    using (var exec = new ExecuteHelper(_log, _npmPath, verboseOutput: false))
                     {
                         exec.Run(new[] { "--version" });
                         exec.ThrowIfFailed();
@@ -45,7 +45,7 @@ namespace ITGlobal.MarkDocs.Format
         {
             // $ npm install {package}
 
-            using (var exec = new ExecuteHelper(_log, _npmPath, directory, true))
+            using (var exec = new ExecuteHelper(_log, _npmPath, directory))
             {
                 exec.Run(new[] { "install" });
                 exec.ThrowIfFailed();
@@ -56,7 +56,7 @@ namespace ITGlobal.MarkDocs.Format
         {
             // $ npm install {package}
 
-            using (var exec = new ExecuteHelper(_log, _npmPath, directory, true))
+            using (var exec = new ExecuteHelper(_log, _npmPath, directory))
             {
                 exec.Run(new[] { "install", package });
                 exec.ThrowIfFailed();
@@ -78,7 +78,7 @@ namespace ITGlobal.MarkDocs.Format
                 arg = "npm";
             }
 
-            using (var exec = new ExecuteHelper(log, command, null, true))
+            using (var exec = new ExecuteHelper(log, command))
             {
                 exec.Run(new[] { arg });
                 exec.ThrowIfFailed();

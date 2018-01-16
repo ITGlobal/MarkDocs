@@ -36,7 +36,7 @@ namespace ITGlobal.MarkDocs
         private readonly Process _process;
         private readonly bool _verboseOutput;
 
-        public ExecuteHelper(ILogger log, string programName, string workDirectory = null, bool verboseOutput = false)
+        public ExecuteHelper(ILogger log, string programName, string workDirectory = null, bool verboseOutput = true)
         {
             _log = log;
             _programName = programName;
@@ -80,7 +80,10 @@ namespace ITGlobal.MarkDocs
             var w = Stopwatch.StartNew();
             _process.Start();
 
-            _log.LogDebug($"{_programName} {_process.StartInfo.Arguments} (PID {_process.Id})");
+            if (_verboseOutput)
+            {
+                _log.LogDebug($"{_programName} {_process.StartInfo.Arguments} (PID {_process.Id})");
+            }
 
             _process.BeginErrorReadLine();
             _process.BeginOutputReadLine();
@@ -101,7 +104,10 @@ namespace ITGlobal.MarkDocs
             ExitCode = _process.ExitCode;
             w.Stop();
 
-            _log.LogDebug($"{_programName} exited with {_process.ExitCode} in {w.ElapsedMilliseconds}ms");
+            if (_verboseOutput)
+            {
+                _log.LogDebug($"{_programName} exited with {_process.ExitCode} in {w.ElapsedMilliseconds}ms");
+            }
         }
 
         public void ThrowIfFailed()
@@ -134,7 +140,7 @@ namespace ITGlobal.MarkDocs
                     _output.Add(new OutputLine(OutputStream.Stdin, line));
                 }
 
-                _log.LogDebug("\t< {0}", line);
+                _log.LogDebug("{0}: < {1}", _programName, line);
             }
         }
 
@@ -147,7 +153,10 @@ namespace ITGlobal.MarkDocs
                     _output.Add(new OutputLine(OutputStream.Stdout, line));
                 }
 
-                _log.LogDebug("\t1> {0}", line);
+                if (_verboseOutput)
+                {
+                    _log.LogDebug("{0}: > {1}", _programName, line);
+                }
             }
         }
 
@@ -160,7 +169,7 @@ namespace ITGlobal.MarkDocs
                     _output.Add(new OutputLine(OutputStream.Stderr, line));
                 }
 
-                _log.LogDebug("\t1> {0}", line);
+                _log.LogWarning("{0}: > {1}", _programName, line);
             }
         }
     }

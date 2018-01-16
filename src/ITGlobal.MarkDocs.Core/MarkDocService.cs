@@ -110,6 +110,7 @@ namespace ITGlobal.MarkDocs
 
                     _extensions.CreateExtensions(this, _state);
 
+                    Storage.EnableChangeNotifications();
                     Log.LogInformation("Documentation is ready");
                     _initialized.Set();
 

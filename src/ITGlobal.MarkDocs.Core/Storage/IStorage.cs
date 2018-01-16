@@ -30,6 +30,12 @@ namespace ITGlobal.MarkDocs.Storage
         void Initialize();
 
         /// <summary>
+        ///     Enables <see cref="Changed"/> event
+        /// </summary>
+        [PublicAPI]
+        void EnableChangeNotifications();
+
+        /// <summary>
         ///     Gets a list of available documentations
         /// </summary>
         [PublicAPI, NotNull]

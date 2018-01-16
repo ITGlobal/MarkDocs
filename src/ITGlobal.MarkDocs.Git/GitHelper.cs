@@ -25,7 +25,7 @@ namespace ITGlobal.MarkDocs.Git
             {
                 try
                 {
-                    using (var exec = Execute(null, "version"))
+                    using (var exec = ExecuteNonVerbose(null, "version"))
                     {
                         exec.ThrowIfFailed();
 
@@ -54,7 +54,7 @@ namespace ITGlobal.MarkDocs.Git
                 return false;
             }
 
-            using (var exec = Execute(directory, "status"))
+            using (var exec = ExecuteNonVerbose(directory, "status"))
             {
                 return exec.ExitCode != 128;
             }
@@ -313,7 +313,7 @@ namespace ITGlobal.MarkDocs.Git
                 filename
             };
 
-            using (var exec = ExecuteNonVerbose(directory, args))
+            using (var exec = Execute(directory, args))
             {
                 exec.ThrowIfFailed();
 
@@ -355,7 +355,7 @@ namespace ITGlobal.MarkDocs.Git
                 name
             };
 
-            using (var exec = ExecuteNonVerbose(directory, args))
+            using (var exec = Execute(directory, args))
             {
                 exec.ThrowIfFailed();
 
@@ -394,7 +394,7 @@ namespace ITGlobal.MarkDocs.Git
                 path
             };
 
-            using (var exec = ExecuteNonVerbose(directory, args))
+            using (var exec = Execute(directory, args))
             {
                 exec.ThrowIfFailed();
 
@@ -414,14 +414,14 @@ namespace ITGlobal.MarkDocs.Git
 
         private ExecuteHelper Execute(string workDirectory, params string[] args)
         {
-            var execute = new ExecuteHelper(_log, EXECUTABLE_NAME, workDirectory, true);
+            var execute = new ExecuteHelper(_log, EXECUTABLE_NAME, workDirectory);
             execute.Run(args);
             return execute;
         }
 
         private ExecuteHelper ExecuteNonVerbose(string workDirectory, params string[] args)
         {
-            var execute = new ExecuteHelper(_log, EXECUTABLE_NAME, workDirectory, false);
+            var execute = new ExecuteHelper(_log, EXECUTABLE_NAME, workDirectory, verboseOutput: false);
             execute.Run(args);
             return execute;
         }

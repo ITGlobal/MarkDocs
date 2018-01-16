@@ -22,13 +22,13 @@ namespace ITGlobal.MarkDocs.Format
             {
                 try
                 {
-                    using (var exec = new ExecuteHelper(_log, EXECUTABLE_NAME))
+                    using (var exec = new ExecuteHelper(_log, EXECUTABLE_NAME, verboseOutput: false))
                     {
                         exec.Run(new[] { "--version" });
                         exec.ThrowIfFailed();
 
                         var version = exec.StandardOutput.FirstOrDefault();
-                        LoggerExtensions.LogDebug(_log, "nodejs is installed: {0}", version);
+                        _log.LogDebug("nodejs is installed: {0}", version);
 
                         return true;
                     }
