@@ -5,28 +5,19 @@ namespace ITGlobal.MarkDocs.Content
 {
     internal sealed class PageCompilationReport : IPageCompilationReport, IPageCompilationReportBuilder
     {
-        private readonly string _path;
-
         private readonly List<ICompilationReportMessage> _messages
             = new List<ICompilationReportMessage>();
 
-        private Page _page;
-
-        public PageCompilationReport(string path)
+        public PageCompilationReport(Page page)
         {
-            _path = path;
+            Page = page;
         }
 
-        IPage IPageCompilationReport.Page => _page;
+        public IPage Page { get; set; }
 
-        string IPageCompilationReport.SourceFileName => _page.RelativeFilePath;
+        string IPageCompilationReport.SourceFileName => ((Page)Page).RelativeFilePath;
 
         IReadOnlyList<ICompilationReportMessage> IPageCompilationReport.Messages => _messages;
-
-        public void SetPage(Page page)
-        {
-            _page = page;
-        }
 
         public void Warning(string message, int? lineNumber = null, Exception exception = null)
         {
@@ -36,6 +27,14 @@ namespace ITGlobal.MarkDocs.Content
         public void Error(string message, int? lineNumber = null, Exception exception = null)
         {
             _messages.Add(CompilationReportMessage.Error(message, lineNumber, exception));
+        }
+
+        public void MergeWith(FileCompilationReport report)
+        {
+            foreach (var message in report.Messages)
+            {
+                _messages.Add(message);
+            }
         }
     }
 }
