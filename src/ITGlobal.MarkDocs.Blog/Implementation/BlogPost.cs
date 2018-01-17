@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using ITGlobal.MarkDocs.Content;
 using ITGlobal.MarkDocs.Tags;
 
 namespace ITGlobal.MarkDocs.Blog.Implementation
@@ -10,13 +11,20 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
     /// </summary>
     internal sealed class BlogPost : IBlogPost
     {
-        public BlogPost(IBlogEngine engine, IPage page, DateTime date, string slug)
+        public BlogPost(
+            IBlogEngine engine,
+            IPage page,
+            ICompilationReportBuilder report,
+            DateTime date,
+            string slug,
+            Dictionary<string, IBlogResource> resources)
         {
             Engine = engine;
             Page = page;
             Date = date;
             Slug = slug;
 
+            // Evaluate page ID
             if (!string.IsNullOrEmpty(slug))
             {
                 Id = $"/{date.Year:D04}/{date.Month:D02}/{date.Day:D02}/{slug.ToLowerInvariant()}";
@@ -26,7 +34,33 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
                 Id = $"/{date.Year:D04}/{date.Month:D02}/{date.Day:D02}";
             }
 
-            Tags = Page.GetPageTags();
+            // Evaluate tags
+            Tags = page.GetPageTags();
+            
+            // Get title image
+            var titleImageId = page.Metadata.GetString("title_image") ?? page.Metadata.GetString("image");
+            if (titleImageId != null)
+            {
+                if (resources.TryGetValue(titleImageId, out var titleImage))
+                {
+                    TitleImage = titleImage;
+                }
+                else
+                {
+                    var fullTitleImageId = Path.Combine(Path.GetDirectoryName(page.PageTreeNode.RelativeFilePath), titleImageId);
+                    fullTitleImageId = "/" + fullTitleImageId;
+                    fullTitleImageId = fullTitleImageId.Replace("\\", "/");
+
+                    if (resources.TryGetValue(fullTitleImageId, out titleImage))
+                    {
+                        TitleImage = titleImage;
+                    }
+                    else
+                    {
+                        report.ForPage(page).Error($"Bad title image reference: \"{titleImageId}\"");
+                    }
+                }
+            }
         }
 
         public IPage Page { get; }
@@ -76,6 +110,11 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
         ///     Blog post description
         /// </summary>
         public string Description => Page.Description;
+
+        /// <summary>
+        ///     A post's title image if specified
+        /// </summary>
+        public IBlogResource TitleImage { get; }
 
         /// <summary>
         ///     Blog post permalink

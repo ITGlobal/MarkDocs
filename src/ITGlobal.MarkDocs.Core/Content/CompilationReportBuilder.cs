@@ -5,8 +5,8 @@ namespace ITGlobal.MarkDocs.Content
 {
     internal sealed class CompilationReportBuilder : ICompilationReportBuilder
     {
-        private readonly Dictionary<Page, PageCompilationReport> _byPage
-            = new Dictionary<Page, PageCompilationReport>();
+        private readonly Dictionary<IPage, PageCompilationReport> _byPage
+            = new Dictionary<IPage, PageCompilationReport>();
         private readonly Dictionary<string, PageCompilationReport> _byPath
             = new Dictionary<string, PageCompilationReport>();
         private readonly List<IPageCompilationReport> _list
@@ -27,7 +27,7 @@ namespace ITGlobal.MarkDocs.Content
             return report;
         }
 
-        public IPageCompilationReportBuilder ForPage(Page page)
+        public IPageCompilationReportBuilder ForPage(IPage page)
         {
             if (!_byPage.TryGetValue(page, out var report))
             {
@@ -37,7 +37,7 @@ namespace ITGlobal.MarkDocs.Content
                 }
                 else
                 {
-                    report.SetPage(page);
+                    report.SetPage((Page)page);
                 }
 
                 _byPage.Add(page, report);
@@ -60,6 +60,39 @@ namespace ITGlobal.MarkDocs.Content
         public ICompilationReport Build()
         {
             return new CompilationReport(_list, _common);
+        }
+
+        public void MergeWith(ICompilationReport report)
+        {
+            foreach (var pageReport in report.Pages)
+            {
+                var p = ForPage(pageReport.Page);
+                foreach (var message in pageReport.Messages)
+                {
+                    switch (message.Type)
+                    {
+                        case CompilationReportMessageType.Warning:
+                            p.Warning(message.Message, message.LineNumber,message.Exception);
+                            break;
+                        case CompilationReportMessageType.Error:
+                            p.Error(message.Message, message.LineNumber, message.Exception);
+                            break;
+                    }
+                }
+            }
+
+            foreach (var message in report.Common)
+            {
+                switch (message.Type)
+                {
+                    case CompilationReportMessageType.Warning:
+                        Warning(message.Message,  message.Exception);
+                        break;
+                    case CompilationReportMessageType.Error:
+                        Error(message.Message, message.Exception);
+                        break;
+                }
+            }
         }
     }
 }

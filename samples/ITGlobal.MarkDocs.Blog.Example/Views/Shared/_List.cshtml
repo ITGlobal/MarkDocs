@@ -3,6 +3,10 @@
 @foreach (var post in Model)
 {
     <div class="blog-post">
+        @if (post.TitleImage != null)
+        {
+            <img src="@post.TitleImage.Id" alt=""/>
+        }
         <h2 class="blog-post-title">
             <a href="@post.Id">@post.Title</a>
         </h2>

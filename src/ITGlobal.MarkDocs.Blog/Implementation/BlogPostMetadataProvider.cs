@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using ITGlobal.MarkDocs.Content;
 
 namespace ITGlobal.MarkDocs.Blog.Implementation
 {
@@ -11,7 +12,7 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
         private static readonly string[] TimeFormats = { "HH:mm:ss", "HH:mm" };
         private static readonly string[] DateFormats = { "yyyyMMdd", "yyyy-MM-dd", "yyyy/MM/dd" };
 
-        public static bool TryParse(IPage page, BlogCompilationReport report, out DateTime date, out string slug)
+        public static bool TryParse(IPage page, ICompilationReportBuilder report, out DateTime date, out string slug)
         {
             date = default(DateTime);
             slug = null;
@@ -25,13 +26,13 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
             var parts = page.Id.Split(PathSeparators, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length < 3 || parts.Length > 4)
             {
-                report.AddWarning($"Page \"{page.Id}\" skipped - wrong path format");
+                report.ForPage(page).Warning($"Page \"{page.Id}\" skipped - wrong path format");
                 return false;
             }
 
             if (!int.TryParse(parts[0], out var year) || year < 0)
             {
-                report.AddWarning($"Page \"{page.Id}\" skipped - \"{parts[0]}\" is not a valid year");
+                report.ForPage(page).Warning($"Skipped - \"{parts[0]}\" is not a valid year");
                 return false;
             }
 
@@ -62,7 +63,7 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
 
             if (month <= 0 || month > 12)
             {
-                report.AddWarning($"Page \"{page.Id}\" skipped - \"{parts[1]}\" is not a valid month");
+                report.ForPage(page).Warning($"Skipped - \"{parts[1]}\" is not a valid month");
                 return false;
             }
 
@@ -98,7 +99,7 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
                 }
             }
 
-            report.AddWarning($"Page \"{page.Id}\" skipped - \"{parts[2]}\" is not a valid day of {year}/{month}");
+            report.ForPage(page).Warning($"Skipped - \"{parts[2]}\" is not a valid day of {year}/{month}");
             return false;
         }
     }

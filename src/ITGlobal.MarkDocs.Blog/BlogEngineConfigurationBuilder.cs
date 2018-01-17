@@ -27,7 +27,6 @@ namespace ITGlobal.MarkDocs.Blog
             {
                 Update(state);
                 return this;
-
             }
 
             public void Update(IMarkDocServiceState state)
@@ -58,6 +57,7 @@ namespace ITGlobal.MarkDocs.Blog
 
         private readonly MarkDocsConfigurationBuilder _builder;
         private readonly string _dataDirectory;
+        private readonly MarkdownOptions _markdownOptions = new MarkdownOptions();
         private string _rootUrl = "";
 
         internal BlogEngineConfigurationBuilder(string dataDirectory)
@@ -127,6 +127,16 @@ namespace ITGlobal.MarkDocs.Blog
             return this;
         }
 
+        /// <summary>
+        ///     Configures blog engine markdown parser and renderer
+        /// </summary>
+        [PublicAPI, NotNull]
+        public BlogEngineConfigurationBuilder ConfigureMarkdown([NotNull] Action<MarkdownOptions> configure)
+        {
+            configure(_markdownOptions);
+            return this;
+        }
+
         internal Func<IServiceProvider, IBlogEngine> Build()
         {
             return services =>
@@ -153,14 +163,12 @@ namespace ITGlobal.MarkDocs.Blog
                 Directory = Path.Combine(_dataDirectory, "cache"),
                 EnableConcurrentWrites = false
             });
-
-            _builder.Format.UseMarkdown(new MarkdownOptions
-            {
-                ResourceUrlResolver = new ResourceUrlResolver(_rootUrl),
-                SyntaxColorizer = new ServerHighlightJsSyntaxColorizer(Path.Combine(_dataDirectory, "temp")),
-                ChildrenListRenderer = new NoneChildrenListRenderer(),
-                DontRenderFirstHeading = true
-            });
+            
+            _markdownOptions.ResourceUrlResolver = new ResourceUrlResolver(_rootUrl);
+            _markdownOptions.SyntaxColorizer = new ServerHighlightJsSyntaxColorizer(Path.Combine(_dataDirectory, "temp"));
+            _markdownOptions.ChildrenListRenderer = new NoneChildrenListRenderer();
+            _markdownOptions.DontRenderFirstHeading = true;
+            _builder.Format.UseMarkdown(_markdownOptions);
 
             _builder.Extensions.AddTags();
             _builder.Extensions.AddSearch(Path.Combine(_dataDirectory, "search-index"));

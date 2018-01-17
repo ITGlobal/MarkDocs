@@ -10,6 +10,12 @@ namespace ITGlobal.MarkDocs.Blog
     public interface IBlogEngine : IDisposable
     {
         /// <summary>
+        ///     Gets an underlying MarkDocs service
+        /// </summary>
+        [PublicAPI]
+        IMarkDocService MarkDocs { get; }
+
+        /// <summary>
         ///     Initializes blog data (foreground)
         /// </summary>
         [PublicAPI]

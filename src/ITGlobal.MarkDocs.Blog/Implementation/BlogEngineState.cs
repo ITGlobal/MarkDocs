@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ITGlobal.MarkDocs.Content;
 using ITGlobal.MarkDocs.Extensions;
 using ITGlobal.MarkDocs.Search;
 
@@ -11,17 +12,17 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
 
         public BlogEngineState(IBlogEngine engine, IMarkDocServiceState state)
         {
-            var report = new BlogCompilationReport();
+            var report = new CompilationReportBuilder();
             if (state.List.Count > 1)
             {
-                report.AddError($"More than one source found. Choosing \"{state.List[0].Id}\" arbitrarily");
+                report.Error($"More than one source found. Choosing \"{state.List[0].Id}\" arbitrarily");
             }
 
             _documentation = state.List[0];
 
             Index = new BlogIndex(engine, _documentation, report);
             report.MergeWith(_documentation.CompilationReport);
-            CompilationReport = report;
+            CompilationReport = report.Build();
         }
 
         public IContentVersion ContentVersion => _documentation.ContentVersion;

@@ -41,6 +41,12 @@ namespace ITGlobal.MarkDocs.Blog
         string Description { get; }
 
         /// <summary>
+        ///     A post's title image if specified
+        /// </summary>
+        [PublicAPI, CanBeNull]
+        IBlogResource TitleImage { get; }
+
+        /// <summary>
         ///     Blog post permalink
         /// </summary>
         IBlogPermalink Permalink { get; }

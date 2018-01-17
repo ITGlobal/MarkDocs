@@ -40,6 +40,11 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
         #region IBlogEngine
 
         /// <summary>
+        ///     Gets an underlying MarkDocs service
+        /// </summary>
+        public IMarkDocService MarkDocs => _service;
+
+        /// <summary>
         ///     Blog version
         /// </summary>
         public IContentVersion ContentVersion => State.ContentVersion;

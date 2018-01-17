@@ -22,8 +22,7 @@ namespace ITGlobal.MarkDocs.Content
         private readonly Dictionary<string, Attachment> _attachmentsById = new Dictionary<string, Attachment>(StringComparer.OrdinalIgnoreCase);
 
         private RootDirectoryPageTreeNode _pageTree;
-
-
+        
         #endregion
 
         #region .ctor

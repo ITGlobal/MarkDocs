@@ -34,6 +34,14 @@
                 </td>
             </tr>
             <tr>
+                <td>Title</td>
+                <td><samp>@Model.Title</samp></td>
+            </tr>
+            <tr>
+                <td>TitleImage</td>
+                <td><samp>@Model.TitleImage?.Id</samp></td>
+            </tr>
+            <tr>
                 <td>Date</td>
                 <td><samp>@Model.Date.ToString("s")</samp></td>
             </tr>
@@ -56,7 +64,7 @@
                     {
                         <a href="@Model.Permalink.Id"><samp>@Model.Permalink.Id</samp></a>
                     }
-                    
+
                 </td>
             </tr>
             <tr>
@@ -73,9 +81,9 @@
                 <td>
                     @foreach (var metatag in Model.MetaTags)
                     {
-                    <div>
-                        <samp>@metatag</samp>
-                    </div>
+                        <div>
+                            <samp>@metatag</samp>
+                        </div>
                     }
                 </td>
             </tr>

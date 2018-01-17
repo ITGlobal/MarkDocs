@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ITGlobal.MarkDocs.Content;
 using ITGlobal.MarkDocs.Tags;
 
 namespace ITGlobal.MarkDocs.Blog.Implementation
@@ -14,14 +15,14 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
 
         private readonly List<IBlogPost> _postsList;
 
-        public BlogIndex(IBlogEngine engine, IDocumentation documentation, BlogCompilationReport report)
+        public BlogIndex(IBlogEngine engine, IDocumentation documentation, ICompilationReportBuilder report)
         {
             // Collect resources
             foreach (var attachment in documentation.Attachments)
             {
                 if (Resources.ContainsKey(attachment.Id))
                 {
-                    report.AddError($"Non-unique resource: \"{attachment.Id}\"");
+                    report.Error($"Non-unique resource: \"{attachment.Id}\"");
                     continue;
                 }
 
@@ -39,10 +40,10 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
                         continue;
                     }
 
-                    var post = new BlogPost(engine, page, date, slug);
+                    var post = new BlogPost(engine, page, report, date, slug, Resources);
                     if (Resources.ContainsKey(post.Id))
                     {
-                        report.AddError($"Non-unique resource: \"{post.Id}\"");
+                        report.Error($"Non-unique resource: \"{post.Id}\"");
                         continue;
                     }
 
@@ -68,7 +69,7 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
                     address = "/" + address;
                     if (Resources.ContainsKey(address))
                     {
-                        report.AddError($"Non-unique resource: \"{post.Id}\" (permalink to \"{post.Id}\"");
+                        report.Error($"Non-unique resource: \"{post.Id}\" (permalink to \"{post.Id}\"");
                         continue;
                     }
 
