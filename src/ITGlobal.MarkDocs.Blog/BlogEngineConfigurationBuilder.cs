@@ -64,7 +64,6 @@ namespace ITGlobal.MarkDocs.Blog
         {
             _builder = new MarkDocsConfigurationBuilder();
             _dataDirectory = dataDirectory;
-            SetupRequiredServices();
         }
 
         /// <summary>
@@ -148,6 +147,8 @@ namespace ITGlobal.MarkDocs.Blog
 
         internal IBlogEngine BuildInstance(ILoggerFactory loggerFactory)
         {
+            SetupRequiredServices();
+
             var connector = new EventConnector();
             _builder.Extensions.Add(_ => connector);
             var markdocs = _builder.BuildInstance(loggerFactory);
