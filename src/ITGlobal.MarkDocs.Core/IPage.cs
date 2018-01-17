@@ -36,6 +36,12 @@ namespace ITGlobal.MarkDocs
         Metadata Metadata { get; }
 
         /// <summary>
+        ///     true if page has a preview
+        /// </summary>
+        [PublicAPI]
+        bool HasPreview { get; }
+
+        /// <summary>
         ///     Page anchors (with names)
         /// </summary>
         IReadOnlyDictionary<string, string> Anchors { get; }
@@ -57,5 +63,14 @@ namespace ITGlobal.MarkDocs
         /// </returns>
         [PublicAPI, NotNull]
         Stream ReadHtml();
+
+        /// <summary>
+        ///     Reads page preview (HTML)
+        /// </summary>
+        /// <returns>
+        ///     Read-only stream
+        /// </returns>
+        [PublicAPI, NotNull]
+        Stream ReadPreviewHtml();
     }
 }

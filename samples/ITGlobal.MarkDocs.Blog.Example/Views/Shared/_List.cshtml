@@ -13,5 +13,11 @@
         <p class="blog-post-meta">
             @post.Date.ToString("D") by <strong>@(post.Author ?? "unknown")</strong>
         </p>
+        @if (post.HasPreview)
+        {
+            <p>
+                @Html.Raw(post.ReadPreviewHtmlString())
+            </p>
+        }
     </div>
 }

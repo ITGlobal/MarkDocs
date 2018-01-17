@@ -36,6 +36,11 @@ test.. test... test..... test?..... test!....
 
 "Smartypants, double quotes" and 'single quotes'
 
+Line BEFORE cut
+
+:::cut:::
+
+Line AFTER cut
 
 ## Emphasis
 

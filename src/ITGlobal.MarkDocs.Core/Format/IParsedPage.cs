@@ -10,6 +10,11 @@ namespace ITGlobal.MarkDocs.Format
     public interface IParsedPage
     {
         /// <summary>
+        ///     true if page contains a "cut" separator
+        /// </summary>
+        bool HasPreview { get; }
+
+        /// <summary>
         ///     Page anchors (with names)
         /// </summary>
         [NotNull]
@@ -19,5 +24,10 @@ namespace ITGlobal.MarkDocs.Format
         ///     Renders page into HTML
         /// </summary>
         string Render([NotNull] IRenderContext ctx);
+
+        /// <summary>
+        ///     Renders page preview into HTML
+        /// </summary>
+        string RenderPreview([NotNull] IRenderContext ctx);
     }
 }

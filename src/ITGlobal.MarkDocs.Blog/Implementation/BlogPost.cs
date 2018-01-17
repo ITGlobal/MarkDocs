@@ -137,6 +137,11 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
         public IReadOnlyList<string> MetaTags => Page.Metadata.MetaTags;
 
         /// <summary>
+        ///     true if blog post has a preview
+        /// </summary>
+        public bool HasPreview => Page.HasPreview;
+
+        /// <summary>
         ///     Reads blog post source markup
         /// </summary>
         /// <returns>
@@ -151,5 +156,13 @@ namespace ITGlobal.MarkDocs.Blog.Implementation
         ///     Read-only stream
         /// </returns>
         public Stream ReadHtml() => Page.ReadHtml();
+
+        /// <summary>
+        ///     Reads blog post preview
+        /// </summary>
+        /// <returns>
+        ///     Read-only stream
+        /// </returns>
+        public Stream ReadPreviewHtml() => Page.ReadPreviewHtml();
     }
 }

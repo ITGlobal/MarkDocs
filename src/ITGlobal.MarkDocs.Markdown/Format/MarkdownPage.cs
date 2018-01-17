@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ITGlobal.MarkDocs.Markdown.Format.Cut;
 using JetBrains.Annotations;
 using Markdig;
 using Markdig.Renderers;
@@ -16,12 +17,14 @@ namespace ITGlobal.MarkDocs.Format
     internal sealed class MarkdownPage : IParsedPage
     {
         private readonly MarkdownDocument _ast;
+        private readonly MarkdownDocument _previewAst;
         private readonly MarkdownOptions _options;
         private readonly MarkdownPipeline _pipeline;
         private readonly IResourceUrlResolver _resourceUrlResolver;
-
+        
         public MarkdownPage(
             MarkdownDocument ast,
+            MarkdownDocument previewAst,
             MarkdownOptions options,
             MarkdownPipeline pipeline,
             IResourceUrlResolver resourceUrlResolver,
@@ -29,11 +32,17 @@ namespace ITGlobal.MarkDocs.Format
         )
         {
             _ast = ast;
+            _previewAst = previewAst;
             _options = options;
             _pipeline = pipeline;
             _resourceUrlResolver = resourceUrlResolver;
             Anchors = anchors;
         }
+
+        /// <summary>
+        ///     true if page contains a "cut" separator
+        /// </summary>
+        public bool HasPreview => _previewAst != null;
 
         /// <summary>
         ///     Page anchors (with names)
@@ -45,10 +54,28 @@ namespace ITGlobal.MarkDocs.Format
         /// </summary>
         public string Render(IRenderContext ctx)
         {
+            return Render(ctx, _ast);
+        }
+
+        /// <summary>
+        ///     Renders page preview into HTML
+        /// </summary>
+        public string RenderPreview(IRenderContext ctx)
+        {
+            if (_previewAst == null)
+            {
+                throw new Exception("This page doesn't have a preview");
+            }
+
+            return Render(ctx, _previewAst);
+        }
+
+        private string Render(IRenderContext ctx, MarkdownDocument ast)
+        {
             using (MarkdownRenderingContext.SetCurrentRenderingContext(ctx, _options, _resourceUrlResolver))
             {
                 // Rewrite links (and validate them)
-                RewriteLinkUrls(ctx.Page, _ast);
+                RewriteLinkUrls(ctx.Page, ast);
 
                 // Render HTML
                 string html;
@@ -56,7 +83,7 @@ namespace ITGlobal.MarkDocs.Format
                 {
                     var renderer = new HtmlRenderer(writer);
                     _pipeline.Setup(renderer);
-                    renderer.Render(_ast);
+                    renderer.Render(ast);
                     writer.Flush();
 
                     html = writer.ToString();
@@ -78,15 +105,24 @@ namespace ITGlobal.MarkDocs.Format
             }
         }
 
+        private const string REWRITTEN_LINK_PROP = "RewrittenLinkProp";
+
         [CanBeNull]
         private string RewriteLinkUrl(IPage page, LinkInline link)
         {
+            if (link.ContainsData(REWRITTEN_LINK_PROP))
+            {
+                return null;
+            }
+
+            link.SetData(REWRITTEN_LINK_PROP, "");
+
             var url = link.Url;
             if (url.Length > 0 && url[0] == '#')
             {
                 return TryResolveSelfPageUrl(page, link, url.Substring(1));
             }
-            
+
             if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uri))
             {
                 return null;
@@ -144,12 +180,12 @@ namespace ITGlobal.MarkDocs.Format
             }
 
             var (resolvedUrl, ok) = TryResolvePageUrl(page, link, url, hash);
-            
+
             if (!ok)
             {
                 (resolvedUrl, ok) = TryResolveAttachmentUrl(page, link, url, hash);
             }
-            
+
             if (!ok)
             {
                 MarkdownRenderingContext.RenderContext.Error(
@@ -158,7 +194,7 @@ namespace ITGlobal.MarkDocs.Format
                 );
                 return null;
             }
-            
+
             return resolvedUrl;
         }
 
@@ -171,7 +207,7 @@ namespace ITGlobal.MarkDocs.Format
                     link.Line
                 );
             }
-            
+
             return "#" + hash;
         }
 
@@ -197,19 +233,19 @@ namespace ITGlobal.MarkDocs.Format
                 }
                 else if (referencedPage == page)
                 {
-                    var text=link.GetText();
+                    var text = link.GetText();
                     MarkdownRenderingContext.RenderContext.Warning(
                         $"Link [{text}]({url}#{hash}) can be replaced with {text}](#{hash})",
                         link.Line
                     );
                 }
-                
+
                 url += "#" + hash;
             }
 
             return (url, true);
         }
-        
+
         private (string url, bool success) TryResolveAttachmentUrl(IPage page, LinkInline link, string url, string hash)
         {
             var attachment = page.Documentation.GetAttachment(url);

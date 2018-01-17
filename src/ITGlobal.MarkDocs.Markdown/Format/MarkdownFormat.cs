@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using AngleSharp.Dom.Html;
 using AngleSharp.Extensions;
 using AngleSharp.Parser.Html;
 using ITGlobal.MarkDocs.Format.Mathematics;
+using ITGlobal.MarkDocs.Markdown.Format.Cut;
 using JetBrains.Annotations;
 using Markdig;
 using Markdig.Extensions.Tables;
@@ -125,14 +127,34 @@ namespace ITGlobal.MarkDocs.Format
                 // Extract anchors
                 var anchors = new Dictionary<string, string>();
                 ExtractAnchors(ctx, html, anchors);
-
-                return new MarkdownPage(ast, _options, _pipeline, _resourceUrlResolver, anchors);
+                
+                var previewAst = GetPreviewAst(ast, markup);
+                return new MarkdownPage(ast, previewAst, _options, _pipeline, _resourceUrlResolver, anchors);
             }
         }
 
         #endregion
 
         #region helpers
+
+        private MarkdownDocument GetPreviewAst(MarkdownDocument ast, string markup)
+        {
+            var (block, index) = ast
+                .Select((b, i) => (block: b, index: i))
+                .FirstOrDefault(_ => _.block is CutBlock);
+            if (block == null)
+            {
+                return null;
+            }
+
+            var previewAst = Markdig.Markdown.Parse(markup, _pipeline);
+            while (previewAst.Count > index)
+            {
+                previewAst.RemoveAt(previewAst.Count-1);
+            }
+
+            return previewAst;
+        }
 
         private static void ExtractAnchors(IParseContext ctx, string html, Dictionary<string, string> anchors)
         {
@@ -251,6 +273,7 @@ namespace ITGlobal.MarkDocs.Format
             builder.UseCustomCodeBlockRendering(options);
             builder.UseAdmonitions();
             builder.UseAlerts();
+            builder.UseCuts();
 
             if (options.MathRenderer != null)
             {

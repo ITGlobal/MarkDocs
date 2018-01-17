@@ -35,7 +35,7 @@ namespace ITGlobal.MarkDocs
         /// <summary>
         ///     Constructor
         /// </summary>
-        public MarkDocService(
+        internal MarkDocService(
             [NotNull] ILoggerFactory loggerFactory,
             [NotNull] IStorage storage,
             [NotNull] IFormat format,
@@ -164,7 +164,7 @@ namespace ITGlobal.MarkDocs
         }
 
         #endregion
-
+        
         #region private methods
 
         private void Resync(string documentationId = null)

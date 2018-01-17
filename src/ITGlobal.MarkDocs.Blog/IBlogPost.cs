@@ -68,6 +68,12 @@ namespace ITGlobal.MarkDocs.Blog
         /// </summary>
         [PublicAPI]
         IReadOnlyList<string> MetaTags { get; }
+        
+        /// <summary>
+        ///     true if blog post has a preview
+        /// </summary>
+        [PublicAPI]
+        bool HasPreview { get; }
 
         /// <summary>
         ///     Reads blog post source markup
@@ -86,5 +92,14 @@ namespace ITGlobal.MarkDocs.Blog
         /// </returns>
         [PublicAPI, NotNull]
         Stream ReadHtml();
+
+        /// <summary>
+        ///     Reads blog post preview
+        /// </summary>
+        /// <returns>
+        ///     Read-only stream
+        /// </returns>
+        [PublicAPI, NotNull]
+        Stream ReadPreviewHtml();
     }
 }

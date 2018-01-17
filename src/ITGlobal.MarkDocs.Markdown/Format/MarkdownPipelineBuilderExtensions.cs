@@ -5,6 +5,7 @@ using ITGlobal.MarkDocs.Format.Icons;
 using ITGlobal.MarkDocs.Format.TableOfContents;
 using ITGlobal.MarkDocs.Markdown.Format;
 using ITGlobal.MarkDocs.Markdown.Format.Admonition;
+using ITGlobal.MarkDocs.Markdown.Format.Cut;
 using Markdig;
 
 namespace ITGlobal.MarkDocs.Format
@@ -52,6 +53,12 @@ namespace ITGlobal.MarkDocs.Format
         public static MarkdownPipelineBuilder UseAlerts(this MarkdownPipelineBuilder pipeline)
         {
             pipeline.Extensions.Add(new AlertBlockExtension());
+            return pipeline;
+        }
+
+        public static MarkdownPipelineBuilder UseCuts(this MarkdownPipelineBuilder pipeline)
+        {
+            pipeline.Extensions.Add(new CutBlockExtension());
             return pipeline;
         }
     }

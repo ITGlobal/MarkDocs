@@ -96,5 +96,48 @@ namespace ITGlobal.MarkDocs
                 return str;
             }
         }
+
+        /// <summary>
+        ///     Reads page preview as a string
+        /// </summary>
+        /// <param name="page">
+        ///     Documentation page
+        /// </param>
+        /// <returns>
+        ///     Page HTML
+        /// </returns>
+        [PublicAPI, NotNull]
+        public static string ReadPreviewHtmlString([NotNull] this IPage page)
+        {
+            using (var stream = page.ReadPreviewHtml())
+            using (var reader = new StreamReader(stream))
+            {
+                var str = reader.ReadToEnd();
+                return str;
+            }
+        }
+
+        /// <summary>
+        ///     Reads page preview as a string (asynchronously)
+        /// </summary>
+        /// <param name="page">
+        ///     Documentation page
+        /// </param>
+        /// <param name="cancellationToken">
+        ///     Cancellation token
+        /// </param>
+        /// <returns>
+        ///     Page HTML
+        /// </returns>
+        [PublicAPI, NotNull]
+        public static async Task<string> ReadPreviewHtmlStringAsync([NotNull] this IPage page, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            using (var stream = page.ReadPreviewHtml())
+            using (var reader = new StreamReader(stream))
+            {
+                var str = await reader.ReadToEndAsync();
+                return str;
+            }
+        }
     }
 }

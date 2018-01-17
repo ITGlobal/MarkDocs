@@ -22,7 +22,7 @@ namespace ITGlobal.MarkDocs.Content
         private readonly Dictionary<string, Attachment> _attachmentsById = new Dictionary<string, Attachment>(StringComparer.OrdinalIgnoreCase);
 
         private RootDirectoryPageTreeNode _pageTree;
-        
+
         #endregion
 
         #region .ctor
@@ -143,6 +143,7 @@ namespace ITGlobal.MarkDocs.Content
 
                 // Render pages and put them into cache
                 RenderPages(operation);
+                ReleasePageDatas();
 
                 // Wait for pending page compilations since they might produce new attachments
                 operation.Flush();
@@ -212,10 +213,22 @@ namespace ITGlobal.MarkDocs.Content
                 var j = i;
                 var p = page;
 
-                page.Render(operation, _compilationReport.ForPage(page), () =>
+                var report = _compilationReport.ForPage(page);
+                page.Render(operation, report, () =>
                 {
-                    _service.Callback.RenderedPage(Id, p.Id, j, _pages.Count);
+                    page.RenderPreview(operation, report, () =>
+                    {
+                        _service.Callback.RenderedPage(Id, p.Id, j, _pages.Count);
+                    });
                 });
+            }
+        }
+
+        private void ReleasePageDatas()
+        {
+            foreach (var page in _pages.Values)
+            {
+                page.ReleaseParsedPage();
             }
         }
 
