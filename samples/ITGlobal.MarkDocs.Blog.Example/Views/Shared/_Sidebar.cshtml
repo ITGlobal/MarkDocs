@@ -25,7 +25,7 @@
                 var date = new DateTime(year.Key, month.Key, 1);
 
                 <option value="@Url.Action("Month", "Home", new {year = year.Key, month = month.Key})">
-                    @date.ToString("MMM yyyy") (@year.Value.Count)
+                    @date.ToString("MMM yyyy") (@month.Value.Count)
                 </option>
             }
         }

@@ -58,6 +58,16 @@ namespace ITGlobal.MarkDocs.Format
             return sb.ToString();
         }
 
+        public static MarkdownDocument GetDocument(this Block block)
+        {
+            while (block != null && !(block is MarkdownDocument))
+            {
+                block = block.Parent;
+            }
+
+            return block as MarkdownDocument;
+        }
+
         public static void WriteErrorInline(this HtmlRenderer renderer, string message)
         {
             renderer.Write("<span style=\"background: white; color: red\"><strong>Error!</strong> ");

@@ -1,5 +1,4 @@
 ﻿using Markdig;
-using Markdig.Parsers;
 using Markdig.Renderers;
 using Markdig.Renderers.Html;
 
@@ -14,15 +13,7 @@ namespace ITGlobal.MarkDocs.Format.CustomHeading
             _dontRenderFirstHeading = dontRenderFirstHeading;
         }
 
-        public void Setup(MarkdownPipelineBuilder pipeline)
-        {
-            if (_dontRenderFirstHeading)
-            {
-                var i = pipeline.BlockParsers.FindIndex(_ => _ is HeadingBlockParser);
-                pipeline.BlockParsers.RemoveAt(i);
-                pipeline.BlockParsers.Insert(i, new CustomHeadingBlockParser());
-            }
-        }
+        public void Setup(MarkdownPipelineBuilder pipeline) { }
 
         public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer)
         {
