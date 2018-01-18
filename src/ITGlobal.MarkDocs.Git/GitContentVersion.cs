@@ -1,5 +1,4 @@
 ﻿using System;
-using ITGlobal.MarkDocs;
 
 namespace ITGlobal.MarkDocs.Git
 {
@@ -62,14 +61,20 @@ namespace ITGlobal.MarkDocs.Git
             }
 
             var sourceUrl = git.GetRemoteUrl(path);
+            if (Uri.IsWellFormedUriString(sourceUrl, UriKind.Absolute))
+            {
+                var sourceUrlBuilder = new UriBuilder(new Uri(sourceUrl));
+                if (sourceUrlBuilder.Scheme != "git")
+                {
+                    sourceUrlBuilder.UserName = "";
+                    sourceUrlBuilder.Password = "";
+                }
+                sourceUrl = sourceUrlBuilder.Uri.ToString();
+            }
+
             var version = git.Describe(path) ?? git.RevParseHead(path);
 
-            string commitSha;
-            DateTime commitTime;
-            string commitAuthor;
-            string commitMessage;
-
-            if (!git.LogLastCommit(path, out commitSha, out commitTime, out commitAuthor, out commitMessage))
+            if (!git.LogLastCommit(path, out var commitSha, out var commitTime, out var commitAuthor, out var commitMessage))
             {
                 commitSha = null;
                 commitTime = DateTime.Today;

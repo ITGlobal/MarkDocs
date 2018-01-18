@@ -37,7 +37,7 @@ namespace ITGlobal.MarkDocs.Git
 
         #region methods
 
-        public void Refresh()
+        public void Refresh(bool initialize)
         {
             if (!Directory.Exists(Path))
             {
@@ -52,7 +52,17 @@ namespace ITGlobal.MarkDocs.Git
             }
             else
             {
-                UpdateWorkingCopy();
+                if (initialize && ShouldPerformCleanCheckout())
+                {
+                    _log.LogWarning("Working copy \"{0}\" is stale and will be recreated.", Path);
+                    Directory.Delete(Path, true);
+
+                    CheckoutNewWorkingCopy();
+                }
+                else
+                {
+                    UpdateWorkingCopy();
+                }
             }
 
             _log.LogInformation("Working copy {0} is ready", BranchOrTag);
@@ -69,6 +79,18 @@ namespace ITGlobal.MarkDocs.Git
         {
             _log.LogInformation("Checking out new working copy ({0}) into \"{1}\"", BranchOrTag, Path);
             _git.Clone(_options.Url, Path, BranchOrTag);
+        }
+
+        private bool ShouldPerformCleanCheckout()
+        {
+            var remoteUrl = _git.GetRemoteUrl(Path);
+            if (remoteUrl != _options.Url)
+            {
+                _log.LogDebug("Working copy \"{0}\" doesn't match specified origin URL", Path);
+                return true;
+            }
+
+            return false;
         }
 
         private void UpdateWorkingCopy()

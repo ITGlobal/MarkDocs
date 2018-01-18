@@ -52,7 +52,7 @@ namespace ITGlobal.MarkDocs.Git
         /// <summary>
         ///     Glob patterns to ignore (e.g. ".git" directory)
         /// </summary>
-        public string[] IgnorePatterns { get; } = {".git/**/*"};
+        public string[] IgnorePatterns { get; } = { ".git/**/*" };
 
         /// <summary>
         ///     This event is raised when documentation source is changed.
@@ -73,8 +73,8 @@ namespace ITGlobal.MarkDocs.Git
                 throw new Exception("git executable is not found in PATH");
             }
 
-            Refresh();
-            
+            Refresh(initialize: true);
+
             _initialized.Set();
         }
 
@@ -197,7 +197,7 @@ namespace ITGlobal.MarkDocs.Git
             try
             {
                 var author = _git.GetLastChangeAutor(rootDirectory, path);
-                
+
                 return author;
             }
             catch (Exception e)
@@ -220,7 +220,7 @@ namespace ITGlobal.MarkDocs.Git
 
         #region private methods
 
-        private void Refresh()
+        private void Refresh(bool initialize = false)
         {
             lock (_updateLock)
             {
@@ -249,7 +249,7 @@ namespace ITGlobal.MarkDocs.Git
                         i + 1,
                         workingCopies.Count
                     );
-                    workingCopy.Refresh();
+                    workingCopy.Refresh(initialize);
                 }
 
                 // Delete all other directories
