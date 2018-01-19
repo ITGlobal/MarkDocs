@@ -148,7 +148,7 @@ namespace ITGlobal.MarkDocs.Git
                 }
 
                 // Refresh only one documentation
-                workingCopy.Refresh();
+                workingCopy.Refresh(initialize: false);
 
                 // Update content state
                 UpdateState(workingCopies.Values, contentDescriptor);
