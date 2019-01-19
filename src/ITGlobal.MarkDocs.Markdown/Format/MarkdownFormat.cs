@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using AngleSharp.Dom.Html;
-using AngleSharp.Extensions;
-using AngleSharp.Parser.Html;
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 using ITGlobal.MarkDocs.Format.Mathematics;
 using ITGlobal.MarkDocs.Markdown.Format.Cut;
 using JetBrains.Annotations;
@@ -159,7 +159,7 @@ namespace ITGlobal.MarkDocs.Format
         private static void ExtractAnchors(IParseContext ctx, string html, Dictionary<string, string> anchors)
         {
             var parser = new HtmlParser();
-            var document = parser.Parse(html);
+            var document = parser.ParseDocument(html);
             foreach (var node in document.Body.Descendents())
             {
                 switch (node)

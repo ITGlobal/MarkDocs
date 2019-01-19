@@ -5,6 +5,7 @@ using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Storage;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using static ITGlobal.CommandLine.Terminal;
 
 namespace ITGlobal.MarkDocs.Tools.Lint
 {
@@ -66,10 +67,10 @@ namespace ITGlobal.MarkDocs.Tools.Lint
                                          p.Messages.Count(_ => _.Type == CompilationReportMessageType.Warning))
                                      .Sum();
 
-                    Console.WriteLine("Summary");
-                    Console.WriteLine("-------:");
-                    Console.WriteLine($"  {errors} error(s)");
-                    Console.WriteLine($"  {warnigs} warning(s)");
+                    Stdout.WriteLine("Summary");
+                    Stdout.WriteLine("-------");
+                    Stdout.WriteLine($"  {errors} error(s)");
+                    Stdout.WriteLine($"  {warnigs} warning(s)");
                 }
             }
         }

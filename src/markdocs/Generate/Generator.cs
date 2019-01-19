@@ -5,6 +5,7 @@ using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Storage;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using static ITGlobal.CommandLine.Terminal;
 
 namespace ITGlobal.MarkDocs.Tools.Generate
 {
@@ -28,10 +29,9 @@ namespace ITGlobal.MarkDocs.Tools.Generate
                     break;
 
                 default:
-                    using (CLI.WithForeground(ConsoleColor.Red))
-                    {
-                        Console.WriteLine($"Unable to find template {templateName}");
-                    }
+                    Stdout.WriteLine(
+                        $"Unable to find template {templateName}".WithForeground(ConsoleColor.Red)
+                    );
                     return 1;
             }
             
@@ -61,23 +61,14 @@ namespace ITGlobal.MarkDocs.Tools.Generate
                 );
             }
 
-            Console.WriteLine();
-            Console.Write("Generating static website from ");
-            using (CLI.WithForeground(ConsoleColor.Cyan))
-            {
-                Console.Write(sourceDir);
-            }
-            Console.Write(" into ");
-            using (CLI.WithForeground(ConsoleColor.Cyan))
-            {
-                Console.Write(targetDir);
-            }
-            Console.Write(" using ");
-            using (CLI.WithForeground(ConsoleColor.Cyan))
-            {
-                Console.Write(template.Name);
-            }
-            Console.WriteLine(" template");
+            Stdout.WriteLine();
+            Stdout.Write("Generating static website from ");
+            Stdout.Write(sourceDir.WithForeground(ConsoleColor.Cyan));
+            Stdout.Write(" into ");
+            Stdout.Write(targetDir.WithForeground(ConsoleColor.Cyan));
+            Stdout.Write(" using ");
+            Stdout.Write(template.Name.WithForeground(ConsoleColor.Cyan));
+            Stdout.WriteLine(" template");
 
             using (markdocs)
             {

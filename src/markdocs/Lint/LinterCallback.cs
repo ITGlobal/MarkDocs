@@ -1,5 +1,5 @@
 using System;
-using ITGlobal.CommandLine;
+using ITGlobal.CommandLine.ProgressBars;
 
 namespace ITGlobal.MarkDocs.Tools.Lint
 {
@@ -21,7 +21,7 @@ namespace ITGlobal.MarkDocs.Tools.Lint
 
         public override IDisposable CompilationStarted(string id)
         {
-            _progressBar = CLI.ProgressBar();
+            _progressBar = TerminalProgressBar.Create();
             _progressBar.SetState(0, "compiling");
 
             return new DisposableToken(() =>

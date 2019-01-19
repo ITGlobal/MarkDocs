@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace ITGlobal.MarkDocs.Format
 {
     /// <summary>
-    ///    A context for <see cref="IFormat.Render"/>
+    ///    A context for <see cref="IFormat.ParsePage"/>
     /// </summary>
     [PublicAPI]
     public interface IParsePropertiesContext

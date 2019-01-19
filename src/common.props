@@ -1,26 +1,26 @@
 <Project>
-
   <PropertyGroup>
     <Description>ASP.NET Core extensible and embeddable documentation engine</Description>
     <Copyright>IT Global LLC</Copyright>
     <Authors>IT Global LLC</Authors>
     <PackageTags>markdocs;markdown;documentation;aspnet;aspnetcore</PackageTags>
     <PackageProjectUrl>https://github.com/ITGlobal/MarkDocs</PackageProjectUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/ITGlobal/MarkDocs/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/ITGlobal/MarkDocs.git</RepositoryUrl>
-
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
-
+  <!--
+  <ItemGroup>
+    <None Include="../../LICENSE" Pack="true" PackagePath="LICENSE"/>
+  </ItemGroup>  
   <PropertyGroup>
-    <!-- <TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
-    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion> -->
-    <VersionPrefix Condition="'$(Version)' == ''">0.0.0-dev</VersionPrefix>
-    <VersionPrefix Condition="'$(Version)' != ''">$(Version)</VersionPrefix>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
-
+  -->
+  <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
 </Project>

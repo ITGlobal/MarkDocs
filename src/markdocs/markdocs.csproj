@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
-  </PropertyGroup>
   <Import Project="../../src/common.props" />
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>markdocs</AssemblyName>
     <OutputType>Exe</OutputType>
     <RuntimeIdentifiers>win7-x64;ubuntu.14.04-x64</RuntimeIdentifiers>
@@ -15,8 +12,6 @@
     <ProjectReference Include="..\..\src\ITGlobal.MarkDocs\ITGlobal.MarkDocs.csproj" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
     <PackageReference Include="Serilog.Sinks.Literate" Version="3.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="ITGlobal.CLI" Version="1.0.23" />
+    <PackageReference Include="ITGlobal.CLI" Version="2.1.5" />
   </ItemGroup>
 </Project>

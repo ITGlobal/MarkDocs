@@ -2,9 +2,11 @@
 using System.IO;
 using System.Reflection;
 using ITGlobal.CommandLine;
+using ITGlobal.CommandLine.Parsing;
 using ITGlobal.MarkDocs.Tools.Generate;
 using ITGlobal.MarkDocs.Tools.Lint;
 using Serilog;
+using static ITGlobal.CommandLine.Terminal;
 
 namespace ITGlobal.MarkDocs.Tools
 {
@@ -18,35 +20,25 @@ namespace ITGlobal.MarkDocs.Tools
 
         public static int Main(string[] args)
         {
-            return CLI.HandleErrors(() =>
+            return TerminalErrorHandler.Handle(() =>
             {
-                var parser = CLI.Parser();
+                var parser = CliParser.NewTreeParser();
                 parser.ExecutableName("markdocs");
-                parser.Title("Markdocs command line tool");
-                parser.Version(Version);
+                parser.HelpText("Markdocs command line tool");
                 parser.SuppressLogo(true);
 
-                var verboseSwitch = parser.Switch("v").Alias("verbose").HelpText("Enable verbose output");
-                var helpSwitch = parser.Switch("help").HelpText("Display help");
+                var verboseSwitch = parser.Switch('v', "verbose").HelpText("Enable verbose output");
                 var versionSwitch = parser.Switch("version").HelpText("Display version number");
 
-                parser.Handler(_ =>
+                parser.BeforeExecute(ctx =>
                 {
                     if (versionSwitch.IsSet)
                     {
-                        Console.WriteLine(Version);
-                        return 0;
+                        Stdout.WriteLine(Version);
+                        ctx.Break();
                     }
 
-                    if (helpSwitch.IsSet)
-                    {
-                        parser.Usage().Print();
-                        return 0;
-                    }
-
-                    parser.Usage().Print();
-
-                    return 0;
+                    SetupLogger(verboseSwitch.IsSet);
                 });
 
                 {
@@ -54,30 +46,20 @@ namespace ITGlobal.MarkDocs.Tools
                         .HelpText("Run a linter on a documentation");
 
                     var pathParameter = lintCommand
-                        .Parameter<string>(0, "path")
+                        .Argument("path", 0)
                         .DefaultValue(".")
-                        .HelpText("Path to documentation root directory");
-                    var summarySwitch = lintCommand.Switch("summary").HelpText("Display summary");
+                        .HelpText("Path to documentation root directory")
+                        .Required();
 
-                    lintCommand.Handler(_ =>
+                    var summarySwitch = lintCommand
+                        .Switch("summary")
+                        .HelpText("Display summary");
+
+                    lintCommand.OnExecute(_ =>
                     {
-                        if (versionSwitch.IsSet)
-                        {
-                            Console.WriteLine(Version);
-                            return 0;
-                        }
-
-                        if (helpSwitch.IsSet)
-                        {
-                            parser.Usage("lint").Print();
-                            return 0;
-                        }
-
                         SetupLogger(verboseSwitch.IsSet);
                         var path = Path.GetFullPath(pathParameter.Value);
                         Linter.Run(path, verboseSwitch.IsSet, summarySwitch.IsSet);
-
-                        return 0;
                     });
                 }
 
@@ -86,33 +68,20 @@ namespace ITGlobal.MarkDocs.Tools
                         .HelpText("Generate static website from documentation");
 
                     var pathParameter = buildCommand
-                        .Parameter<string>(0, "path")
+                        .Argument("path",0)
                         .DefaultValue(".")
-                        .HelpText("Path to documentation root directory");
+                        .HelpText("Path to documentation root directory")
+                        .Required();
                     var targetDirParameter = buildCommand
-                        .Parameter<string>("o")
-                        .Alias("output")
+                        .Option('o', "output")
                         .HelpText("Path to output directory");
                     var templateParameter = buildCommand
-                        .Parameter<string>("t")
-                        .Alias("template")
+                        .Option('t', "template")
                         .HelpText("Template name");
 
-                    buildCommand.Handler(_ =>
+                    buildCommand.OnExecute(ctx =>
                     {
-                        if (versionSwitch.IsSet)
-                        {
-                            Console.WriteLine(Version);
-                            return 0;
-                        }
-
-                        if (helpSwitch.IsSet)
-                        {
-                            parser.Usage("build").Print();
-                            return 0;
-                        }
-
-                        SetupLogger(verboseSwitch.IsSet);
+                        
 
                         var path = Path.GetFullPath(pathParameter.Value);
                         var outputPath = targetDirParameter.IsSet
@@ -122,12 +91,13 @@ namespace ITGlobal.MarkDocs.Tools
                             ? templateParameter.Value
                             : "";
 
-                        return Generator.Run(
-                            path, 
+                        var exitCode = Generator.Run(
+                            path,
                             outputPath,
                             templateName,
                             verboseSwitch.IsSet
                         );
+                        ctx.Break(exitCode);
                     });
                 }
 
@@ -139,10 +109,7 @@ namespace ITGlobal.MarkDocs.Tools
         {
             if (report.Common.Count == 0 && report.Pages.Count == 0)
             {
-                using (CLI.WithForeground(ConsoleColor.Green))
-                {
-                    Console.WriteLine("Everything is OK");
-                }
+                Stdout.WriteLine("Everything is OK".WithForeground(ConsoleColor.Green));
                 return;
             }
 
@@ -151,26 +118,17 @@ namespace ITGlobal.MarkDocs.Tools
                 switch (error.Type)
                 {
                     case CompilationReportMessageType.Warning:
-                        using (CLI.WithForeground(ConsoleColor.Yellow))
-                        {
-                            Console.Write("warning: ");
-                        }
+                        Stdout.Write("warning: ".WithForeground(ConsoleColor.Yellow));
                         break;
                     case CompilationReportMessageType.Error:
-                        using (CLI.WithForeground(ConsoleColor.Red))
-                        {
-                            Console.Write("error: ");
-                        }
+                        Stdout.Write("error: ".WithForeground(ConsoleColor.Red));
                         break;
                     default:
-                        using (CLI.WithForeground(ConsoleColor.Magenta))
-                        {
-                            Console.Write($"{error.Type:G}: ");
-                        }
+                        Stdout.Write($"{error.Type:G}: ".WithForeground(ConsoleColor.Magenta));
                         break;
                 }
 
-                Console.WriteLine(error.Message);
+                Stdout.WriteLine(error.Message);
                 if (error.Exception != null && verbose)
                 {
                     PrintException(error.Exception);
@@ -181,38 +139,29 @@ namespace ITGlobal.MarkDocs.Tools
             {
                 foreach (var error in page.Messages)
                 {
-                    Console.Write(page.SourceFileName);
+                    Stdout.Write(page.SourceFileName);
                     if (error.LineNumber != null)
                     {
-                        Console.Write(":");
-                        Console.Write(error.LineNumber.Value + 1);
+                        Stdout.Write(":");
+                        Stdout.Write(error.LineNumber.Value + 1);
                     }
 
-                    Console.Write(": ");
+                    Stdout.Write(": ");
 
                     switch (error.Type)
                     {
                         case CompilationReportMessageType.Warning:
-                            using (CLI.WithForeground(ConsoleColor.Yellow))
-                            {
-                                Console.Write("warning: ");
-                            }
+                            Stdout.Write("warning: ".WithForeground(ConsoleColor.Yellow));
                             break;
                         case CompilationReportMessageType.Error:
-                            using (CLI.WithForeground(ConsoleColor.Red))
-                            {
-                                Console.Write("error: ");
-                            }
+                            Stdout.Write("error: ".WithForeground(ConsoleColor.Red));
                             break;
                         default:
-                            using (CLI.WithForeground(ConsoleColor.Magenta))
-                            {
-                                Console.Write($"{error.Type:G}: ");
-                            }
+                            Stdout.Write($"{error.Type:G}: ".WithForeground(ConsoleColor.Magenta));
                             break;
                     }
 
-                    Console.WriteLine(error.Message);
+                    Stdout.WriteLine(error.Message);
                     if (error.Exception != null && verbose)
                     {
                         PrintException(error.Exception);
@@ -230,11 +179,11 @@ namespace ITGlobal.MarkDocs.Tools
                 {
                     if (e != exception)
                     {
-                        Console.WriteLine("----------");
+                        Stdout.WriteLine("----------");
                     }
 
-                    Console.WriteLine(e.Message);
-                    Console.WriteLine(e.StackTrace);
+                    Stdout.WriteLine(e.Message);
+                    Stdout.WriteLine(e.StackTrace);
 
                     e = e.InnerException;
                 }

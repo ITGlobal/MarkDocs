@@ -77,7 +77,10 @@ namespace ITGlobal.MarkDocs.Storage
         /// </summary>
         public void EnableChangeNotifications()
         {
-            _watcher.EnableRaisingEvents = true;
+            if (_watcher != null)
+            {
+                _watcher.EnableRaisingEvents = true;
+            }
         }
 
         /// <summary>

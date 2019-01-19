@@ -4,11 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using AngleSharp.Dom.Css;
-using AngleSharp.Dom.Html;
-using AngleSharp.Parser.Css;
-using AngleSharp.Parser.Html;
+using AngleSharp.Css.Dom;
+using AngleSharp.Css.Parser;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 
@@ -82,7 +81,7 @@ namespace ITGlobal.MarkDocs.Format
             {
                 var css = LoadResource($"styles.{ResourceAttribute.GetId(_stylesheet)}");
                 var cssParser = new CssParser();
-                _styles = cssParser.ParseStylesheet(css);
+                _styles = cssParser.ParseStyleSheet(css);
             }
         }
 
@@ -95,7 +94,7 @@ namespace ITGlobal.MarkDocs.Format
               
             if (_stylesheet != HighlightJsStylesheet.None)
             {
-                var doc = _htmlParser.Parse(html);
+                var doc = _htmlParser.ParseDocument(html);
                 InlineCss(doc.Body, _styles);
                 html = doc.Body.InnerHtml;
             }
@@ -171,7 +170,7 @@ namespace ITGlobal.MarkDocs.Format
                 }
             }
 
-            if (element.Style == null)
+            if (element.GetStyle() == null)
             {
                 element.SetAttribute("style", "");
             }

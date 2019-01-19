@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using AngleSharp.Dom;
-using AngleSharp.Parser.Html;
+using AngleSharp.Html.Parser;
 
 namespace ITGlobal.MarkDocs.Search
 {
@@ -11,7 +11,7 @@ namespace ITGlobal.MarkDocs.Search
             var html = page.ReadHtmlString();
 
             var parser = new HtmlParser();
-            var document = parser.Parse(html);
+            var document = parser.ParseDocument(html);
 
             var text = new StringBuilder();
             RenderHtmlRec(document, text);

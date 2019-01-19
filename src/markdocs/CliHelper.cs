@@ -1,5 +1,6 @@
 ﻿using System;
 using ITGlobal.CommandLine;
+using ITGlobal.CommandLine.Spinners;
 
 namespace ITGlobal.MarkDocs.Tools
 {
@@ -9,10 +10,10 @@ namespace ITGlobal.MarkDocs.Tools
         {
             if (!Console.IsOutputRedirected)
             {
-                return CLI.Spinner(title);
+                return TerminalSpinner.Create(title);
             }
 
-            Console.Error.WriteLine(title);
+            Terminal.Stderr.WriteLine(title);
             return null;
         }
     }
