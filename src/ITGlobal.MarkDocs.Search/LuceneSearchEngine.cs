@@ -54,6 +54,7 @@ namespace ITGlobal.MarkDocs.Search
         {
             _log = loggerFactory.CreateLogger<LuceneSearchEngine>();
             _indexRootDirectory = options.IndexDirectory;
+            System.IO.Directory.CreateDirectory(_indexRootDirectory);
 
             lock (_descriptorLock)
             {
