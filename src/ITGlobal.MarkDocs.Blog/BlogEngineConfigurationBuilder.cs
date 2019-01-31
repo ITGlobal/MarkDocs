@@ -55,14 +55,14 @@ namespace ITGlobal.MarkDocs.Blog
             }
         }
 
-        private readonly MarkDocsConfigurationBuilder _builder;
+        private readonly MarkDocsOptions _builder;
         private readonly string _dataDirectory;
         private readonly MarkdownOptions _markdownOptions = new MarkdownOptions();
         private string _rootUrl = "";
 
         internal BlogEngineConfigurationBuilder(string dataDirectory)
         {
-            _builder = new MarkDocsConfigurationBuilder();
+            _builder = new MarkDocsOptions();
             _dataDirectory = dataDirectory;
         }
 
@@ -136,22 +136,14 @@ namespace ITGlobal.MarkDocs.Blog
             return this;
         }
 
-        internal Func<IServiceProvider, IBlogEngine> Build()
-        {
-            return services =>
-            {
-                var loggerFactory = services.GetRequiredService<ILoggerFactory>();
-                return BuildInstance(loggerFactory);
-            };
-        }
-
-        internal IBlogEngine BuildInstance(ILoggerFactory loggerFactory)
+        internal IBlogEngine Build(IServiceProvider services)
         {
             SetupRequiredServices();
+            var loggerFactory = services.GetRequiredService<ILoggerFactory>();
 
             var connector = new EventConnector();
             _builder.Extensions.Add(_ => connector);
-            var markdocs = _builder.BuildInstance(loggerFactory);
+            var markdocs = _builder.Build(services);
             var engine = new MarkdocsBlogEngine(markdocs, loggerFactory);
             connector.Engine = engine;
             return engine;

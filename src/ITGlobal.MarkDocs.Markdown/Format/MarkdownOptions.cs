@@ -1,5 +1,16 @@
-using ITGlobal.MarkDocs.Format.ChildrenList;
+using ITGlobal.MarkDocs.Format.Impl.Metadata;
 using JetBrains.Annotations;
+using Markdig.Renderers;
+using Markdig.Renderers.Html;
+using Markdig.Syntax;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using ITGlobal.MarkDocs.Format.Impl;
+using ITGlobal.MarkDocs.Format.Impl.Extensions.ChildrenList;
+using ITGlobal.MarkDocs.Format.Impl.Extensions.CustomBlockRendering;
+using ITGlobal.MarkDocs.Format.Impl.Extensions.Mathematics;
 
 namespace ITGlobal.MarkDocs.Format
 {
@@ -7,168 +18,241 @@ namespace ITGlobal.MarkDocs.Format
     ///     Options for markdown format
     /// </summary>
     [PublicAPI]
-    public sealed class MarkdownOptions
+    public sealed partial class MarkdownOptions
     {
-        /// <summary>
-        ///     Resource URL resolver
-        /// </summary>
-        [PublicAPI]
-        public IResourceUrlResolver ResourceUrlResolver { get; set; } = new DefaultResourceUrlResolver();
+        private readonly List<Action<IServiceCollection>> _customRegistrations 
+            = new List<Action<IServiceCollection>>();
+
+        internal MarkdownOptions Register(Action<IServiceCollection> action)
+        {
+            _customRegistrations.Add(action);
+            return this;
+        }
 
         /// <summary>
-        ///     A syntax colorizer
+        ///     .ctor
         /// </summary>
-        [PublicAPI]
-        public ISyntaxColorizer SyntaxColorizer { get; set; } = new ClientHighlightJsSyntaxColorizer();
+        public MarkdownOptions()
+        {
+            CodeBlocks = new MarkdownCodeBlockRenderingOptions(this);
+        }
+
+        #region ResourceUrlResolver
+
+        private Func<IServiceProvider, IResourceUrlResolver> _resourceUrlResolverFactory
+            = _ => new DefaultResourceUrlResolver();
 
         /// <summary>
-        ///     A PlantUML renderer
+        ///     Sets resource URL resolver implementation
         /// </summary>
-        [PublicAPI]
-        public IUmlRenderer UmlRenderer { get; set; } = new PlantUmlWebServiceRenderer();
+        [NotNull]
+        public MarkdownOptions UseResourceUrlResolver([NotNull] Func<IServiceProvider, IResourceUrlResolver> factory)
+        {
+            _resourceUrlResolverFactory = factory;
+            return this;
+        }
 
         /// <summary>
-        ///     A MathML/Tex/LaTex renderer
+        ///     Sets resource URL resolver implementation
         /// </summary>
-        [PublicAPI]
-        public IMathRenderer MathRenderer { get; set; } = new CodecogsMathRenderer();
+        [NotNull]
+        public MarkdownOptions UseResourceUrlResolver([NotNull] IResourceUrlResolver resolver)
+            => UseResourceUrlResolver(_ => resolver);
 
         /// <summary>
-        ///     A TOC renderer
+        ///     Sets resource URL resolver implementation
         /// </summary>
-        [PublicAPI]
-        public ITocRenderer TocRenderer { get; set; }
+        [NotNull]
+        public MarkdownOptions UseResourceUrlResolver<T>()
+            where T : class, IResourceUrlResolver
+            => Register(_ => _.AddSingleton<T>()).UseResourceUrlResolver(_ => _.GetRequiredService<T>());
+
+        #endregion
+
+        #region Code Blocks
+
+        [NotNull]
+        public MarkdownCodeBlockRenderingOptions CodeBlocks { get; }
+
+        #endregion
+
+        #region MathRenderer
+
+        private Func<IServiceProvider, IMathRenderer> _mathRendererFactory
+            = _ => new CodecogsMathRenderer(CodecogsMathRenderer.DefaultUrl);
 
         /// <summary>
-        ///     A "Children List" renderer
+        ///     Sets MathML/Tex/LaTex renderer implementation
         /// </summary>
-        [PublicAPI]
-        public IChildrenListRenderer ChildrenListRenderer { get; set; } = new DefaultChildrenListRenderer();
+        [NotNull]
+        public MarkdownOptions UseMathRenderer([NotNull] Func<IServiceProvider, IMathRenderer> factory)
+        {
+            _mathRendererFactory = factory;
+            return this;
+        }
 
         /// <summary>
-        ///     Options for rendering markdown into HTML
+        ///     Sets MathML/Tex/LaTex renderer implementation
         /// </summary>
-        [PublicAPI]
-        public MarkdownRenderingOptions Rendering { get; } = new MarkdownRenderingOptions();
+        [NotNull]
+        public MarkdownOptions UseMathRenderer([NotNull] IMathRenderer renderer)
+            => UseMathRenderer(_ => renderer);
 
         /// <summary>
-        ///     Enable abbreviations extension
+        ///     Sets MathML/Tex/LaTex renderer implementation
         /// </summary>
-        [PublicAPI]
-        public bool UseAbbreviations { get; set; } = true;
+        [NotNull]
+        public MarkdownOptions UseMathRenderer<T>()
+            where T : class, IMathRenderer
+            => Register(_ => _.AddSingleton<T>()).UseMathRenderer(_ => _.GetRequiredService<T>());
+
+        #endregion
+
+        #region TocRenderer
+
+        private Func<IServiceProvider, ITocRenderer> _tocRendererFactory;
 
         /// <summary>
-        ///     Enable automatic identifiers extension
+        ///     Sets table-of-contents renderer implementation
         /// </summary>
-        [PublicAPI]
-        public bool UseAutoIdentifiers { get; set; } = true;
+        [NotNull]
+        public MarkdownOptions UseTocRenderer([NotNull] Func<IServiceProvider, ITocRenderer> factory)
+        {
+            _tocRendererFactory = factory;
+            return this;
+        }
 
         /// <summary>
-        ///     Enable citations extension
+        ///     Sets table-of-contents renderer implementation
         /// </summary>
-        [PublicAPI]
-        public bool UseCitations { get; set; } = true;
+        [NotNull]
+        public MarkdownOptions UseTocRenderer([NotNull] ITocRenderer renderer)
+            => UseTocRenderer(_ => renderer);
 
         /// <summary>
-        ///     Enable custom container extension
+        ///     Sets table-of-contents renderer implementation
         /// </summary>
-        [PublicAPI]
-        public bool UseCustomContainers { get; set; } = true;
+        [NotNull]
+        public MarkdownOptions UseTocRenderer<T>()
+            where T : class, ITocRenderer
+            => Register(_ => _.AddSingleton<T>()).UseTocRenderer(_ => _.GetRequiredService<T>());
+
+        #endregion
+
+        #region ChildrenListRenderer
+
+        private Func<IServiceProvider, IChildrenListRenderer> _childrenListRendererFactory
+            = _=>_.GetRequiredService<DefaultChildrenListRenderer>();
 
         /// <summary>
-        ///     Enable definition lists extension
+        ///     Sets children-list renderer implementation
         /// </summary>
-        [PublicAPI]
-        public bool UseDefinitionLists { get; set; } = true;
+        [NotNull]
+        public MarkdownOptions UseChildrenListRenderer([NotNull] Func<IServiceProvider, IChildrenListRenderer> factory)
+        {
+            _childrenListRendererFactory = factory;
+            return this;
+        }
 
         /// <summary>
-        ///     Enable extra emphasis extension
+        ///     Sets children-list renderer implementation
         /// </summary>
-        [PublicAPI]
-        public bool UseEmphasisExtras { get; set; } = true;
+        [NotNull]
+        public MarkdownOptions UseChildrenListRenderer([NotNull] IChildrenListRenderer renderer)
+            => UseChildrenListRenderer(_ => renderer);
 
         /// <summary>
-        ///     Enable grid tables extension
+        ///     Sets children-list renderer implementation
         /// </summary>
-        [PublicAPI]
-        public bool UseGridTables { get; set; } = true;
+        [NotNull]
+        public MarkdownOptions UseChildrenListRenderer<T>()
+            where T : class, IChildrenListRenderer
+            => Register(_ => _.AddSingleton<T>()).UseChildrenListRenderer(_ => _.GetRequiredService<T>());
+
+        #endregion
+
+        #region OverrideRendering
+
+        private readonly List<Action<HtmlRenderer>> _htmlRendererOverrides = new List<Action<HtmlRenderer>>();
 
         /// <summary>
-        ///     Enable HTML attributes extension
+        ///     Sets custom rendering function for <typeparamref name="T"/>
         /// </summary>
-        [PublicAPI]
-        public bool UseGenericAttributes { get; set; } = true;
+        [NotNull]
+        public MarkdownOptions OverrideRendering<T>([NotNull] Action<HtmlRenderer, T> func)
+            where T : MarkdownObject
+        {
+            OverrideRendering<T>((renderer, block) =>
+            {
+                func(renderer, block);
+                return true;
+            });
+            return this;
+        }
 
         /// <summary>
-        ///     Enable figures extension
+        ///     Sets custom rendering function for <typeparamref name="T"/>
         /// </summary>
-        [PublicAPI]
-        public bool UseFigures { get; set; } = true;
+        [NotNull]
+        public MarkdownOptions OverrideRendering<T>([NotNull] Func<HtmlRenderer, T, bool> func)
+            where T : MarkdownObject
+        {
+            _htmlRendererOverrides.Add(htmlRenderer =>
+            {
+                if (htmlRenderer.ObjectRenderers.FirstOrDefault(_ => _ is HtmlObjectRenderer<T>) is HtmlObjectRenderer<T> existing)
+                {
+                    existing.TryWriters.Add((renderer, block) => func(renderer, block));
+                }
+                else
+                {
+                    htmlRenderer.ObjectRenderers.Add(new HtmlObjectRendererAdapter<T>(func));
+                }
+            });
 
-        /// <summary>
-        ///     Enable footer extension
-        /// </summary>
-        [PublicAPI]
-        public bool UseFooters { get; set; } = true;
+            return this;
+        }
 
-        /// <summary>
-        ///     Enable footnotes extension
-        /// </summary>
-        [PublicAPI]
-        public bool UseFootnotes { get; set; } = true;
+        #endregion
 
-        /// <summary>
-        ///     Enable media links extension
-        /// </summary>
-        [PublicAPI]
-        public bool UseMediaLinks { get; set; } = true;
+        #region Service registration
 
-        /// <summary>
-        ///     Enable pipe table extension
-        /// </summary>
-        [PublicAPI]
-        public bool UsePipeTables { get; set; } = true;
+        internal void RegisterServices(IServiceCollection services)
+        {
+            foreach (var action in _customRegistrations)
+            {
+                action(services);
+            }
 
-        /// <summary>
-        ///     Enable extra list extension
-        /// </summary>
-        [PublicAPI]
-        public bool UseListExtras { get; set; } = true;
+            if (_resourceUrlResolverFactory != null)
+            {
+                services.AddSingleton(_resourceUrlResolverFactory);
+            }
 
-        /// <summary>
-        ///     Enable task list extension
-        /// </summary>
-        [PublicAPI]
-        public bool UseTaskLists { get; set; } = true;
+            if (_mathRendererFactory != null)
+            {
+                services.AddSingleton(_mathRendererFactory);
+            }
 
-        /// <summary>
-        ///     Enable Bootstap styles
-        /// </summary>
-        [PublicAPI]
-        public bool UseBootstrap { get; set; } = true;
+            if (_tocRendererFactory != null)
+            {
+                services.AddSingleton(_tocRendererFactory);
+            }
 
-        /// <summary>
-        ///     Enable emoji and smiley support
-        /// </summary>
-        [PublicAPI]
-        public bool UseEmojiAndSmiley { get; set; } = true;
+            if (_childrenListRendererFactory != null)
+            {
+                services.AddSingleton(_childrenListRendererFactory);
+            }
 
-        /// <summary>
-        ///     Enable smarty-pants extension
-        /// </summary>
-        [PublicAPI]
-        public bool UseSmartyPants { get; set; } = true;
+            services.AddSingleton(this);
+            services.AddSingleton<MarkdownPipelineFactory>();
+            services.AddSingleton<IMetadataExtractor, DefaultMetadataExtractor>();
 
-        /// <summary>
-        ///     Enable font-awesome icons extension
-        /// </summary>
-        [PublicAPI]
-        public bool UseIcons { get; set; } = true;
+            CodeBlocks.RegisterServices(services);
 
-        /// <summary>
-        ///     Disable rendering of the first heading in the document
-        /// </summary>
-        [PublicAPI]
-        public bool DontRenderFirstHeading { get; set; } = false;
+            services.AddSingleton<DefaultChildrenListRenderer>();
+        }
+
+        #endregion
     }
-}
+
+}   

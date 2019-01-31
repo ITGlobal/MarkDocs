@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Format
@@ -28,15 +29,8 @@ namespace ITGlobal.MarkDocs.Format
         Encoding SourceEncoding { get; }
 
         /// <summary>
-        ///     Reads a page file <paramref name="filename"/> and parses it's metadata (see <see cref="Metadata"/>)
+        ///     Parses content of file <paramref name="filename"/>
         /// </summary>
-        [NotNull]
-        Metadata ParseProperties([NotNull] IParsePropertiesContext ctx, [NotNull] string filename);
-
-        /// <summary>
-        ///     Parses content of <paramref name="markup"/>
-        /// </summary>
-        [NotNull]
-        IParsedPage ParsePage([NotNull] IParseContext ctx, [NotNull] string markup);
+        (IParsedPage, PageMetadata) Read([NotNull] IReadPageContext ctx, [NotNull] string filename);
     }
 }

@@ -24,7 +24,7 @@ namespace ITGlobal.MarkDocs.Blog.Example
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseLoggerFactory(loggerFactory)
+                .ConfigureLogging(_=>_.AddSerilog())
                 .UseStartup<Startup>()
                 .Build();
 

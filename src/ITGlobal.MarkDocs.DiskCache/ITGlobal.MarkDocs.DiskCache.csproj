@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../common.props" />
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyTitle>MarkDocs.DiskCache</AssemblyTitle>
+    <AssemblyName>ITGlobal.MarkDocs.DiskCache</AssemblyName>
+    <PackageId>ITGlobal.MarkDocs.DiskCache</PackageId>
+    <RootNamespace>ITGlobal.MarkDocs</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.csproj" />
+  </ItemGroup>
+</Project>

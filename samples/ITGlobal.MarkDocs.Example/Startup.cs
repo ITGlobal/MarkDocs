@@ -1,17 +1,13 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using ITGlobal.MarkDocs.Cache;
 using ITGlobal.MarkDocs.Format;
-using ITGlobal.MarkDocs.Git;
-using ITGlobal.MarkDocs.Storage;
 using ITGlobal.MarkDocs.Tags;
 using ITGlobal.MarkDocs.Search;
+using ITGlobal.MarkDocs.Source;
 using Serilog;
 
 namespace ITGlobal.MarkDocs.Example
@@ -41,25 +37,30 @@ namespace ITGlobal.MarkDocs.Example
             // Add MarkDocs services
             services.AddMarkDocs(config =>
             {
-                config.Format.UseMarkdown(new MarkdownOptions
-                {
-                    ResourceUrlResolver = new ResourceUrlResolver(),
-                    SyntaxColorizer = new ServerHighlightJsSyntaxColorizer(Path.Combine(Env.ContentRootPath, "Data", "temp"))
-                });
-                config.Cache.UseDisk(Path.Combine(Env.ContentRootPath, "Data", "cached-content"), enableConcurrentWrites: false);
+                config.SourceTree.UseStaticDirectory(
+                    Path.GetFullPath(Path.Combine(Env.ContentRootPath, "../../docs")),
+                    watchForChanges: true
+                );
 
-                config.Storage.UseStaticDirectory(Path.GetFullPath(Path.Combine(Env.ContentRootPath, "../../docs")), enableWatch: true);
+                config.Format.UseMarkdown(markdown =>
+                {
+                    markdown.UseCodecogsMathRenderer();
+                    markdown.CodeBlocks.UseServerSideHighlightJs(Path.Combine(Env.ContentRootPath, "Data", "temp"));
+                    markdown.CodeBlocks.UsePlantUmlWebService();
+                    markdown.UseResourceUrlResolver<ResourceUrlResolver>();
+                });
                 
+                config.Cache.UseDisk(Path.Combine(Env.ContentRootPath, "Data", "cached-content"));
+
                 config.Extensions.AddTags();
+
                 config.Extensions.AddSearch(Path.Combine(Env.ContentRootPath, "Data", "search-index"));
+
+                config.UseAspNetLog();
             });
         }
 
-        public void Configure(
-            IApplicationBuilder app,
-            IHostingEnvironment env,
-            IApplicationLifetime appLifetime,
-            IMarkDocService markDocs)
+        public void Configure(IApplicationBuilder app, IApplicationLifetime appLifetime)
         {
             appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
             app.UseDeveloperExceptionPage();
@@ -73,13 +74,17 @@ namespace ITGlobal.MarkDocs.Example
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            Task.Factory.StartNew(markDocs.Initialize);
+            appLifetime.ApplicationStarted.Register(
+                    () =>
+                    {
+                        app.ApplicationServices.GetRequiredService<IMarkDocService>();
+                    });
         }
 
         private sealed class ResourceUrlResolver : IResourceUrlResolver
         {
-            public string ResolveUrl(IResource resource, IResource relativeTo)
-                 => $"/{resource.Documentation.Id}{resource.Id}";
+            public string ResolveUrl(IPageRenderContext context, IResourceId resource) 
+                => $"/{context.AssetTree.Id}{resource.Id}";
         }
     }
 }

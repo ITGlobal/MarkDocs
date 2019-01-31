@@ -2,6 +2,7 @@
   <Import Project="../common.props" />
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <AssemblyTitle>MarkDocs</AssemblyTitle>
     <AssemblyName>ITGlobal.MarkDocs.Blog</AssemblyName>
     <PackageId>ITGlobal.MarkDocs.Blog</PackageId>

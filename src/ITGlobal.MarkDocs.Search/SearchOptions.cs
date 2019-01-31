@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using ITGlobal.MarkDocs.Extensions;
-using Microsoft.Extensions.Logging;
+﻿using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Search
 {
-
     /// <summary>
     ///     Options for search extension
     /// </summary>
@@ -16,7 +11,7 @@ namespace ITGlobal.MarkDocs.Search
         /// <summary>
         ///     Path to lucene index directory
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         public string IndexDirectory { get; set; }
     }
 }

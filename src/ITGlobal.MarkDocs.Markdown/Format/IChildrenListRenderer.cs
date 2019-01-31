@@ -1,3 +1,4 @@
+using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
 using Markdig.Renderers;
 
@@ -12,6 +13,6 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Renders a list of child pages into HTML
         /// </summary>
-        void Render(HtmlRenderer renderer, IPage page);
+        void Render([NotNull] HtmlRenderer renderer, [NotNull] AssetTree assetTree, [NotNull] PageAsset page);
     }
 }

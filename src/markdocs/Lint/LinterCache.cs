@@ -13,7 +13,7 @@ namespace ITGlobal.MarkDocs.Tools.Lint
             return CacheVerifyResult.OutOfDate;
         }
 
-        public ICacheUpdateOperation BeginUpdate() => new LinterCacheUpdateOperation();
+        public ICacheUpdateOperation_OLD BeginUpdate() => new LinterCacheUpdateOperation();
 
         public Stream Read(IResource item)
         {

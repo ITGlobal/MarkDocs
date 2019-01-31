@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using ITGlobal.MarkDocs.Format.Impl;
+using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Format
 {

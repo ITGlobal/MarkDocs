@@ -2,9 +2,11 @@
   <Import Project="../common.props" />
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <AssemblyTitle>MarkDocs.Git</AssemblyTitle>
     <AssemblyName>ITGlobal.MarkDocs.Git</AssemblyName>
     <PackageId>ITGlobal.MarkDocs.Git</PackageId>
+    <RootNamespace>ITGlobal.MarkDocs</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.csproj" />

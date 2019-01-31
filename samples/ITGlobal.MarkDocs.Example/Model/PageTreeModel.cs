@@ -2,14 +2,13 @@
 {
     public sealed class PageTreeModel
     {
-        public PageTreeModel(IPageTree tree, IPage page)
+        public PageTreeModel(IDocumentation documentation, IPage page)
         {
-            Tree = tree;
+            Documentation = documentation;
             Page = page;
         }
 
-        public IPageTree Tree { get; }
+        public IDocumentation Documentation { get; }
         public IPage Page { get; }
-        public IDocumentation Documentation => Page.Documentation;
     }
 }

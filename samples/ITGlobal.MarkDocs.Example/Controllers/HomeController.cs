@@ -1,5 +1,4 @@
-﻿using System.IO;
-using ITGlobal.MarkDocs.Example.Model;
+﻿using ITGlobal.MarkDocs.Example.Model;
 using ITGlobal.MarkDocs.Search;
 using ITGlobal.MarkDocs.Tags;
 using Microsoft.AspNetCore.Mvc;
@@ -44,7 +43,7 @@ namespace ITGlobal.MarkDocs.Example.Controllers
             var file = documentation.GetAttachment(id);
             if (file != null)
             {
-                return File(file.Read(), file.ContentType);
+                return File(file.OpenRead(), file.ContentType);
             }
 
             return NotFound($"ResourceNotFound: [{branch}!{id}]");

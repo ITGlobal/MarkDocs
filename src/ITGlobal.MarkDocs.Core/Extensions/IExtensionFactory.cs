@@ -14,13 +14,10 @@ namespace ITGlobal.MarkDocs.Extensions
         /// <param name="service">
         ///     MarkDocs service
         /// </param>
-        /// <param name="state">
-        ///     Initial documentation state
-        /// </param>
         /// <returns>
         ///     MarkDocs extension
         /// </returns>
-        [PublicAPI, NotNull]
-        IExtension Create([NotNull] IMarkDocService service, [NotNull] IMarkDocServiceState state);
+        [NotNull]
+        IExtension Create([NotNull] IMarkDocService service);
     }
 }

@@ -2,14 +2,14 @@
 {
     public sealed class PageTreeNodeModel
     {
-        public PageTreeNodeModel(IPageTreeNode node, IPage page)
+        public PageTreeNodeModel(IPage page, IPage selectedPage)
         {
-            Node = node;
             Page = page;
+            SelectedPage = selectedPage;
         }
 
-        public IPageTreeNode Node { get; }
         public IPage Page { get; }
-        public IDocumentation Documentation => Page.Documentation;
+        public IPage SelectedPage { get; }
+        public IDocumentation Documentation => SelectedPage.Documentation;
     }
 }

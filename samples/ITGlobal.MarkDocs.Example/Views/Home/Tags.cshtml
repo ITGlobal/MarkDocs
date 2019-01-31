@@ -8,8 +8,10 @@
 <div class="list-group">
     @foreach (var page in Model.Pages)
     {
-        <a href="~/@Uri.EscapeDataString(Model.Documentation.Id)/@page.Id" class="list-group-item">
-            @page.Title
+        var url = $"~/{Uri.EscapeDataString(Model.Documentation.Id)}/{page.Id}";
+        
+        <a href="@url" class="list-group-item">
+            @(page.Title)
         </a>
     }
 </div>

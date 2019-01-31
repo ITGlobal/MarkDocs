@@ -1,5 +1,4 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs
 {
@@ -12,25 +11,18 @@ namespace ITGlobal.MarkDocs
         /// <summary>
         ///     Severity
         /// </summary>
-        [PublicAPI]
         CompilationReportMessageType Type { get; }
 
         /// <summary>
         ///     A line number in a source file
         /// </summary>
-        [PublicAPI, CanBeNull]
+        [CanBeNull]
         int? LineNumber { get; }
 
         /// <summary>
         ///     Message text
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         string Message { get; }
-
-        /// <summary>
-        ///     Exception
-        /// </summary>
-        [PublicAPI, CanBeNull]
-        Exception Exception { get; }
     }
 }

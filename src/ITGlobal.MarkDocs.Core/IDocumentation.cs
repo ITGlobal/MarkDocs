@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using System.Collections.Generic;
+using ITGlobal.MarkDocs.Source;
 
 namespace ITGlobal.MarkDocs
 {
@@ -31,14 +32,14 @@ namespace ITGlobal.MarkDocs
         ///     Documentation version
         /// </summary>
         [PublicAPI, NotNull]
-        IContentVersion ContentVersion { get; }
+        ISourceInfo SourceInfo { get; }
 
         /// <summary>
-        ///     Page tree
+        ///     Root page
         /// </summary>
         [PublicAPI, NotNull]
-        IPageTree PageTree { get; }
-        
+        IPage RootPage { get; }
+
         /// <summary>
         ///     Provides errors and warning for documentation
         /// </summary>

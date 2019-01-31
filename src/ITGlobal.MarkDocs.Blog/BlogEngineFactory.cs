@@ -22,7 +22,7 @@ namespace ITGlobal.MarkDocs.Blog
             var builder = new BlogEngineConfigurationBuilder(workingDirectory);
             configure(builder);
 
-            var engine = builder.BuildInstance(loggerFactory ?? new LoggerFactory());
+            var engine = builder.Build(loggerFactory ?? new LoggerFactory());
             return engine;
         }
     }

@@ -1,11 +1,12 @@
 ﻿using JetBrains.Annotations;
 using ITGlobal.MarkDocs.Extensions;
+using ITGlobal.MarkDocs.Search.Impl;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ITGlobal.MarkDocs.Search
 {
-
     /// <summary>
-    ///     Extension methods for <see cref="MarkDocsExtensionConfigurationBuilder"/> to configure search extension
+    ///     Extension methods for <see cref="MarkDocsExtensionOptions"/> to configure search extension
     /// </summary>
     [PublicAPI]
     public static class MarkdocsConfigurationExtensions
@@ -21,7 +22,7 @@ namespace ITGlobal.MarkDocs.Search
         /// </param>
         [PublicAPI]
         public static void AddSearch(
-            [NotNull] this MarkDocsExtensionConfigurationBuilder configuration,
+            [NotNull] this MarkDocsExtensionOptions configuration,
             [NotNull] string indexDirectory)
         {
             AddSearch(configuration, new SearchOptions { IndexDirectory = indexDirectory });
@@ -38,14 +39,12 @@ namespace ITGlobal.MarkDocs.Search
         /// </param>
         [PublicAPI]
         public static void AddSearch(
-            [NotNull] this MarkDocsExtensionConfigurationBuilder configuration,
+            [NotNull] this MarkDocsExtensionOptions configuration,
             [NotNull] SearchOptions options)
         {
-            configuration.Add(ctx =>
-            {
-                var searchEngine = new LuceneSearchEngine(ctx.LoggerFactory, options);
-                return new SearchExtensionFactory(searchEngine);
-            });
+            configuration.ConfigureServices(_ => _.AddSingleton(options));
+            configuration.ConfigureServices(_ => _.AddSingleton< LuceneSearchEngine>());
+            configuration.Use<SearchExtensionFactory>();
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using System.Collections.Generic;
 
 namespace ITGlobal.MarkDocs.Tags
 {
@@ -18,7 +18,7 @@ namespace ITGlobal.MarkDocs.Tags
         /// <returns>
         ///     List of tags
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         IReadOnlyList<string> GetTags([NotNull] IDocumentation documentation);
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace ITGlobal.MarkDocs.Tags
         /// <returns>
         ///     List of tags
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         IReadOnlyList<string> GetPageTags([NotNull] IPage page);
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace ITGlobal.MarkDocs.Tags
         /// <returns>
         ///     List of pages
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         IReadOnlyList<IPage> GetPagesByTag([NotNull] IDocumentation documentation, [NotNull] string tag);
     }
 }

@@ -6,14 +6,8 @@ namespace ITGlobal.MarkDocs
     ///     A generic resource
     /// </summary>
     [PublicAPI]
-    public interface IResource
+    public interface IResource : IResourceId
     {
-        /// <summary>
-        ///     Resource ID
-        /// </summary>
-        [PublicAPI, NotNull]
-        string Id { get; }
-
         /// <summary>
         ///     A reference to a documentation
         /// </summary>

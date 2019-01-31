@@ -5,7 +5,7 @@ using ITGlobal.MarkDocs.Cache;
 
 namespace ITGlobal.MarkDocs.Tools.Generate
 {
-    public sealed class OutputCacheUpdateOperation : ICacheUpdateOperation
+    public sealed class OutputCacheUpdateOperation : ICacheUpdateOperation_OLD
     {
         private readonly string _directory;
         private readonly ITemplate _template;

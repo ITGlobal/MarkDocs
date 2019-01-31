@@ -2,6 +2,7 @@
   <Import Project="../common.props" />
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <AssemblyTitle>MarkDocs.Search</AssemblyTitle>
     <AssemblyName>ITGlobal.MarkDocs.Search</AssemblyName>
     <PackageId>ITGlobal.MarkDocs.Search</PackageId>

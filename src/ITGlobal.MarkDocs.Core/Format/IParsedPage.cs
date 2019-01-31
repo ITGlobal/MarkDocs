@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Format
@@ -10,24 +10,26 @@ namespace ITGlobal.MarkDocs.Format
     public interface IParsedPage
     {
         /// <summary>
+        ///     Anchors
+        /// </summary>
+        [CanBeNull]
+        PageAnchors Anchors { get; }
+
+        /// <summary>
         ///     true if page contains a "cut" separator
         /// </summary>
         bool HasPreview { get; }
 
         /// <summary>
-        ///     Page anchors (with names)
-        /// </summary>
-        [NotNull]
-        IReadOnlyDictionary<string, string> Anchors { get; }
-
-        /// <summary>
         ///     Renders page into HTML
         /// </summary>
-        string Render([NotNull] IRenderContext ctx);
+        [NotNull]
+        string Render([NotNull] IPageRenderContext ctx);
 
         /// <summary>
         ///     Renders page preview into HTML
         /// </summary>
-        string RenderPreview([NotNull] IRenderContext ctx);
+        [NotNull]
+        string RenderPreview([NotNull] IPageRenderContext ctx);
     }
 }

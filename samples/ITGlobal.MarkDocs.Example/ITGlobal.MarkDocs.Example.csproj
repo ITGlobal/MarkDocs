@@ -2,6 +2,7 @@
   <Import Project="../../src/common.props" />
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>MarkDocs.Example</AssemblyName>
     <OutputType>Exe</OutputType>

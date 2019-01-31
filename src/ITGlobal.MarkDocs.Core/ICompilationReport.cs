@@ -12,13 +12,13 @@ namespace ITGlobal.MarkDocs
         /// <summary>
         ///     List of compilation warnings and errors for every page
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IReadOnlyList<IPageCompilationReport> Pages { get; }
 
         /// <summary>
         ///     List of compilation warnings and errors than are not connected to any specific page
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IReadOnlyList<ICompilationReportMessage> Common { get; }
     }
 }

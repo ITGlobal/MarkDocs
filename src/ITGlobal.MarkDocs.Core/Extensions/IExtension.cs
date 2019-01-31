@@ -9,12 +9,30 @@ namespace ITGlobal.MarkDocs.Extensions
     public interface IExtension
     {
         /// <summary>
-        ///     Handle a documentation state update
+        ///     Initialize extension.
+        ///     This method is called at startup, no more than once.
+        ///     If there's no cached documentation - this method won't be called at all.
         /// </summary>
-        /// <param name="state">
-        ///     New documentation state
-        /// </param>
-        [PublicAPI]
-        void Update([NotNull] IMarkDocServiceState state);
+        void Initialize([NotNull] IMarkDocState state);
+
+        /// <summary>
+        ///     Called when new documentation branch is added 
+        /// </summary>
+        void OnCreated([NotNull] IDocumentation documentation);
+
+        /// <summary>
+        ///     Called when a documentation branch is updated
+        /// </summary>
+        void OnUpdated([NotNull] IDocumentation documentation);
+
+        /// <summary>
+        ///     Called when a documentation branch is updated and all changes are committed
+        /// </summary>
+        void OnUpdateCompleted([NotNull] IDocumentation documentation);
+
+        /// <summary>
+        ///     Called when a documentation branch is removed
+        /// </summary>
+        void OnRemoved([NotNull] IDocumentation documentation);
     }
 }

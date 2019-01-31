@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using ITGlobal.MarkDocs.Tags.Impl;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Tags
@@ -19,15 +19,10 @@ namespace ITGlobal.MarkDocs.Tags
         /// <returns>
         ///     Page tags service
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         public static ITagService GetTagService([NotNull] this IDocumentation documentation)
         {
             var extension = documentation.Service.GetExtension<TagsExtension>();
-            if (extension == null)
-            {
-                throw new InvalidOperationException($"{typeof(TagsExtension)} is not registered");
-            }
-
             return extension;
         }
 
@@ -40,7 +35,7 @@ namespace ITGlobal.MarkDocs.Tags
         /// <returns>
         ///     List of tags
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         public static IReadOnlyList<string> GetTags([NotNull] this IDocumentation documentation)
         {
             var extension = documentation.GetTagService();
@@ -56,7 +51,7 @@ namespace ITGlobal.MarkDocs.Tags
         /// <returns>
         ///     List of tags
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         public static IReadOnlyList<string> GetPageTags([NotNull] this IPage page)
         {
             var extension = page.Documentation.GetTagService();
@@ -75,7 +70,7 @@ namespace ITGlobal.MarkDocs.Tags
         /// <returns>
         ///     List of pages
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         public static IReadOnlyList<IPage> GetPagesByTag([NotNull] this IDocumentation documentation, [NotNull] string tag)
         {
             var extension = documentation.GetTagService();

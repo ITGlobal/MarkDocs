@@ -73,7 +73,7 @@ hr {
 ";
         public string Name => "preview";
 
-        public void Initialize(ICacheUpdateOperation operation, IDocumentation documentation) { }
+        public void Initialize(ICacheUpdateOperation_OLD operation, IDocumentation documentation) { }
 
         public void Render(IPage page, string content, TextWriter writer)
         {

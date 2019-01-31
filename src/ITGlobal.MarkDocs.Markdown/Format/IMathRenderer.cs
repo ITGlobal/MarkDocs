@@ -11,7 +11,7 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Render a MathML/Tex/LaTex into an image
         /// </summary>
-        [PublicAPI, NotNull]
-        ImageData Render([NotNull] string sourceCode, int? lineNumber);
+        [NotNull]
+        IGeneratedAssetContent Render([NotNull] string sourceCode, int? lineNumber);
     }
 }

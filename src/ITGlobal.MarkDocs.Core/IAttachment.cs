@@ -12,13 +12,13 @@ namespace ITGlobal.MarkDocs
         /// <summary>
         ///     Attachment MIME type
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         string ContentType { get; }
 
         /// <summary>
         ///     Opens a read-only content stream
         /// </summary>
-        [PublicAPI, NotNull]
-        Stream Read();
+        [NotNull]
+        Stream OpenRead();
     }
 }

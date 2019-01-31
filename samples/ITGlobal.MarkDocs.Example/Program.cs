@@ -1,7 +1,7 @@
-﻿using System.IO;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using System.IO;
 
 namespace ITGlobal.MarkDocs.Example
 {
@@ -16,13 +16,24 @@ namespace ITGlobal.MarkDocs.Example
                 .MinimumLevel.Verbose()
                 .CreateLogger();
 
-            var loggerFactory = new LoggerFactory();
-            loggerFactory.AddSerilog();
-
+            //.ConfigureLogging(_ => _.AddSerilog().AddFilter((category, logLevel) => (category.StartsWith("Microsoft") && logLevel >= LogLevel.Trace)))
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseLoggerFactory(loggerFactory)
+                .ConfigureLogging(logBuilder =>
+                {
+                    logBuilder.AddFilter((provider, category, logLevel) =>
+                    {
+                        if (category.StartsWith("Microsoft") && logLevel<= LogLevel.Error)
+                        {
+                            return false;
+                        }
+                        return true;
+                    });
+                    //_.AddFilter("Microsoft.*", LogLevel.Error);
+                    // logBuilder.AddSerilog();
+                    logBuilder.AddConsole();
+                })
                 .UseStartup<Startup>()
                 .Build();
 

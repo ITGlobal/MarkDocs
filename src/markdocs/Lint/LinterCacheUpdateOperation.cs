@@ -3,7 +3,7 @@ using ITGlobal.MarkDocs.Cache;
 
 namespace ITGlobal.MarkDocs.Tools.Lint
 {
-    public sealed class LinterCacheUpdateOperation : ICacheUpdateOperation
+    public sealed class LinterCacheUpdateOperation : ICacheUpdateOperation_OLD
     {
         public void Clear(IDocumentation documentation) { }
 

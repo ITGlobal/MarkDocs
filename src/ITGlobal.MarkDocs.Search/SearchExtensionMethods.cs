@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using ITGlobal.MarkDocs.Search.Impl;
 using JetBrains.Annotations;
-using ITGlobal.MarkDocs.Extensions;
 
 namespace ITGlobal.MarkDocs.Search
 {
-
     /// <summary>
     ///     Helper methods for search service
     /// </summary>
@@ -21,15 +19,10 @@ namespace ITGlobal.MarkDocs.Search
         /// <returns>
         ///     Search service
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         public static ISearchService GetSearchService([NotNull] this IDocumentation documentation)
         {
             var extension = documentation.Service.GetExtension<SearchExtension>();
-            if (extension == null)
-            {
-                throw new InvalidOperationException($"{typeof(SearchExtension)} is not registered");
-            }
-
             return extension.GetSearchService(documentation);
         }
 
@@ -45,7 +38,7 @@ namespace ITGlobal.MarkDocs.Search
         /// <returns>
         ///     Search results
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         public static IReadOnlyList<SearchResultItem> Search([NotNull] this IDocumentation documentation, [NotNull] string query)
         {
             var service = documentation.GetSearchService();
@@ -64,7 +57,7 @@ namespace ITGlobal.MarkDocs.Search
         /// <returns>
         ///     List of search suggestions
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         public static IReadOnlyList<string> Suggest([NotNull] this IDocumentation documentation, [NotNull] string query)
         {
             var service = documentation.GetSearchService();

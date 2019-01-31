@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using ITGlobal.MarkDocs.Format;
+﻿using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
+using System.Collections.Generic;
+using System.IO;
 
 namespace ITGlobal.MarkDocs
 {
@@ -24,22 +24,16 @@ namespace ITGlobal.MarkDocs
         string Description { get; }
 
         /// <summary>
-        ///     Page tree node that refers to this page
-        /// </summary>
-        [PublicAPI, NotNull]
-        IPageTreeNode PageTreeNode { get; }
-
-        /// <summary>
         ///     Page metadata
         /// </summary>
         [PublicAPI, NotNull]
-        Metadata Metadata { get; }
+        PageMetadata Metadata { get; }
 
         /// <summary>
-        ///     true if page has a preview
+        ///     Page preview if defined, null otherwise
         /// </summary>
-        [PublicAPI]
-        bool HasPreview { get; }
+        [CanBeNull]
+        IPagePreview Preview { get; }
 
         /// <summary>
         ///     Page anchors (with names)
@@ -47,30 +41,21 @@ namespace ITGlobal.MarkDocs
         IReadOnlyDictionary<string, string> Anchors { get; }
 
         /// <summary>
-        ///     Reads page source markup
+        ///     Nested pages
         /// </summary>
-        /// <returns>
-        ///     Read-only stream
-        /// </returns>
         [PublicAPI, NotNull]
-        Stream ReadMarkup();
+        IPage[] NestedPages { get; }
 
         /// <summary>
-        ///     Reads page rendered HTML
+        ///     A reference to a parent page. Null for root nodes
         /// </summary>
-        /// <returns>
-        ///     Read-only stream
-        /// </returns>
-        [PublicAPI, NotNull]
-        Stream ReadHtml();
+        [PublicAPI, CanBeNull]
+        IPage Parent { get; }
 
         /// <summary>
-        ///     Reads page preview (HTML)
+        ///     Opens a read-only content stream
         /// </summary>
-        /// <returns>
-        ///     Read-only stream
-        /// </returns>
-        [PublicAPI, NotNull]
-        Stream ReadPreviewHtml();
+        [NotNull]
+        Stream OpenRead();
     }
 }

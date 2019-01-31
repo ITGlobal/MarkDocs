@@ -2,9 +2,11 @@
   <Import Project="../common.props" />
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <AssemblyTitle>MarkDocs.Markdown</AssemblyTitle>
     <AssemblyName>ITGlobal.MarkDocs.Markdown</AssemblyName>
     <PackageId>ITGlobal.MarkDocs.Markdown</PackageId>
+    <RootNamespace>ITGlobal.MarkDocs</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\*.js" />

@@ -18,7 +18,7 @@ namespace ITGlobal.MarkDocs.Search
         /// <returns>
         ///     Search results
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         IReadOnlyList<SearchResultItem> Search([NotNull] string query);
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace ITGlobal.MarkDocs.Search
         /// <returns>
         ///     List of search suggestions
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         IReadOnlyList<string> Suggest([NotNull] string query);
     }
 }

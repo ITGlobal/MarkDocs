@@ -1,8 +1,11 @@
 ﻿using System;
-using System.Linq;
-using ITGlobal.MarkDocs.Cache;
+using ITGlobal.MarkDocs.Impl;
+using ITGlobal.MarkDocs.Source;
+using ITGlobal.MarkDocs.Source.Impl;
 using JetBrains.Annotations;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ITGlobal.MarkDocs
 {
@@ -22,15 +25,18 @@ namespace ITGlobal.MarkDocs
         ///     MarkDocs configuration function
         /// </param>
         [PublicAPI]
-        public static void AddMarkDocs(this IServiceCollection services, Action<MarkDocsConfigurationBuilder> configure)
+        public static void AddMarkDocs(this IServiceCollection services, Action<MarkDocsOptions> configure)
         {
-            var builder = new MarkDocsConfigurationBuilder();
-            builder.Cache.UseNull();
+            var builder = new MarkDocsOptions(services);
+
             configure(builder);
+            builder.Configure();
 
-            var factory = builder.Build();
-
-            services.AddSingleton(factory);
+            services.AddSingleton<IMarkDocService, MarkDocService>();
+            services.AddSingleton<IAssetTreeReader, AssetTreeReader>();
+            services.TryAddSingleton<IContentHashProvider, Sha1ContentHashProvider>();
+            services.TryAddSingleton<IContentTypeProvider, FileExtensionContentTypeProvider>();
+            services.AddSingleton<IContentMetadataProvider, DefaultContentMetadataProvider>();
         }
     }
 }

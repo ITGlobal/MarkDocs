@@ -1,37 +1,26 @@
-﻿@using System.Threading.Tasks
-@using ITGlobal.MarkDocs.Example.Model
+﻿@using ITGlobal.MarkDocs.Example.Model
 @model ITGlobal.MarkDocs.Example.Model.PageTreeNodeModel
 
 @{
-    var url = Model.Node.IsHyperlink ?
-        string.Format("/{0}{1}", Uri.EscapeDataString(Model.Documentation.Id), Model.Node.Id)
-        : null;
+    var url = $"/{Uri.EscapeDataString(Model.Documentation.Id)}{Model.Page.Id}";
 
-    var isFolder = Model.Node.Nodes != null;
+    var isFolder = Model.Page.NestedPages.Length > 0;
     var icon = isFolder ? "<i class=\"fa fa-fw fa-folder-o\"></i>" : "<i class=\"fa fa-fw fa-file-o\"></i>";
 
-    var isActive = Model.Page.Id == Model.Node.Id;
+    var isActive = Model.SelectedPage.Id == Model.Page.Id;
 }
 
-<li data-id="@Html.Encode(Model.Node)" class="@(isActive?"active":"")">
-    @if (url != null)
-    {
-        <a href="@url">
-            @Html.Raw(icon)
-            <span>@Model.Node.Title</span>
-        </a>
-    }
-    else
-    {
+<li data-id="@Html.Encode(Model.Page)" class="@(isActive?"active":"")">
+    <a href="@url">
         @Html.Raw(icon)
-        <span>@Model.Node.Title</span>
-    }
+        <span>@Model.Page.Title</span>
+    </a>
     @if (isFolder)
     {
         <ul>
-            @foreach (var node in Model.Node.Nodes)
+            @foreach (var page in Model.Page.NestedPages)
             {
-                @Html.Partial("Components/_PageTreeNode", new PageTreeNodeModel(node, Model.Page));
+                @(await Html.PartialAsync("Components/_PageTreeNode", new PageTreeNodeModel(page, Model.SelectedPage)))
             }
         </ul>
     }

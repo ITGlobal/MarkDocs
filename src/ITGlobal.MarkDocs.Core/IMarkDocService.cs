@@ -12,15 +12,9 @@ namespace ITGlobal.MarkDocs
     public interface IMarkDocService : IDisposable
     {
         /// <summary>
-        ///     Initializes documentation data (foreground)
+        ///     Gets a list of all available documentations
         /// </summary>
-        [PublicAPI]
-        void Initialize();
-
-        /// <summary>
-        ///     Gets a list of all available documentatios
-        /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IReadOnlyList<IDocumentation> Documentations { get; }
 
         /// <summary>
@@ -32,7 +26,7 @@ namespace ITGlobal.MarkDocs
         /// <returns>
         ///     A documentation if exists, null otherwise
         /// </returns>
-        [PublicAPI, CanBeNull]
+        [CanBeNull]
         IDocumentation GetDocumentation([NotNull] string documentationId);
         
         /// <summary>
@@ -40,7 +34,6 @@ namespace ITGlobal.MarkDocs
         ///     Existing branches are updated, new branches are checked out.
         ///     Any local changes are discarded.
         /// </summary>
-        [PublicAPI]
         void Synchronize();
 
         /// <summary>
@@ -52,7 +45,7 @@ namespace ITGlobal.MarkDocs
         /// <returns>
         ///     An instance of an extension or null if no such extension is registered.
         /// </returns>
-        [PublicAPI, CanBeNull]
+        [NotNull]
         TExtension GetExtension<TExtension>()
             where TExtension : class, IExtension;
     }

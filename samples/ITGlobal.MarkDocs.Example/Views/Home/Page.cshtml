@@ -7,9 +7,12 @@
 
 @section head
 {
-    @foreach (var metaTag in Model.Page.Metadata.MetaTags)
+    @if (Model.Page.Metadata.MetaTags != null)
     {
-        @Html.Raw(metaTag)
+        foreach (var metaTag in Model.Page.Metadata.MetaTags)
+        {
+            @Html.Raw(metaTag)
+        }
     }
 }
 
@@ -50,7 +53,7 @@
 
             <div class="tab-content">
                 <div class="tab-pane active" id="catalog">
-                    @Html.Partial("Components/_PageTree", new PageTreeModel(Model.Documentation.PageTree, Model.Page))
+                    @(await Html.PartialAsync("Components/_PageTree", new PageTreeModel(Model.Documentation, Model.Page)))
                 </div>
                 <div class="tab-pane" id="attachments">
                     @Html.Partial("Components/_AttachmentList", Model.Documentation)

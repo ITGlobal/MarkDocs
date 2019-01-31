@@ -21,13 +21,13 @@ namespace ITGlobal.MarkDocs.Search
         /// <summary>
         ///     Page
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         public IPage Page { get; }
 
         /// <summary>
         ///     Preview (markup)
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         public string Preview { get; }
     }
 }

@@ -2,6 +2,7 @@
   <Import Project="../common.props" />
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <AssemblyTitle>MarkDocs</AssemblyTitle>
     <AssemblyName>ITGlobal.MarkDocs</AssemblyName>
     <PackageId>ITGlobal.MarkDocs</PackageId>
@@ -9,6 +10,8 @@
   <ItemGroup>
     <ProjectReference Include="..\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.csproj" />
     <ProjectReference Include="..\ITGlobal.MarkDocs.Markdown\ITGlobal.MarkDocs.Markdown.csproj" />
+    <ProjectReference Include="..\ITGlobal.MarkDocs.DirectorySource\ITGlobal.MarkDocs.DirectorySource.csproj" />
+    <ProjectReference Include="..\ITGlobal.MarkDocs.DiskCache\ITGlobal.MarkDocs.DiskCache.csproj" />
     <ProjectReference Include="..\ITGlobal.MarkDocs.Git\ITGlobal.MarkDocs.Git.csproj" />
     <ProjectReference Include="..\ITGlobal.MarkDocs.Search\ITGlobal.MarkDocs.Search.csproj" />
     <ProjectReference Include="..\ITGlobal.MarkDocs.Tags\ITGlobal.MarkDocs.Tags.csproj" />

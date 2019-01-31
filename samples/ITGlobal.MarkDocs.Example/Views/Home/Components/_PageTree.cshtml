@@ -2,7 +2,7 @@
 @model PageTreeModel
 
 @{
-    var url = string.Format("/{0}", Uri.EscapeDataString(Model.Documentation.Id));
+    var url = $"/{Uri.EscapeDataString(Model.Documentation.Id)}";
     var isActive = string.IsNullOrEmpty(Model.Page.Id);
 }
 
@@ -14,8 +14,8 @@
         </a>
     </li>
 
-    @foreach (var node in Model.Tree.Nodes)
+    @foreach (var page in Model.Documentation.RootPage.NestedPages)
     {
-        @Html.Partial("Components/_PageTreeNode", new PageTreeNodeModel(node, Model.Page));
+        @(await Html.PartialAsync("Components/_PageTreeNode", new PageTreeNodeModel(page, Model.Page)))
     }
 </ul>

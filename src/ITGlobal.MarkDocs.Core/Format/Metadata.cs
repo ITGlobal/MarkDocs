@@ -19,7 +19,7 @@ namespace ITGlobal.MarkDocs.Format
 
         #endregion
 
-        #region properties
+        #region metadata
 
         /// <summary>
         ///     Page permanent identifier

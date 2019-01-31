@@ -22,7 +22,7 @@ namespace ITGlobal.MarkDocs.Tools.Generate
             return CacheVerifyResult.OutOfDate;
         }
 
-        public ICacheUpdateOperation BeginUpdate()
+        public ICacheUpdateOperation_OLD BeginUpdate()
             => new OutputCacheUpdateOperation(_directory, _template);
 
         public Stream Read(IResource item)
