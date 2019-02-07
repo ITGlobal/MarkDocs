@@ -224,10 +224,10 @@ namespace ITGlobal.MarkDocs.Cache.Impl
                 case ResourceType.PagePreview:
                     dictionary = index.PagePreviews;
                     break;
-                case ResourceType.Attachment:
+                case ResourceType.File:
                     dictionary = index.Files;
                     break;
-                case ResourceType.GeneratedAttachment:
+                case ResourceType.GeneratedFile:
                     dictionary = index.GeneratedFiles;
                     break;
                 default:
@@ -385,6 +385,7 @@ namespace ITGlobal.MarkDocs.Cache.Impl
                     if (Directory.Exists(directory))
                     {
                         Directory.Delete(directory, recursive: true);
+                        _log.Debug($"Cache directory \"{directory}\" has been deleted");
                     }
                 }
                 catch (IOException e)

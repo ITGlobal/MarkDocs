@@ -15,7 +15,7 @@ namespace ITGlobal.MarkDocs.Impl
         {
             Id = "",
             Title = "",
-            FileName = "",
+            RelativePath = "",
             Pages = Array.Empty<PageModel>(),
             Anchors = Array.Empty<PageAnchorModel>(),
             Preview = null,
@@ -26,8 +26,8 @@ namespace ITGlobal.MarkDocs.Impl
         private readonly DocumentationModel _model;
 
         private readonly ImmutableDictionary<string, IPage> _pages;
-        private readonly List<IAttachment> _attachments;
-        private readonly ImmutableDictionary<string, IAttachment> _attachmentsById;
+        private readonly List<IFileResource> _attachments;
+        private readonly ImmutableDictionary<string, IFileResource> _attachmentsById;
 
         #endregion
 
@@ -58,18 +58,18 @@ namespace ITGlobal.MarkDocs.Impl
                 }
             }
 
-            var attachments = new List<IAttachment>();
-            foreach (var m in model.Attachments ?? Array.Empty<AttachmentModel>())
+            var files = new List<IFileResource>();
+            foreach (var m in model.Files ?? Array.Empty<FileModel>())
             {
-                var attachment = new Attachment(this, cache, m);
-                attachments.Add(attachment);
+                var file = new FileResource(this, cache, m);
+                files.Add(file);
             }
 
-            Attachments = attachments;
-            _attachmentsById = attachments.ToImmutableDictionary(_ => _.Id, StringComparer.OrdinalIgnoreCase);
+            Files = files;
+            _attachmentsById = files.ToImmutableDictionary(_ => _.Id, StringComparer.OrdinalIgnoreCase);
 
             SourceInfo = new SourceInfo(model.Info);
-            CompilationReport = new CompilationReport(this, model.CompilationReport);
+            CompilationReport = new CompilationReport(model.CompilationReport);
         }
 
         #endregion
@@ -109,7 +109,7 @@ namespace ITGlobal.MarkDocs.Impl
         /// <summary>
         ///     Documentation attached files
         /// </summary>
-        public IReadOnlyList<IAttachment> Attachments { get; }
+        public IReadOnlyList<IFileResource> Files { get; }
 
         /// <summary>
         ///     Gets a documentation page by its ID
@@ -136,12 +136,12 @@ namespace ITGlobal.MarkDocs.Impl
         ///     Gets an attachment by its ID
         /// </summary>
         /// <param name="id">
-        ///     Attachment ID
+        ///     FileResource ID
         /// </param>
         /// <returns>
         ///     An attachment or null if it doesn't exist
         /// </returns>
-        public IAttachment GetAttachment(string id)
+        public IFileResource GetAttachment(string id)
         {
             ResourceId.Normalize(ref id);
 

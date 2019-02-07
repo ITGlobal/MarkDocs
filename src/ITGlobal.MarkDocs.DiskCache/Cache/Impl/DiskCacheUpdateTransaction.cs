@@ -109,17 +109,17 @@ namespace ITGlobal.MarkDocs.Cache.Impl
 
         public void Store(PagePreviewAsset asset, Action<Stream> write) => _pagePreviewAssetContainer.Store(asset, write);
 
-        public void Store(AttachmentAsset asset, Action<Stream> write) => _attachmentAssetContainer.Store(asset, write);
+        public void Store(PhysicalFileAsset asset, Action<Stream> write) => _attachmentAssetContainer.Store(asset, write);
 
-        public void Store(GeneratedAsset asset, Action<Stream> write) => _generatedAssetContainer.Store(asset, write);
+        public void Store(GeneratedFileAsset asset, Action<Stream> write) => _generatedAssetContainer.Store(asset, write);
 
         public Stream Read(PageAsset asset) => _pageAssetContainer.ReadAsset(asset);
 
         public Stream Read(PagePreviewAsset asset) => _pagePreviewAssetContainer.ReadAsset(asset);
 
-        public Stream Read(AttachmentAsset asset) => _attachmentAssetContainer.ReadAsset(asset);
+        public Stream Read(PhysicalFileAsset asset) => _attachmentAssetContainer.ReadAsset(asset);
 
-        public Stream Read(GeneratedAsset asset) => _generatedAssetContainer.ReadAsset(asset);
+        public Stream Read(GeneratedFileAsset asset) => _generatedAssetContainer.ReadAsset(asset);
 
         public ICacheReader Commit()
         {
@@ -157,7 +157,7 @@ namespace ITGlobal.MarkDocs.Cache.Impl
 
                 if (_oldDirectory != null)
                 {
-                    _provider.EnqueueForGarbageCollection(_oldDirectory);
+                    _provider.EnqueueForGarbageCollection(Path.Combine(_provider.RootDirectory, _oldDirectory));
                 }
             }
         }

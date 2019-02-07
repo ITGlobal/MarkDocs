@@ -1,52 +1,139 @@
-using System.Collections.Generic;
 using ITGlobal.MarkDocs.Cache.Model;
 using ITGlobal.MarkDocs.Source;
+using ITGlobal.MarkDocs.Source.Impl;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ITGlobal.MarkDocs.Impl
 {
     internal sealed class CompilationReportBuilder : ICompilationReportBuilder
     {
-        private readonly Dictionary<IPage, PageCompilationReport> _byPage = new Dictionary<IPage, PageCompilationReport>();
-        private readonly Dictionary<string, FileCompilationReportBuilder> _byPath = new Dictionary<string, FileCompilationReportBuilder>();
-        
-        private readonly List<CompilationReportMessageModel> _messages
-            = new List<CompilationReportMessageModel>();
-
-        public IPageCompilationReportBuilder ForFile(string path)
+        private readonly struct Msg
         {
-            if (!_byPath.TryGetValue(path, out var report))
+            public Msg(CompilationReportMessageType type, string message, string path, int? lineNumber)
             {
-                report = new FileCompilationReportBuilder(_messages, path);
-                _byPath.Add(path, report);
+                Type = type;
+                Message = message;
+                Path = path;
+                LineNumber = lineNumber;
             }
 
-            return report;
+            public readonly CompilationReportMessageType Type;
+            public readonly string Message;
+            public readonly string Path;
+            public readonly int? LineNumber;
+
+            public static Msg Warning(string message)
+            {
+                return new Msg(CompilationReportMessageType.Warning, message, null, null);
+            }
+
+            public static Msg Error(string message)
+            {
+                return new Msg(CompilationReportMessageType.Error, message, null, null);
+            }
+
+            public static Msg Warning(string message, string path, int? lineNumber)
+            {
+                return new Msg(CompilationReportMessageType.Warning, message, path, lineNumber);
+            }
+
+            public static Msg Error(string message, string path, int? lineNumber)
+            {
+                return new Msg(CompilationReportMessageType.Error, message, path, lineNumber);
+            }
+
+            public void Deconstruct(out CompilationReportMessageType type, out string message, out string path, out int? lineNumber)
+            {
+                type = Type;
+                message = Message;
+                path = Path;
+                lineNumber = LineNumber;
+            }
         }
-        
+
+        private readonly List<Msg> _messages = new List<Msg>();
+
         public void Warning(string message)
         {
-            _messages.Add(new CompilationReportMessageModel
-            {
-                Message = message,
-                Type = CompilationReportMessageType.Warning,
-            });
+            _messages.Add(Msg.Warning(message));
         }
 
         public void Error(string message)
         {
-            _messages.Add(new CompilationReportMessageModel
-            {
-                Message = message,
-                Type = CompilationReportMessageType.Error,
-            });
+            _messages.Add(Msg.Error(message));
         }
 
-        public CompilationReportModel Build()
+        public void Warning(string path, string message, int? lineNumber = null)
+        {
+            _messages.Add(Msg.Warning(message, path, lineNumber));
+        }
+
+        public void Error(string path, string message, int? lineNumber = null)
+        {
+            _messages.Add(Msg.Error(message, path, lineNumber));
+        }
+
+        public CompilationReportModel Build(string rootDirectory)
+        {
+            var messages = new CompilationReportMessageModel[_messages.Count];
+            for (int i = 0; i < _messages.Count; i++)
+            {
+                var (type, text, path, lineNumber) = _messages[i];
+                if (path != null)
+                {
+                    path = PathHelper.GetRelativePath(rootDirectory, path);
+                }
+
+                messages[i] = new CompilationReportMessageModel
+                {
+                    Type = type,
+                    Message = text,
+                    Filename = path,
+                    LineNumber = lineNumber
+                };
+            }
+
+            return new CompilationReportModel
+            {
+                Messages = messages
+            };
+        }
+
+        public CompilationReportModel Merge(ICompilationReport report)
         {
             return new CompilationReportModel
             {
-                Messages = _messages.ToArray()
+                Messages = Iterator().ToArray()
             };
+
+            IEnumerable<CompilationReportMessageModel> Iterator()
+            {
+                foreach (var (path, messages) in report.Messages)
+                {
+                    foreach (var message in messages)
+                    {
+                        yield return new CompilationReportMessageModel
+                        {
+                            Type = message.Type,
+                            Message = message.Message,
+                            Filename = path,
+                            LineNumber = message.LineNumber
+                        };
+                    }
+                }
+
+                foreach (var (type, text, path, lineNumber) in _messages)
+                {
+                    yield return new CompilationReportMessageModel
+                    {
+                        Type = type,
+                        Message = text,
+                        Filename = path,
+                        LineNumber = lineNumber
+                    };
+                }
+            }
         }
     }
 }

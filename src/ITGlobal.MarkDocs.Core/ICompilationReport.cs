@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Immutable;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs
@@ -10,15 +10,9 @@ namespace ITGlobal.MarkDocs
     public interface ICompilationReport
     {
         /// <summary>
-        ///     List of compilation warnings and errors for every page
+        ///     List of compilation warnings and errors
         /// </summary>
         [NotNull]
-        IReadOnlyList<IPageCompilationReport> Pages { get; }
-
-        /// <summary>
-        ///     List of compilation warnings and errors than are not connected to any specific page
-        /// </summary>
-        [NotNull]
-        IReadOnlyList<ICompilationReportMessage> Common { get; }
+        ImmutableDictionary<string, ImmutableArray<ICompilationReportMessage>> Messages { get; }
     }
 }

@@ -9,6 +9,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.csproj" />
+    <ProjectReference Include="..\ITGlobal.MarkDocs.DirectorySource\ITGlobal.MarkDocs.DirectorySource.csproj" />
+    <ProjectReference Include="..\ITGlobal.MarkDocs.DiskCache\ITGlobal.MarkDocs.DiskCache.csproj" />
     <ProjectReference Include="..\ITGlobal.MarkDocs.Markdown\ITGlobal.MarkDocs.Markdown.csproj" />
     <ProjectReference Include="..\ITGlobal.MarkDocs.Git\ITGlobal.MarkDocs.Git.csproj" />
     <ProjectReference Include="..\ITGlobal.MarkDocs.Search\ITGlobal.MarkDocs.Search.csproj" />

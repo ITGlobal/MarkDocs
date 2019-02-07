@@ -1,12 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using ITGlobal.MarkDocs.Cache;
-using ITGlobal.MarkDocs.Storage;
+using ITGlobal.MarkDocs.Source;
+using System;
+using System.IO;
 
 namespace ITGlobal.MarkDocs.Tools.Generate
 {
-    public sealed class OutputCache : ICache
+    public sealed class OutputCache : ICacheProvider
     {
         private readonly string _directory;
         private readonly ITemplate _template;
@@ -17,20 +16,16 @@ namespace ITGlobal.MarkDocs.Tools.Generate
             _template = template;
         }
 
-        public CacheVerifyResult Verify(IReadOnlyList<IContentDirectory> contentDirectories)
+        public CacheDocumentationModel[] Load() => Array.Empty<CacheDocumentationModel>();
+
+        public ICacheUpdateTransaction BeginTransaction(ISourceTree sourceTree, ISourceInfo sourceInfo, bool forceCacheClear = false)
         {
-            return CacheVerifyResult.OutOfDate;
+            return new OutputCacheUpdateTransaction(_directory, _template);
         }
 
-        public ICacheUpdateOperation_OLD BeginUpdate()
-            => new OutputCacheUpdateOperation(_directory, _template);
+        public void Drop(string documentationId) { }
 
-        public Stream Read(IResource item)
-        {
-            throw new NotSupportedException();
-        }
-
-        public static string GetRelativeResourcePath(IResource resource, IResource relativeTo)
+        public static string GetRelativeResourcePath(IResourceId resource, IResourceId relativeTo)
         {
             var relativeToUrl = new Uri($"http://site{GetResourcePath(relativeTo)}");
             var resourceUrl = new Uri($"http://site{GetResourcePath(resource)}");
@@ -51,7 +46,7 @@ namespace ITGlobal.MarkDocs.Tools.Generate
             return urlstr;
         }
 
-        public static string GetResourcePath(IResource resource)
+        public static string GetResourcePath(IResourceId resource)
         {
             var path = resource.Id;
             if (path == "/")
@@ -59,18 +54,11 @@ namespace ITGlobal.MarkDocs.Tools.Generate
                 path = "/index";
             }
 
-            string extension;
-            switch (resource.Type)
+            if (resource.Type == ResourceType.Page)
             {
-                case ResourceType.Page:
-                    extension = ".html";
-                    break;
-                default:
-                    extension = Path.GetExtension(resource.FileName);
-                    break;
+                path = Path.ChangeExtension(path, ".html");
             }
 
-            path = Path.ChangeExtension(path, extension);
             return path;
         }
     }

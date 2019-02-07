@@ -6,7 +6,7 @@ namespace ITGlobal.MarkDocs
     /// <summary>
     ///     Default implementation of <see cref="IMarkDocsEventCallback"/>
     /// </summary>
-    [PublicAPI]
+    [PublicAPI] // TODO broken
     public class MarkDocsEventCallback : IMarkDocsEventCallback
     {
         private sealed class EmptyToken : IDisposable

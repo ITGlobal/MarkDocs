@@ -53,7 +53,7 @@ namespace ITGlobal.MarkDocs.Blog.Example.Controllers
                     return Redirect(permalink.Post.Id);
 
                 case IBlogAttachment file:
-                    return File(file.Read(), file.ContentType);
+                    return File(file.OpenRead(), file.ContentType);
 
                 case null:
                     return View("404");

@@ -7,11 +7,16 @@ namespace ITGlobal.MarkDocs
     /// </summary>
     [PublicAPI]
     public interface IResourceId
-    { 
+    {
         /// <summary>
         ///     Resource ID
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         string Id { get; }
+
+        /// <summary>
+        ///     Resource type
+        /// </summary>
+        ResourceType Type { get; }
     }
 }

@@ -1,52 +1,34 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using ITGlobal.MarkDocs.Cache.Model;
+﻿using ITGlobal.MarkDocs.Cache.Model;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace ITGlobal.MarkDocs.Impl
 {
     internal sealed class CompilationReport : ICompilationReport
     {
-        public CompilationReport(IDocumentation documentation, CompilationReportModel model)
+        public CompilationReport(CompilationReportModel model)
         {
-            var pages = new Dictionary<string, List<ICompilationReportMessage>>();
-            var common = new List<ICompilationReportMessage>();
+            var dict = new Dictionary<string, List<ICompilationReportMessage>>();
 
             foreach (var m in model.Messages)
             {
+                var location = m.Filename ?? "";
+                if (!dict.TryGetValue(location, out var list))
+                {
+                    list = new List<ICompilationReportMessage>();
+                    dict.Add(location, list);
+                }
+
                 var item = new CompilationReportMessage(m);
-                if (string.IsNullOrEmpty(m.Page))
-                {
-                    common.Add(item);
-                }
-                else
-                {
-                    if (!pages.TryGetValue(m.Page, out var list))
-                    {
-                        list = new List<ICompilationReportMessage>();
-                        pages.Add(m.Page, list);
-                    }
-                    list.Add(item);
-                }
+                list.Add(item);
             }
 
-            Pages = pages
-                .Select(p =>
-                {
-                    var page = documentation.GetPage(p.Key);
-                    if (page == null)
-                    {
-                        return null;
-                    }
-
-                    return (IPageCompilationReport)(new PageCompilationReport(page, p.Value));
-                })
-                .Where(_ => _ != null)
-                .ToList();
-
-            Common = common;
+            Messages = dict.ToImmutableDictionary(
+                _ => _.Key,
+                _ => _.Value.ToImmutableArray()
+            );
         }
 
-        public IReadOnlyList<IPageCompilationReport> Pages { get; }
-        public IReadOnlyList<ICompilationReportMessage> Common { get; }
+        public ImmutableDictionary<string, ImmutableArray<ICompilationReportMessage>> Messages { get; }
     }
 }

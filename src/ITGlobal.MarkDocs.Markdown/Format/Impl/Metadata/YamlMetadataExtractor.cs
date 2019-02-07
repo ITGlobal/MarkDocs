@@ -1,16 +1,16 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using ITGlobal.MarkDocs.Source;
+﻿using ITGlobal.MarkDocs.Source;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
 using SharpYaml.Serialization;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace ITGlobal.MarkDocs.Format.Impl.Metadata
 {
     internal sealed class YamlMetadataExtractor : IMetadataExtractor
     {
-        public PageMetadata Extract(IReadPageContext ctx, MarkdownDocument document)
+        public PageMetadata Extract(IPageReadContext ctx, MarkdownDocument document)
         {
             var block = document.Descendants<YamlFrontMatterBlock>().FirstOrDefault();
             if (block == null)
@@ -21,7 +21,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Metadata
             try
             {
                 var properties = PageMetadata.Empty;
-                
+
                 var yaml = string.Join("\n", from l in block.Lines.Lines select l.Slice.ToString());
                 using (var reader = new StringReader(yaml))
                 {
@@ -113,6 +113,15 @@ namespace ITGlobal.MarkDocs.Format.Impl.Metadata
                         if (GetStringArrayMetadata(node, out var values))
                         {
                             metadata = metadata.WithMetaTags(values);
+                        }
+                    }
+                    break;
+
+                default:
+                    {
+                        if (GetStringMetadata(node, out var value))
+                        {
+                            metadata = metadata.With(key, value);
                         }
                     }
                     break;

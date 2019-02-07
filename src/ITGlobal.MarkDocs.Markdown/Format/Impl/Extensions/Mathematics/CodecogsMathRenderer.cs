@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
+﻿using Markdig.Extensions.Mathematics;
 
 namespace ITGlobal.MarkDocs.Format.Impl.Extensions.Mathematics
 {
@@ -9,43 +7,6 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.Mathematics
     /// </summary>
     internal sealed class CodecogsMathRenderer : IMathRenderer
     {
-        private sealed class GeneratedAsset : IGeneratedAssetContent
-        {
-            private readonly string _url;
-            private readonly string _source;
-            private readonly int? _lineNumber;
-
-            public GeneratedAsset(string url, string source, int? lineNumber)
-            {
-                _url = url;
-                _source = source;
-                _lineNumber = lineNumber;
-            }
-
-            public string ContentType => "image/png";
-
-            public string FormatFileName(string name) => $"math.{name}.png";
-
-            public void Write(Stream stream)
-            {
-                try
-                {
-                    var url = $"{_url}?{Uri.EscapeDataString(_source)}";
-
-                    using (var httpClient = new HttpClient())
-                    {
-                        httpClient.Timeout = TimeSpan.FromSeconds(30);
-                        var resultStream = httpClient.GetStreamAsync(url).GetAwaiter().GetResult();
-                        resultStream.CopyTo(stream);
-                    }
-                }
-                catch (HttpRequestException e)
-                {
-                    MarkdownRenderingContext.RenderContext?.Error($"Failed to render math markup. {e.Message}", _lineNumber);
-                }
-            }
-        }
-
         public const string DefaultUrl = "http://latex.codecogs.com/png.download";
 
         private readonly string _url;
@@ -55,9 +16,30 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.Mathematics
             _url = url;
         }
 
-        public IGeneratedAssetContent Render(string sourceCode, int? lineNumber)
+        public IRenderable CreateRenderable(IPageReadContext ctx, MathBlock block)
         {
-            return new GeneratedAsset(_url, sourceCode, lineNumber);
+            var markup = block.GetText();
+
+            ctx.CreateAttachment(
+                markup,
+                new CodecogsGeneratedAsset(_url, markup, block.Line),
+                out var asset,
+                out var url
+            );
+            return new CodecogsBlockRenderable(block, asset, url);
+        }
+
+        public IRenderable CreateRenderable(IPageReadContext ctx, MathInline inline)
+        {
+            var markup = inline.GetText();
+
+            ctx.CreateAttachment(
+                markup,
+                new CodecogsGeneratedAsset(_url, markup, inline.Line),
+                out var asset,
+                out var url
+            );
+            return new CodecogsInlineRenderable(inline, asset, url);
         }
     }
 }

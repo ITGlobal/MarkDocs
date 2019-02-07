@@ -73,7 +73,7 @@ hr {
 ";
         public string Name => "preview";
 
-        public void Initialize(ICacheUpdateOperation_OLD operation, IDocumentation documentation) { }
+        public void Initialize(ICacheUpdateTransaction transaction) { }
 
         public void Render(IPage page, string content, TextWriter writer)
         {
@@ -130,9 +130,9 @@ hr {
 
         private static void RenderBreadcrumbs(TextWriter writer, IPage page)
         {
-            var nodes = new Stack<IPageTreeNode>();
+            var nodes = new Stack<IPage>();
 
-            var n = page.PageTreeNode;
+            var n = page;
             while (n != null)
             {
                 nodes.Push(n);
@@ -143,7 +143,7 @@ hr {
             while (nodes.Count > 0)
             {
                 var node = nodes.Pop();
-                var url = node.IsHyperlink ? OutputCache.GetRelativeResourcePath(node, page) : null;
+                var url = OutputCache.GetRelativeResourcePath(node, page);
                 var isActive = node.Id == page.Id;
 
                 if (isActive)
@@ -185,7 +185,7 @@ hr {
 
             writer.WriteLine("</li>");
 
-            foreach (var node in page.Documentation.PageTree.Nodes)
+            foreach (var node in page.Documentation.RootPage.NestedPages)
             {
                 RenderPageTreeNode(writer, page, node);
             }
@@ -193,11 +193,11 @@ hr {
             writer.WriteLine("</ul>");
         }
 
-        private static void RenderPageTreeNode(TextWriter writer, IPage refPage, IPageTreeNode node)
+        private static void RenderPageTreeNode(TextWriter writer, IPage refPage, IPage node)
         {
-            var url = node.IsHyperlink ? OutputCache.GetRelativeResourcePath(node, refPage) : null;
+            var url = OutputCache.GetRelativeResourcePath(node, refPage) ;
 
-            var isFolder = node.Nodes != null;
+            var isFolder = node.NestedPages.Length>0;
             var icon = isFolder ? "<i class=\"fa fa-fw fa-folder-o\"></i>" : "<i class=\"fa fa-fw fa-file-o\"></i>";
             var isActive = refPage.Id == node.Id;
 
@@ -222,7 +222,7 @@ hr {
             if (isFolder)
             {
                 writer.WriteLine("<ul>");
-                foreach (var child in node.Nodes)
+                foreach (var child in node.NestedPages)
                 {
                     RenderPageTreeNode(writer, refPage, child);
 
@@ -232,6 +232,5 @@ hr {
 
             writer.WriteLine("</li>");
         }
-
     }
 }

@@ -11,7 +11,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Metadata
             new YamlMetadataExtractor()
         };
 
-        public PageMetadata Extract(IReadPageContext ctx, MarkdownDocument document)
+        public PageMetadata Extract(IPageReadContext ctx, MarkdownDocument document)
         {
             var metadata = PageMetadata.Empty;
             foreach (var extractor in _extractors)

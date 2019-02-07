@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using Markdig.Renderers;
 using Markdig.Syntax;
 
 namespace ITGlobal.MarkDocs.Format
@@ -13,11 +12,12 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Checks whether a code block can be rendered wit current renderer
         /// </summary>
-        bool CanRender([NotNull] IPageRenderContext ctx, [NotNull] FencedCodeBlock block);
+        bool CanRender([NotNull] IPageReadContext ctx, [NotNull] FencedCodeBlock block);
 
         /// <summary>
-        ///     Renders a code block
+        ///     Creates a renderable object for specified markup node
         /// </summary>
-        void Render([NotNull] IPageRenderContext ctx, [NotNull] HtmlRenderer renderer, [NotNull] FencedCodeBlock block);
+        [NotNull]
+        IRenderable CreateRenderable([NotNull] IPageReadContext ctx, [NotNull] FencedCodeBlock block);
     }
 }

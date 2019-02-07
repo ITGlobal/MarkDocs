@@ -81,8 +81,6 @@ namespace ITGlobal.MarkDocs.Tools
 
                     buildCommand.OnExecute(ctx =>
                     {
-                        
-
                         var path = Path.GetFullPath(pathParameter.Value);
                         var outputPath = targetDirParameter.IsSet
                             ? targetDirParameter.Value
@@ -107,39 +105,17 @@ namespace ITGlobal.MarkDocs.Tools
 
         public static void PrintReport(ICompilationReport report, bool verbose)
         {
-            if (report.Common.Count == 0 && report.Pages.Count == 0)
+            if (report.Messages.Count == 0)
             {
                 Stdout.WriteLine("Everything is OK".WithForeground(ConsoleColor.Green));
                 return;
             }
-
-            foreach (var error in report.Common)
+            
+            foreach (var (filename, list) in report.Messages)
             {
-                switch (error.Type)
+                foreach (var error in list)
                 {
-                    case CompilationReportMessageType.Warning:
-                        Stdout.Write("warning: ".WithForeground(ConsoleColor.Yellow));
-                        break;
-                    case CompilationReportMessageType.Error:
-                        Stdout.Write("error: ".WithForeground(ConsoleColor.Red));
-                        break;
-                    default:
-                        Stdout.Write($"{error.Type:G}: ".WithForeground(ConsoleColor.Magenta));
-                        break;
-                }
-
-                Stdout.WriteLine(error.Message);
-                if (error.Exception != null && verbose)
-                {
-                    PrintException(error.Exception);
-                }
-            }
-
-            foreach (var page in report.Pages)
-            {
-                foreach (var error in page.Messages)
-                {
-                    Stdout.Write(page.SourceFileName);
+                    Stdout.Write(filename);
                     if (error.LineNumber != null)
                     {
                         Stdout.Write(":");
@@ -162,34 +138,10 @@ namespace ITGlobal.MarkDocs.Tools
                     }
 
                     Stdout.WriteLine(error.Message);
-                    if (error.Exception != null && verbose)
-                    {
-                        PrintException(error.Exception);
-                    }
                 }
             }
         }
-
-        private static void PrintException(Exception exception)
-        {
-            if (exception != null)
-            {
-                var e = exception;
-                while (e != null)
-                {
-                    if (e != exception)
-                    {
-                        Stdout.WriteLine("----------");
-                    }
-
-                    Stdout.WriteLine(e.Message);
-                    Stdout.WriteLine(e.StackTrace);
-
-                    e = e.InnerException;
-                }
-            }
-        }
-
+        
         private static void SetupLogger(bool verbose)
         {
             var configuration = new LoggerConfiguration();

@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using ITGlobal.MarkDocs.Format.Impl.Extensions.Cut;
 using ITGlobal.MarkDocs.Format.Impl.Metadata;
 using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
 using Markdig;
-using Markdig.Syntax;
 
 namespace ITGlobal.MarkDocs.Format.Impl
 {
@@ -78,40 +75,11 @@ namespace ITGlobal.MarkDocs.Format.Impl
         /// <summary>
         ///     Parses content of file <paramref name="filename"/>
         /// </summary>
-        public (IParsedPage, PageMetadata) Read(IReadPageContext ctx, string filename)
+        public (IPageContent, PageMetadata) Read(IPageReadContext ctx, string filename)
         {
             var markup = File.ReadAllText(filename, Encoding.UTF8);
-            var ast = Markdig.Markdown.Parse(markup, _pipeline);
-            var properties = _metadataExtractor.Extract(ctx, ast);
-            var anchors = PageAnchorReader.Read(ast);
-
-            var previewAst = GetPreviewAst(ast, markup);
-            var page = new MarkdownPage(ast, previewAst, _pipeline, _resourceUrlResolver, anchors);
-
-            return (page, properties);
-        }
-
-        #endregion
-
-        #region helpers
-
-        private MarkdownDocument GetPreviewAst(MarkdownDocument ast, string markup)
-        {
-            var (block, index) = ast
-                .Select((b, i) => (block: b, index: i))
-                .FirstOrDefault(_ => _.block is CutBlock);
-            if (block == null)
-            {
-                return null;
-            }
-
-            var previewAst = Markdig.Markdown.Parse(markup, _pipeline);
-            while (previewAst.Count > index)
-            {
-                previewAst.RemoveAt(previewAst.Count - 1);
-            }
-
-            return previewAst;
+            var page = MarkdownPageContent.Read(ctx, _metadataExtractor, _pipeline, markup);
+            return (page, page.Metadata);
         }
 
         #endregion

@@ -1,42 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Blog
 {
     /// <summary>
-    ///     Markdocs blog engine
+    ///     MarkDocs-powered blog engine
     /// </summary>
+    [PublicAPI]
     public interface IBlogEngine : IDisposable
     {
         /// <summary>
-        ///     Gets an underlying MarkDocs service
-        /// </summary>
-        [PublicAPI]
-        IMarkDocService MarkDocs { get; }
-
-        /// <summary>
-        ///     Initializes blog data (foreground)
-        /// </summary>
-        [PublicAPI]
-        void Initialize();
-
-        /// <summary>
         ///     Blog version
         /// </summary>
-        [PublicAPI, NotNull]
-        IContentVersion ContentVersion { get; }
+        [NotNull]
+        ISourceInfo SourceInfo { get; }
 
         /// <summary>
         ///     Provides errors and warning for blog
         /// </summary>
-        [PublicAPI]
+        [NotNull]
         ICompilationReport CompilationReport { get; }
 
         /// <summary>
         ///     Blog post index
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IBlogIndex Index { get; }
 
         /// <summary>
@@ -48,13 +38,13 @@ namespace ITGlobal.MarkDocs.Blog
         /// <returns>
         ///     A blog resource or null if resource doesn't exist
         /// </returns>
-        [PublicAPI, CanBeNull]
+        [CanBeNull]
         IBlogResource GetResource([NotNull] string id);
 
         /// <summary>
         ///     Search blog posts by text
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         ITextSearchResult Search([NotNull] string query);
         
         /// <summary>
@@ -66,7 +56,12 @@ namespace ITGlobal.MarkDocs.Blog
         /// <returns>
         ///     List of search suggestions
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         IReadOnlyList<string> Suggest([NotNull] string query);
+
+        /// <summary>
+        ///     Updates blog contents
+        /// </summary>
+        void Synchronize();
     }
 }

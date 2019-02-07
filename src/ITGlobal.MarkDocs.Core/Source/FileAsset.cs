@@ -2,16 +2,17 @@
 {
     public abstract class FileAsset : Asset
     {
-        protected FileAsset(string id, string relativePath, string absolutePath, string contentHash)
+        protected FileAsset(
+            string id,
+            string contentHash,
+            string contentType)
             : base(id)
         {
-            RelativePath = relativePath;
-            AbsolutePath = absolutePath;
             ContentHash = contentHash;
+            ContentType = contentType;
         }
 
-        public string RelativePath { get; }
-        public string AbsolutePath { get; }
         public string ContentHash { get; }
+        public string ContentType { get; }
     }
 }

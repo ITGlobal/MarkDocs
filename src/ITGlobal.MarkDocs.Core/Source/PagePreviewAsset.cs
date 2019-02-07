@@ -9,5 +9,6 @@
         }
 
         public string ContentHash { get; }
+        public override ResourceType Type => ResourceType.PagePreview;
     }
 }

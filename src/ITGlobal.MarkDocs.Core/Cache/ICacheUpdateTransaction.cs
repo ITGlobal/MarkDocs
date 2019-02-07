@@ -30,16 +30,16 @@ namespace ITGlobal.MarkDocs.Cache
         void Store([NotNull] PagePreviewAsset asset, [NotNull] Action<Stream> write);
 
         /// <summary>
-        ///     Writes a <see cref="AttachmentAsset"/> into cache if changed,
+        ///     Writes a <see cref="PhysicalFileAsset"/> into cache if changed,
         ///     copied previous asset content otherwise
         /// </summary>
-        void Store([NotNull] AttachmentAsset asset, [NotNull] Action<Stream> write);
+        void Store([NotNull] PhysicalFileAsset asset, [NotNull] Action<Stream> write);
 
         /// <summary>
-        ///     Writes a <see cref="GeneratedAsset"/> into cache if changed,
+        ///     Writes a <see cref="GeneratedFileAsset"/> into cache if changed,
         ///     copied previous asset content otherwise
         /// </summary>
-        void Store([NotNull] GeneratedAsset asset, [NotNull] Action<Stream> write);
+        void Store([NotNull] GeneratedFileAsset asset, [NotNull] Action<Stream> write);
 
 
 
@@ -56,16 +56,16 @@ namespace ITGlobal.MarkDocs.Cache
         Stream Read([NotNull] PagePreviewAsset asset);
 
         /// <summary>
-        ///     Reads a previously cached <see cref="AttachmentAsset"/>
+        ///     Reads a previously cached <see cref="PhysicalFileAsset"/>
         /// </summary>
         [NotNull]
-        Stream Read([NotNull] AttachmentAsset asset);
+        Stream Read([NotNull] PhysicalFileAsset asset);
 
         /// <summary>
-        ///     Reads a previously cached <see cref="GeneratedAsset"/>
+        ///     Reads a previously cached <see cref="GeneratedFileAsset"/>
         /// </summary>
         [NotNull]
-        Stream Read([NotNull] GeneratedAsset asset);
+        Stream Read([NotNull] GeneratedFileAsset asset);
         
         /// <summary>
         ///     Commits all cached content changes

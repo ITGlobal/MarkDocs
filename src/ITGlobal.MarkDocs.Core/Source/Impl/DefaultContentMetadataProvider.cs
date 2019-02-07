@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ITGlobal.MarkDocs.Source.Impl
+﻿namespace ITGlobal.MarkDocs.Source.Impl
 {
     internal sealed class DefaultContentMetadataProvider : IContentMetadataProvider
     {
@@ -19,13 +17,12 @@ namespace ITGlobal.MarkDocs.Source.Impl
             ISourceTreeRoot rootDirectory,
             string filename,
             ICompilationReportBuilder report,
-            HashSet<string> consumedFiles,
             bool isIndexFile)
         {
             var metadata = PageMetadata.Empty;
             foreach (var provider in _providers)
             {
-                var m = provider.GetMetadata(rootDirectory, filename, report, consumedFiles, isIndexFile);
+                var m = provider.GetMetadata(rootDirectory, filename, report, isIndexFile);
                 metadata = metadata.MergeWith(m);
             }
 

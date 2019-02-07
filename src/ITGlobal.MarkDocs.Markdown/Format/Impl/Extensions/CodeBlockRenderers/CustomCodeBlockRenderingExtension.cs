@@ -1,4 +1,5 @@
 ﻿using Markdig;
+using Markdig.Parsers;
 using Markdig.Renderers;
 using Markdig.Renderers.Html;
 
@@ -13,7 +14,10 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
             _selector = selector;
         }
 
-        public void Setup(MarkdownPipelineBuilder pipeline) { }
+        public void Setup(MarkdownPipelineBuilder pipeline)
+        {
+            pipeline.BlockParsers.ReplaceOrAdd<FencedCodeBlockParser>(new CustomFencedCodeBlockParser(_selector));
+        }
 
         public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer)
         {
@@ -22,8 +26,8 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
             {
                 renderer.ObjectRenderers.Remove(blockRenderer);
             }
-
-            renderer.ObjectRenderers.Add(new CustomCodeBlockRenderer(_selector));
+            
+            renderer.ObjectRenderers.Add(new CustomCodeBlockRenderer());
         }
     }
 }

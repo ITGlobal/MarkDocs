@@ -135,10 +135,7 @@ namespace ITGlobal.MarkDocs.Impl
             return _extensions.GetExtension<TExtension>();
         }
 
-        public void Dispose()
-        {
-            // TODO
-        }
+        public void Dispose() { }
 
         private void Synchronize(bool fullResync)
         {
@@ -160,8 +157,8 @@ namespace ITGlobal.MarkDocs.Impl
             var toRemove = state.ById;
             foreach (var sourceTree in _sourceTreeProvider.GetSourceTrees())
             {
-                var isUpdate = fullResync || state.ById.ContainsKey(sourceTree.Id);
-                Rebuild(sourceTree, isUpdate);
+                var isUpdate = state.ById.ContainsKey(sourceTree.Id);
+                Rebuild(sourceTree, isUpdate, fullResync);
                 toRemove = toRemove.Remove(sourceTree.Id);
 
                 if (!state.ById.ContainsKey(sourceTree.Id))
@@ -174,21 +171,22 @@ namespace ITGlobal.MarkDocs.Impl
             {
                 foreach (var (_, documentation) in toRemove)
                 {
+                    _cache.Drop(documentation.Id);
                     _state = _state.Remove(documentation);
                     _extensions.Removed(documentation);
                 }
             }
         }
 
-        private void Rebuild(ISourceTree sourceTree, bool isUpdate = true)
+        private void Rebuild(ISourceTree sourceTree, bool isUpdate = true, bool forceCacheClear = false)
         {
             var w = Stopwatch.StartNew();
             var reportBuilder = new CompilationReportBuilder();
             var tree = sourceTree.ReadAssetTree(reportBuilder);
 
-            using (var transaction = _cache.BeginTransaction(sourceTree, tree.SourceInfo, forceCacheClear: false))
+            using (var transaction = _cache.BeginTransaction(sourceTree, tree.SourceInfo, forceCacheClear))
             {
-                var compiler = new DocumentationCompiler(transaction);
+                var compiler = new DocumentationCompiler(transaction, reportBuilder);
                 var model = compiler.Compile(tree);
 
                 var reader = transaction.Commit();

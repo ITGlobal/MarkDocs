@@ -11,7 +11,7 @@ namespace ITGlobal.MarkDocs.Impl
         }
 
         public IPage Page { get; }
-        public string SourceFileName => Page.FileName;
+        public string SourceFileName => Page.RelativePath;
         public IReadOnlyList<ICompilationReportMessage> Messages { get; }
     }
 }

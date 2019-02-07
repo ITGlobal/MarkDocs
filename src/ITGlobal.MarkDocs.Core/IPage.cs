@@ -1,6 +1,5 @@
 ﻿using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
-using System.Collections.Generic;
 using System.IO;
 
 namespace ITGlobal.MarkDocs
@@ -14,19 +13,19 @@ namespace ITGlobal.MarkDocs
         /// <summary>
         ///     Page title
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         string Title { get; }
 
         /// <summary>
         ///     Page description
         /// </summary>
-        [PublicAPI, CanBeNull]
+        [CanBeNull]
         string Description { get; }
 
         /// <summary>
         ///     Page metadata
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         PageMetadata Metadata { get; }
 
         /// <summary>
@@ -38,18 +37,19 @@ namespace ITGlobal.MarkDocs
         /// <summary>
         ///     Page anchors (with names)
         /// </summary>
-        IReadOnlyDictionary<string, string> Anchors { get; }
+        [NotNull]
+        PageAnchors Anchors { get; }
 
         /// <summary>
         ///     Nested pages
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IPage[] NestedPages { get; }
 
         /// <summary>
         ///     A reference to a parent page. Null for root nodes
         /// </summary>
-        [PublicAPI, CanBeNull]
+        [CanBeNull]
         IPage Parent { get; }
 
         /// <summary>

@@ -2,14 +2,14 @@
 
 namespace ITGlobal.MarkDocs.Source
 {
-    public abstract class PageAsset : FileAsset
+    public abstract class PageAsset : FileBasedAsset
     {
         protected PageAsset(
             string id,
             string relativePath,
             string absolutePath,
             string contentHash,
-            IParsedPage content,
+            IPageContent content,
             PageMetadata metadata)
             : base(id, relativePath, absolutePath, contentHash)
         {
@@ -17,7 +17,8 @@ namespace ITGlobal.MarkDocs.Source
             Metadata = metadata;
         }
 
-        public IParsedPage Content { get; }
+        public IPageContent Content { get; }
         public PageMetadata Metadata { get; }
+        public override ResourceType Type => ResourceType.Page;
     }
 }

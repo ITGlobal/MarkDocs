@@ -1,5 +1,6 @@
 using System.IO;
 using System.Net.Http;
+using ITGlobal.MarkDocs.Source;
 
 namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
 {
@@ -22,7 +23,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
 
             public string FormatFileName(string name)
             {
-                return $"plantuml.{name}.png";
+                return $"plantuml/{name}.png";
             }
 
             public void Write(Stream stream)
@@ -34,7 +35,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
                 }
                 catch (HttpRequestException e)
                 {
-                    MarkdownRenderingContext.RenderContext?.Error($"Failed to render PlantUML markup. {e.Message}", _lineNumber);
+                    MarkdownPageRenderContext.Current?.Error($"Failed to render PlantUML markup. {e.Message}", _lineNumber);
                 }
             }
         }
@@ -48,7 +49,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
             _url = url;
         }
 
-        protected override IGeneratedAssetContent GenerateContent(string source, int? lineNumber)
+        internal override IGeneratedAssetContent GenerateContent(string source, int? lineNumber)
         {
             return new GeneratedContent(_url, source, lineNumber);
         }

@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace ITGlobal.MarkDocs.Source
 {
     /// <summary>
-    ///     Extension methods for <see cref="MarkDocsSourceTreeOptions"/> to configure storage
+    ///     Extension methods for <see cref="MarkDocsOptions"/> to configure storage
     /// </summary>
     [PublicAPI]
     public static class StorageConfigurationExtensions
@@ -26,12 +26,12 @@ namespace ITGlobal.MarkDocs.Source
         ///     Configuration builder (fluent interface)
         /// </returns>
         [PublicAPI, NotNull]
-        public static MarkDocsSourceTreeOptions UseStaticDirectory(
-            [NotNull] this MarkDocsSourceTreeOptions config,
+        public static MarkDocsOptions FromStaticDirectory(
+            [NotNull] this MarkDocsOptions config,
             [NotNull] string directory,
             bool watchForChanges = false)
         {
-            return config.UseStaticDirectory(new[] { directory }, watchForChanges);
+            return config.FromStaticDirectories(new[] { directory }, watchForChanges);
         }
 
         /// <summary>
@@ -50,12 +50,12 @@ namespace ITGlobal.MarkDocs.Source
         ///     Configuration builder (fluent interface)
         /// </returns>
         [PublicAPI, NotNull]
-        public static MarkDocsSourceTreeOptions UseStaticDirectory(
-            [NotNull] this MarkDocsSourceTreeOptions config,
+        public static MarkDocsOptions FromStaticDirectories(
+            [NotNull] this MarkDocsOptions config,
             [NotNull] string[] directories,
             bool watchForChanges = false)
         {
-            return config.UseStaticDirectory(new StaticDirectorySourceTreeOptions
+            return config.FromStaticDirectories(new StaticDirectorySourceTreeOptions
             {
                 Directories = directories,
                 WatchForChanges = watchForChanges
@@ -75,12 +75,13 @@ namespace ITGlobal.MarkDocs.Source
         ///     Configuration builder (fluent interface)
         /// </returns>
         [PublicAPI, NotNull]
-        public static MarkDocsSourceTreeOptions UseStaticDirectory(
-            [NotNull] this MarkDocsSourceTreeOptions config,
+        public static MarkDocsOptions FromStaticDirectories(
+            [NotNull] this MarkDocsOptions config,
             [NotNull] StaticDirectorySourceTreeOptions options)
         {
             config.ConfigureServices(_ => _.AddSingleton(options));
-            config.Use<StaticDirectorySourceTreeProvider>();
+            config.ConfigureServices(_ => _.AddSingleton< StaticDirectorySourceTreeProvider>());
+            config.UseSourceTree(_=>_.GetRequiredService<StaticDirectorySourceTreeProvider>());
             return config;
         }
     }

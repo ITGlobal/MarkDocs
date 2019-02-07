@@ -40,12 +40,11 @@ namespace ITGlobal.MarkDocs.Format.Impl.Metadata
 
             public PageAnchor ToPageAnchor()
             {
-                return new PageAnchor
-                {
-                    Id = Heading?.GetAttributes().Id ?? "",
-                    Title = Heading?.Inline.GetText() ?? "",
-                    Nested = _children.Count>0? _children.Select(_=>_.ToPageAnchor()).ToArray(): null
-                };
+                return new PageAnchor(
+                    id: Heading?.GetAttributes().Id ?? "",
+                    title: Heading?.Inline.GetText() ?? "",
+                    nested: _children.Count > 0 ? _children.Select(_ => _.ToPageAnchor()).ToArray() : null
+                );
             }
         }
 

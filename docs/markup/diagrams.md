@@ -2,7 +2,7 @@
 title: Diagrams
 ---
 
-# Diagrams
+# Diagrams 1
 
 ## PlantUML
 

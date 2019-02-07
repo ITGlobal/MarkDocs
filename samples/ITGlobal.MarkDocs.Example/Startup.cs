@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ITGlobal.MarkDocs.Cache;
 using ITGlobal.MarkDocs.Format;
@@ -16,19 +15,12 @@ namespace ITGlobal.MarkDocs.Example
     {
         public Startup(IHostingEnvironment env)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-            Configuration = builder.Build();
             Env = env;
         }
 
         public IHostingEnvironment Env { get; }
-        public IConfigurationRoot Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        // This method gets called by the runtime. AddExtension this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
@@ -37,24 +29,23 @@ namespace ITGlobal.MarkDocs.Example
             // Add MarkDocs services
             services.AddMarkDocs(config =>
             {
-                config.SourceTree.UseStaticDirectory(
+                config.FromStaticDirectory(
                     Path.GetFullPath(Path.Combine(Env.ContentRootPath, "../../docs")),
                     watchForChanges: true
                 );
+                config.UseResourceUrlResolver<ResourceUrlResolver>();
 
-                config.Format.UseMarkdown(markdown =>
+                config.UseMarkdown(markdown =>
                 {
                     markdown.UseCodecogsMathRenderer();
-                    markdown.CodeBlocks.UseServerSideHighlightJs(Path.Combine(Env.ContentRootPath, "Data", "temp"));
+                    markdown.CodeBlocks.UseServerSideHighlightJs(Path.Combine(Env.ContentRootPath, "Data", "hljs"));
                     markdown.CodeBlocks.UsePlantUmlWebService();
-                    markdown.UseResourceUrlResolver<ResourceUrlResolver>();
                 });
                 
-                config.Cache.UseDisk(Path.Combine(Env.ContentRootPath, "Data", "cached-content"));
+                config.UseDiskCache(Path.Combine(Env.ContentRootPath, "Data", "cache"));
 
-                config.Extensions.AddTags();
-
-                config.Extensions.AddSearch(Path.Combine(Env.ContentRootPath, "Data", "search-index"));
+                config.AddTags();
+                config.AddSearch(Path.Combine(Env.ContentRootPath, "Data", "search"));
 
                 config.UseAspNetLog();
             });
@@ -83,8 +74,8 @@ namespace ITGlobal.MarkDocs.Example
 
         private sealed class ResourceUrlResolver : IResourceUrlResolver
         {
-            public string ResolveUrl(IPageRenderContext context, IResourceId resource) 
-                => $"/{context.AssetTree.Id}{resource.Id}";
+            public string ResolveUrl(IResourceUrlResolutionContext context, IResourceId resource)
+                => $"/{context.SourceTreeId}{resource.Id}";
         }
     }
 }

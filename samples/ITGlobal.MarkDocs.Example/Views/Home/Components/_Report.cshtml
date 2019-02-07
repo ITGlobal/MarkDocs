@@ -1,0 +1,23 @@
+﻿@using ITGlobal.MarkDocs
+@model ITGlobal.MarkDocs.IDocumentation
+<dl>
+    @foreach (var (path, msgs) in Model.CompilationReport.Messages)
+    {
+        <dt>@path</dt>
+        <dd>
+            <ul>
+                @foreach (var m in msgs)
+                {
+                    var className = m.Type == CompilationReportMessageType.Error ? "text-danger" : "text-warning";
+                    <li class="@className">
+                        @if (m.LineNumber != null)
+                        {
+                            <text>(at @m.LineNumber.Value)</text>
+                        }
+                        @m.Message
+                    </li>
+                }
+            </ul>
+        </dd>
+    }
+</dl>

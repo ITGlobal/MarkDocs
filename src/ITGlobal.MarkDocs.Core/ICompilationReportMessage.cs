@@ -14,11 +14,10 @@ namespace ITGlobal.MarkDocs
         CompilationReportMessageType Type { get; }
 
         /// <summary>
-        ///     A line number in a source file
+        ///     Line number in source file
         /// </summary>
-        [CanBeNull]
         int? LineNumber { get; }
-
+        
         /// <summary>
         ///     Message text
         /// </summary>

@@ -11,12 +11,12 @@ namespace ITGlobal.MarkDocs.Format
     [PublicAPI]
     public readonly struct CreateAttachmentResult
     {
-        private readonly Func<GeneratedAsset, Stream> _readFunc;
+        private readonly Func<GeneratedFileAsset, Stream> _readFunc;
 
         /// <summary>
         ///     .ctor
         /// </summary>
-        public CreateAttachmentResult([NotNull] GeneratedAsset asset, [NotNull] Func<GeneratedAsset, Stream> readFunc)
+        public CreateAttachmentResult([NotNull] GeneratedFileAsset asset, [NotNull] Func<GeneratedFileAsset, Stream> readFunc)
         {
             Asset = asset;
             _readFunc = readFunc;
@@ -26,7 +26,7 @@ namespace ITGlobal.MarkDocs.Format
         ///     A generated asset
         /// </summary>
         [NotNull]
-        public GeneratedAsset Asset { get; }
+        public GeneratedFileAsset Asset { get; }
 
         /// <summary>
         ///     Opens asset content for reading

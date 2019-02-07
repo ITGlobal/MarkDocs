@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using Markdig.Extensions.Mathematics;
 
 namespace ITGlobal.MarkDocs.Format
 {
@@ -9,9 +10,15 @@ namespace ITGlobal.MarkDocs.Format
     public interface IMathRenderer
     {
         /// <summary>
-        ///     Render a MathML/Tex/LaTex into an image
+        ///     Creates a renderable object for specified markup node
         /// </summary>
         [NotNull]
-        IGeneratedAssetContent Render([NotNull] string sourceCode, int? lineNumber);
+        IRenderable CreateRenderable([NotNull] IPageReadContext ctx, [NotNull] MathBlock block);
+
+        /// <summary>
+        ///     Creates a renderable object for specified markup node
+        /// </summary>
+        [NotNull]
+        IRenderable CreateRenderable([NotNull] IPageReadContext ctx, [NotNull] MathInline block);
     }
 }

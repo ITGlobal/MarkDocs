@@ -1,8 +1,8 @@
 ﻿using System.IO;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace ITGlobal.MarkDocs.Blog.Example
 {
@@ -24,20 +24,15 @@ namespace ITGlobal.MarkDocs.Blog.Example
                 config =>
                 {
                     config.UseRootUrl("/");
-                    config.UseSourceDirectory(Path.Combine(Env.ContentRootPath, "Blog"));
+                    config.FromSourceDirectory(Path.Combine(Env.ContentRootPath, "Blog"));
+                    config.UseAspNetLog();
                 });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IBlogEngine engine)
+        public void Configure(IApplicationBuilder app, IApplicationLifetime appLifetime)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-            }
+            appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
+            app.UseDeveloperExceptionPage();
 
             app.UseStaticFiles();
 
@@ -48,7 +43,11 @@ namespace ITGlobal.MarkDocs.Blog.Example
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            Task.Factory.StartNew(engine.Initialize);
+            appLifetime.ApplicationStarted.Register(
+                () =>
+                {
+                    app.ApplicationServices.GetRequiredService<IBlogEngine>();
+                });
         }
     }
 }

@@ -15,13 +15,13 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.ChildrenList
 
         protected override void Write(HtmlRenderer renderer, ChildrenListBlock block)
         {
-            if (!MarkdownRenderingContext.IsPresent)
+            if (!MarkdownPageRenderContext.IsPresent)
             {
                 return;
             }
 
 
-            var ctx = MarkdownRenderingContext.RenderContext;
+            var ctx = MarkdownPageRenderContext.Current;
             try
             {
                 _renderer.Render(renderer, ctx.AssetTree, ctx.Page);

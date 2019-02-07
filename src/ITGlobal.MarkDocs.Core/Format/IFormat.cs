@@ -31,6 +31,6 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Parses content of file <paramref name="filename"/>
         /// </summary>
-        (IParsedPage, PageMetadata) Read([NotNull] IReadPageContext ctx, [NotNull] string filename);
+        (IPageContent, PageMetadata) Read([NotNull] IPageReadContext ctx, [NotNull] string filename);
     }
 }

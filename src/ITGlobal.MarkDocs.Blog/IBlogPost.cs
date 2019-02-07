@@ -1,74 +1,76 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using JetBrains.Annotations;
+using ITGlobal.MarkDocs.Source;
 
 namespace ITGlobal.MarkDocs.Blog
 {
     /// <summary>
     ///     Blog post
     /// </summary>
+    [PublicAPI]
     public interface IBlogPost : IBlogResource
     {
         /// <summary>
         ///     Blog post permanent identifier
         /// </summary>
-        [PublicAPI, CanBeNull]
+        [CanBeNull]
         string ContentId { get; }
 
         /// <summary>
         ///     Blog post author
         /// </summary>
-        [PublicAPI, CanBeNull]
+        [CanBeNull]
         string Author { get; }
 
         /// <summary>
         ///     Blog post date
         /// </summary>
-        [PublicAPI]
         DateTime Date { get; }
 
         /// <summary>
         ///     Blog post title
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         string Title { get; }
 
         /// <summary>
         ///     Blog post description
         /// </summary>
-        [PublicAPI, CanBeNull]
+        [CanBeNull]
         string Description { get; }
 
         /// <summary>
         ///     A post's title image if specified
         /// </summary>
-        [PublicAPI, CanBeNull]
+        [CanBeNull]
         IBlogResource TitleImage { get; }
 
         /// <summary>
         ///     Blog post permalink
         /// </summary>
+        [CanBeNull]
         IBlogPermalink Permalink { get; }
 
         /// <summary>
         ///     Blog post anchors (with names)
         /// </summary>
-        [PublicAPI, NotNull]
-        IReadOnlyDictionary<string, string> Anchors { get; }
+        [NotNull]
+        PageAnchors Anchors { get; }
 
         /// <summary>
         ///     Blog post tags
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IReadOnlyList<string> Tags { get; }
 
         /// <summary>
         ///     Blog post meta tags (HTML)
         /// </summary>
-        [PublicAPI]
+        [NotNull]
         IReadOnlyList<string> MetaTags { get; }
-        
+
         /// <summary>
         ///     true if blog post has a preview
         /// </summary>
@@ -76,21 +78,12 @@ namespace ITGlobal.MarkDocs.Blog
         bool HasPreview { get; }
 
         /// <summary>
-        ///     Reads blog post source markup
-        /// </summary>
-        /// <returns>
-        ///     Read-only stream
-        /// </returns>
-        [PublicAPI, NotNull]
-        Stream ReadMarkup();
-
-        /// <summary>
         ///     Reads blog post rendered HTML
         /// </summary>
         /// <returns>
         ///     Read-only stream
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         Stream ReadHtml();
 
         /// <summary>
@@ -99,7 +92,7 @@ namespace ITGlobal.MarkDocs.Blog
         /// <returns>
         ///     Read-only stream
         /// </returns>
-        [PublicAPI, NotNull]
+        [NotNull]
         Stream ReadPreviewHtml();
     }
 }

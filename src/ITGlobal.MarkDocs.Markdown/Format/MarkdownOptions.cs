@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ITGlobal.MarkDocs.Format.Impl;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.ChildrenList;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.CustomBlockRendering;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.Mathematics;
@@ -37,37 +36,6 @@ namespace ITGlobal.MarkDocs.Format
             CodeBlocks = new MarkdownCodeBlockRenderingOptions(this);
         }
 
-        #region ResourceUrlResolver
-
-        private Func<IServiceProvider, IResourceUrlResolver> _resourceUrlResolverFactory
-            = _ => new DefaultResourceUrlResolver();
-
-        /// <summary>
-        ///     Sets resource URL resolver implementation
-        /// </summary>
-        [NotNull]
-        public MarkdownOptions UseResourceUrlResolver([NotNull] Func<IServiceProvider, IResourceUrlResolver> factory)
-        {
-            _resourceUrlResolverFactory = factory;
-            return this;
-        }
-
-        /// <summary>
-        ///     Sets resource URL resolver implementation
-        /// </summary>
-        [NotNull]
-        public MarkdownOptions UseResourceUrlResolver([NotNull] IResourceUrlResolver resolver)
-            => UseResourceUrlResolver(_ => resolver);
-
-        /// <summary>
-        ///     Sets resource URL resolver implementation
-        /// </summary>
-        [NotNull]
-        public MarkdownOptions UseResourceUrlResolver<T>()
-            where T : class, IResourceUrlResolver
-            => Register(_ => _.AddSingleton<T>()).UseResourceUrlResolver(_ => _.GetRequiredService<T>());
-
-        #endregion
 
         #region Code Blocks
 
@@ -221,11 +189,6 @@ namespace ITGlobal.MarkDocs.Format
             foreach (var action in _customRegistrations)
             {
                 action(services);
-            }
-
-            if (_resourceUrlResolverFactory != null)
-            {
-                services.AddSingleton(_resourceUrlResolverFactory);
             }
 
             if (_mathRendererFactory != null)

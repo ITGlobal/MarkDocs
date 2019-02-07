@@ -6,7 +6,7 @@ using System;
 namespace ITGlobal.MarkDocs.Source
 {
     /// <summary>
-    ///     Extension methods for <see cref="MarkDocsSourceTreeOptions"/> to configure storage
+    ///     Extension methods for <see cref="MarkDocsOptions"/> to configure storage
     /// </summary>
     [PublicAPI]
     public static class MarkDocsSourceTreeOptionsExtensions
@@ -24,12 +24,13 @@ namespace ITGlobal.MarkDocs.Source
         ///     Configuration builder (fluent interface)
         /// </returns>
         [PublicAPI, NotNull]
-        public static MarkDocsSourceTreeOptions UseGit(
-            [NotNull] this MarkDocsSourceTreeOptions config,
+        public static MarkDocsOptions FromGit(
+            [NotNull] this MarkDocsOptions config,
             [NotNull] GitSourceTreeOptions options)
         {
             config.ConfigureServices(_ => _.AddSingleton(options));
-            config.Use<GitSourceTreeProvider>();
+            config.ConfigureServices(_ => _.AddSingleton<GitSourceTreeProvider>());
+            config.UseSourceTree(_ => _.GetRequiredService<GitSourceTreeProvider>());
             return config;
         }
 
@@ -46,14 +47,14 @@ namespace ITGlobal.MarkDocs.Source
         ///     Configuration builder (fluent interface)
         /// </returns>
         [PublicAPI, NotNull]
-        public static MarkDocsSourceTreeOptions UseGit(
-            [NotNull] this MarkDocsSourceTreeOptions config,
+        public static MarkDocsOptions FromGit(
+            [NotNull] this MarkDocsOptions config,
             [NotNull] Action<GitSourceTreeOptions> setup)
         {
             var options = new GitSourceTreeOptions();
             setup(options);
 
-            return config.UseGit(options);
+            return config.FromGit(options);
         }
     }
 }

@@ -11,13 +11,13 @@ namespace ITGlobal.MarkDocs.Blog
         /// <summary>
         ///     Blog post
         /// </summary>
-        [PublicAPI, NotNull]
-        IBlogPost Post{ get; }
+        [NotNull]
+        IBlogPost Post { get; }
 
         /// <summary>
         ///     Preview (HTML)
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         string Preview { get; }
     }
 }

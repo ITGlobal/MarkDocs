@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using Newtonsoft.Json;
 
@@ -29,7 +30,8 @@ namespace ITGlobal.MarkDocs.Source
             string description = null,
             int? order = null,
             string[] tags = null,
-            string[] metaTags = null)
+            string[] metaTags = null,
+            ImmutableDictionary<string, string> properties=null)
         {
             ContentId = contentId ?? "";
             LastChangedBy = lastChangedBy ?? "";
@@ -38,6 +40,7 @@ namespace ITGlobal.MarkDocs.Source
             Order = order;
             Tags = tags ?? Array.Empty<string>();
             MetaTags = metaTags ?? Array.Empty<string>();
+            Properties = properties ?? ImmutableDictionary<string, string>.Empty;
         }
 
         #endregion
@@ -86,6 +89,12 @@ namespace ITGlobal.MarkDocs.Source
         [JsonProperty("meta_tags", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string[] MetaTags { get; }
 
+        /// <summary>
+        ///     Custom properties
+        /// </summary>
+        [JsonProperty("props", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public ImmutableDictionary<string, string> Properties { get; }
+
         #endregion
 
         #region methods
@@ -104,7 +113,8 @@ namespace ITGlobal.MarkDocs.Source
                 description: Description,
                 order: Order,
                 tags: Tags,
-                metaTags: MetaTags
+                metaTags: MetaTags,
+                properties: Properties
             );
         }
 
@@ -122,7 +132,8 @@ namespace ITGlobal.MarkDocs.Source
                 description: Description,
                 order: Order,
                 tags: Tags,
-                metaTags: MetaTags
+                metaTags: MetaTags,
+                properties: Properties
             );
         }
 
@@ -140,7 +151,8 @@ namespace ITGlobal.MarkDocs.Source
                 description: Description,
                 order: value,
                 tags: Tags,
-                metaTags: MetaTags
+                metaTags: MetaTags,
+                properties: Properties
             );
         }
 
@@ -158,7 +170,8 @@ namespace ITGlobal.MarkDocs.Source
                 description: value,
                 order: Order,
                 tags: Tags,
-                metaTags: MetaTags
+                metaTags: MetaTags,
+                properties: Properties
             );
         }
 
@@ -176,7 +189,8 @@ namespace ITGlobal.MarkDocs.Source
                 description: Description,
                 order: Order,
                 tags: Tags,
-                metaTags: MetaTags
+                metaTags: MetaTags,
+                properties: Properties
             );
         }
 
@@ -189,7 +203,8 @@ namespace ITGlobal.MarkDocs.Source
                 description: Description,
                 order: Order,
                 tags: value,
-                metaTags: MetaTags
+                metaTags: MetaTags,
+                properties: Properties
             );
         }
 
@@ -202,7 +217,22 @@ namespace ITGlobal.MarkDocs.Source
                 description: Description,
                 order: Order,
                 tags: Tags,
-                metaTags: value
+                metaTags: value,
+                properties: Properties
+            );
+        }
+
+        public PageMetadata With(string key, string value)
+        {
+            return new PageMetadata(
+                contentId: ContentId,
+                lastChangedBy: LastChangedBy,
+                title: Title,
+                description: Description,
+                order: Order,
+                tags: Tags,
+                metaTags: MetaTags,
+                properties: Properties.SetItem(key, value)
             );
         }
 
@@ -225,7 +255,8 @@ namespace ITGlobal.MarkDocs.Source
                 description: MergeString(Description, other.Description),
                 order: Order ?? other.Order,
                 tags: MergeArray(Tags, other.Tags),
-                metaTags: MergeArray(MetaTags, other.MetaTags)
+                metaTags: MergeArray(MetaTags, other.MetaTags),
+                properties: MergeDict(Properties, other.Properties)
             );
 
             string MergeString(string thisValue, string otherValue)
@@ -247,6 +278,44 @@ namespace ITGlobal.MarkDocs.Source
 
                 return thisValue.Concat(otherValue).Distinct().ToArray();
             }
+
+            ImmutableDictionary<string, string> MergeDict(
+                ImmutableDictionary<string, string> thisValue,
+                ImmutableDictionary<string, string> otherValue)
+            {
+                if (thisValue == null || thisValue.Count == 0)
+                {
+                    return otherValue;
+                }
+
+                if (otherValue == null || otherValue.Count == 0)
+                {
+                    return thisValue;
+                }
+
+                var builder = ImmutableDictionary.CreateBuilder<string, string>();
+                foreach (var (k, v) in thisValue)
+                {
+                    builder[k] = v;
+                }
+
+                foreach (var (k, v) in otherValue)
+                {
+                    builder[k] = v;
+                }
+
+                return builder.ToImmutable();
+            }
+        }
+
+        public string GetString(string key)
+        {
+            if (!Properties.TryGetValue(key, out var value))
+            {
+                return null;
+            }
+
+            return value;
         }
 
         #endregion

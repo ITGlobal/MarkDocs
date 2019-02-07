@@ -1,29 +1,29 @@
-﻿using System.Collections.Generic;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using System.Collections.Generic;
 
 namespace ITGlobal.MarkDocs.Blog
 {
     /// <summary>
     ///     Post tag with count
     /// </summary>
+    [PublicAPI]
     public interface ITag
     {
         /// <summary>
         ///     Tag name
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         string Name { get; }
 
         /// <summary>
         ///     Page count
         /// </summary>
-        [PublicAPI]
         int Count { get; }
-        
+
         /// <summary>
         ///     Gets a blog posts paged list
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IReadOnlyList<IBlogPost> List(int page, int pageSize = BlogEngineConstants.PageSize);
     }
 }

@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\*.js" />
+    <EmbeddedResource Include="Resources\*.json" />
     <EmbeddedResource Include="Resources\styles\*.css" />
   </ItemGroup>
   <ItemGroup>

@@ -5,7 +5,7 @@ using System;
 namespace ITGlobal.MarkDocs.Format
 {
     /// <summary>
-    ///    A context for <see cref="IParsedPage.Render"/>
+    ///    A context for <see cref="IPageContent.Render"/>
     /// </summary>
     [PublicAPI]
     public interface IPageRenderContext
@@ -23,14 +23,9 @@ namespace ITGlobal.MarkDocs.Format
         AssetTree AssetTree { get; }
 
         /// <summary>
-        ///     Add a generated attachment
+        ///     Writes a generated asset
         /// </summary>
-        CreateAttachmentResult CreateAttachment([NotNull] byte[] source, [NotNull] IGeneratedAssetContent content);
-        
-        /// <summary>
-        ///     Add a generated attachment
-        /// </summary>
-        CreateAttachmentResult CreateAttachment([NotNull] string source, [NotNull] IGeneratedAssetContent content);
+        CreateAttachmentResult Store([NotNull] GeneratedFileAsset asset);
         
         /// <summary>
         ///     Add a warning to compilation report

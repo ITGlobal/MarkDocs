@@ -5,6 +5,20 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.ChildrenList
 {
     internal sealed class DefaultChildrenListRenderer : IChildrenListRenderer
     {
+        private sealed class ChildPageIResourceUrlResolutionContext : IResourceUrlResolutionContext
+        {
+            private readonly IPageRenderContext _context;
+
+            public ChildPageIResourceUrlResolutionContext(IPageRenderContext context)
+            {
+                _context = context;
+            }
+
+            public string SourceTreeId => _context.AssetTree.Id;
+            public IResourceId Page => _context.Page;
+            public bool IsBranchPage => _context.Page is BranchPageAsset;
+        }
+
         private readonly IResourceUrlResolver _resolver;
 
         public DefaultChildrenListRenderer(IResourceUrlResolver resolver)
@@ -14,12 +28,12 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.ChildrenList
 
         public void Render(HtmlRenderer renderer, AssetTree assetTree, PageAsset page)
         {
-            if (!MarkdownRenderingContext.IsPresent)
+            if (!MarkdownPageRenderContext.IsPresent)
             {
                 return;
             }
 
-            var context = MarkdownRenderingContext.RenderContext;
+            var context = MarkdownPageRenderContext.Current;
 
             var parentPage = assetTree.TryGetParentPage(page.Id);
             if (parentPage == null)
@@ -31,7 +45,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.ChildrenList
 
             foreach (var p in parentPage.Subpages)
             {
-                var url = _resolver.ResolveUrl(context, p);
+                var url = _resolver.ResolveUrl(new ChildPageIResourceUrlResolutionContext(context), p);
 
                 renderer.WriteLine("<li>");
                 renderer.Write($"<a href=\"{url}\">{p.Metadata.Title}</a>");

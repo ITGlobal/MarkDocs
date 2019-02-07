@@ -25,13 +25,15 @@ namespace ITGlobal.MarkDocs.Blog
         public static void AddMarkdocsBlogEngine(
             [NotNull] this IServiceCollection services,
             [NotNull] string workingDirectory,
-            [NotNull] Action<BlogEngineConfigurationBuilder> configure)
+            [NotNull] Action<BlogEngineOptions> configure)
         {
-            var builder = new BlogEngineConfigurationBuilder(workingDirectory);
-            configure(builder);
+            services.AddMarkDocs(markdocs =>
+            {
+                markdocs.UseAspNetLog();
 
-            var factory = builder.Build();
-            services.AddSingleton(factory);
+                var builder = new BlogEngineOptions(services, markdocs, workingDirectory);
+                configure(builder);
+            });
         }
     }
 }

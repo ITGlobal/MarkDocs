@@ -1,19 +1,19 @@
-﻿using Markdig.Renderers;
-using Markdig.Syntax;
+﻿using Markdig.Syntax;
 using System.IO;
 using System.Text;
+using ITGlobal.MarkDocs.Source;
 
 namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
 {
     internal sealed class ServerSideHighlightJsCodeBlockRenderer : ICodeBlockRenderer
     {
-        private sealed class HljsCacheData : IGeneratedAssetContent
+        private sealed class HighlightJsCacheData : IGeneratedAssetContent
         {
             private readonly HighlightJsWorker _hljs;
             private readonly string _language;
             private readonly string _sourceCode;
 
-            public HljsCacheData(HighlightJsWorker hljs, string language, string sourceCode)
+            public HighlightJsCacheData(HighlightJsWorker hljs, string language, string sourceCode)
             {
                 _hljs = hljs;
                 _language = language;
@@ -22,7 +22,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
 
             public string ContentType => "text/html";
 
-            public string FormatFileName(string name) => $"hljs.{name}.html";
+            public string FormatFileName(string name) => $"hljs/{name}.html";
 
             public void Write(Stream stream)
             {
@@ -47,27 +47,21 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
             _hljs = hljs;
         }
 
-        public bool CanRender(IPageRenderContext ctx, FencedCodeBlock block)
+        public bool CanRender(IPageReadContext ctx, FencedCodeBlock block)
             => _hljs.SupportedLanguages.Contains(block.Info);
 
-        public void Render(IPageRenderContext ctx, HtmlRenderer renderer, FencedCodeBlock block)
+        public IRenderable CreateRenderable(IPageReadContext ctx, FencedCodeBlock block)
         {
             var language = block.Info;
             var markup = block.GetText();
 
-            var result = MarkdownRenderingContext.RenderContext.CreateAttachment(
+            ctx.CreateAttachment(
                 markup,
-                new HljsCacheData(_hljs, language, markup)
+                new HighlightJsCacheData(_hljs, language, markup),
+                out var asset,
+                out _
             );
-            using (var stream = result.OpenRead())
-            using (var reader = new StreamReader(stream, Encoding.UTF8))
-            {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    renderer.WriteLine(line);
-                }
-            }
+            return new ServerSideHighlightJsRenderable(asset);
         }
     }
 }

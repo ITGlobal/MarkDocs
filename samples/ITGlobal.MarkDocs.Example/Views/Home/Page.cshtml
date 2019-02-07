@@ -56,16 +56,13 @@
                     @(await Html.PartialAsync("Components/_PageTree", new PageTreeModel(Model.Documentation, Model.Page)))
                 </div>
                 <div class="tab-pane" id="attachments">
-                    @Html.Partial("Components/_AttachmentList", Model.Documentation)
+                    @(await Html.PartialAsync("Components/_AttachmentList", Model.Documentation))
                 </div>
                 <div class="tab-pane" id="version">
-                    @Html.Partial("Components/_VersionInfo", Model.Documentation)
+                    @(await Html.PartialAsync("Components/_VersionInfo", Model.Documentation))
                 </div>
                 <div class="tab-pane" id="tags">
-                    @Html.Partial("Components/_TagList", Model.Documentation)
-                </div>
-                <div class="tab-pane" id="search">
-                    @Html.Partial("Components/_SearchPane", Model.Documentation)
+                    @(await Html.PartialAsync("Components/_TagList", Model.Documentation))
                 </div>
             </div>
         </div>
@@ -88,6 +85,11 @@
                     <i class="fa fa-hashtag"></i> Tags
                 </a>
             </li>
+            <li role="presentation">
+                <a href="#report" data-toggle="tab">
+                    <i class="fa fa-check-circle"></i> Compilation report
+                </a>
+            </li>
         </ul>
 
         <div class="tab-content">
@@ -95,10 +97,13 @@
                 @Html.Raw(Model.Page.ReadHtmlString())
             </div>
             <div class="tab-pane" id="metadata">
-                @Html.Partial("Components/_PageMetadata", Model.Page)
+                @(await Html.PartialAsync("Components/_PageMetadata", Model.Page))
             </div>
             <div class="tab-pane" id="pagetags">
-                @Html.Partial("Components/_PageTags", Model.Page)
+                @(await Html.PartialAsync("Components/_PageTags", Model.Page))
+            </div>
+            <div class="tab-pane" id="report">
+                @(await Html.PartialAsync("Components/_Report", Model.Documentation))
             </div>
         </div>
     </div>

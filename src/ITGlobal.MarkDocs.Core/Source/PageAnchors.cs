@@ -1,7 +1,9 @@
-﻿using JetBrains.Annotations;
+﻿using ITGlobal.MarkDocs.Cache.Model;
+using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ITGlobal.MarkDocs.Source
 {
@@ -10,6 +12,11 @@ namespace ITGlobal.MarkDocs.Source
     {
         private readonly Dictionary<string, PageAnchor> _byId
             = new Dictionary<string, PageAnchor>(StringComparer.OrdinalIgnoreCase);
+
+        public PageAnchors([CanBeNull] PageAnchorModel[] array)
+            : this(array?.Select(PageAnchor.FromModel).ToArray() ?? System.Array.Empty<PageAnchor>())
+        {
+        }
 
         public PageAnchors([NotNull] PageAnchor[] array)
         {

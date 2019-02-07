@@ -10,6 +10,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
         private readonly IContentHashProvider _contentHashProvider;
         private readonly IContentTypeProvider _contentTypeProvider;
         private readonly IContentMetadataProvider _contentMetadataProvider;
+        private readonly IResourceUrlResolver _resourceUrlResolver;
         private readonly string[] _includeFiles;
         private readonly string[] _indexFileNames;
 
@@ -17,12 +18,14 @@ namespace ITGlobal.MarkDocs.Source.Impl
             IFormat format, 
             IContentHashProvider contentHashProvider,
             IContentTypeProvider contentTypeProvider,
-            IContentMetadataProvider contentMetadataProvider)
+            IContentMetadataProvider contentMetadataProvider,
+            IResourceUrlResolver resourceUrlResolver)
         {
             _format = format;
             _contentHashProvider = contentHashProvider;
             _contentTypeProvider = contentTypeProvider;
             _contentMetadataProvider = contentMetadataProvider;
+            _resourceUrlResolver = resourceUrlResolver;
 
             _includeFiles = format.FileFilters;
             _indexFileNames = format.IndexFileNames;
@@ -38,6 +41,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
                 contentHashProvider: _contentHashProvider,
                 contentTypeProvider: _contentTypeProvider,
                 contentMetadataProvider: _contentMetadataProvider,
+                resourceUrlResolver: _resourceUrlResolver,
                 includeFiles: _includeFiles,
                 indexFileNames: _indexFileNames,
                 ignorePatterns: sourceTreeProvider.IgnorePatterns ?? Array.Empty<string>(),

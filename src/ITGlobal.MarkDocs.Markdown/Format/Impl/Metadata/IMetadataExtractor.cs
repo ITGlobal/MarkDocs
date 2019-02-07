@@ -7,6 +7,6 @@ namespace ITGlobal.MarkDocs.Format.Impl.Metadata
     internal interface IMetadataExtractor
     {
         [NotNull]
-        PageMetadata Extract([NotNull] IReadPageContext ctx, [NotNull] MarkdownDocument document);
+        PageMetadata Extract([NotNull] IPageReadContext ctx, [NotNull] MarkdownDocument document);
     }
 }

@@ -8,11 +8,10 @@ using System.Linq;
 
 namespace ITGlobal.MarkDocs.Source.Impl
 {
-    internal sealed class AssetTreeReaderWorker
+    internal sealed class AssetTreeReaderWorker : IShallowPageAssetReader
     {
         #region fields
 
-        private readonly IFormat _format;
         private readonly IContentHashProvider _contentHashProvider;
         private readonly IContentTypeProvider _contentTypeProvider;
         private readonly IContentMetadataProvider _contentMetadataProvider;
@@ -20,8 +19,10 @@ namespace ITGlobal.MarkDocs.Source.Impl
         private readonly string[] _indexFileNames;
         private readonly string[] _ignorePatterns;
 
-        private readonly ISourceTreeRoot _root;
-        private readonly ICompilationReportBuilder _report;
+        private readonly Dictionary<string, ShallowPageAsset> _pages
+            = new Dictionary<string, ShallowPageAsset>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, FileAsset> _files
+            = new Dictionary<string, FileAsset>(StringComparer.OrdinalIgnoreCase);
 
         #endregion
 
@@ -32,28 +33,37 @@ namespace ITGlobal.MarkDocs.Source.Impl
             IContentHashProvider contentHashProvider,
             IContentTypeProvider contentTypeProvider,
             IContentMetadataProvider contentMetadataProvider,
+            IResourceUrlResolver resourceUrlResolver,
             string[] includeFiles,
             string[] indexFileNames,
             string[] ignorePatterns,
             ISourceTreeRoot root,
             ICompilationReportBuilder report)
         {
-            _format = format;
+            Format = format;
+
             _contentHashProvider = contentHashProvider;
             _contentTypeProvider = contentTypeProvider;
             _contentMetadataProvider = contentMetadataProvider;
+            ResourceUrlResolver = resourceUrlResolver;
+
             _includeFiles = includeFiles;
             _indexFileNames = indexFileNames;
             _ignorePatterns = ignorePatterns;
-            _root = root;
-            _report = report;
+
+            Root = root;
+            Report = report;
         }
 
         #endregion
 
         #region metadata
 
-        private string RootDirectory => _root.RootDirectory;
+        public ISourceTreeRoot Root { get; }
+        public string RootDirectory => Root.RootDirectory;
+        public IFormat Format { get; }
+        public ICompilationReportBuilder Report { get; }
+        public IResourceUrlResolver ResourceUrlResolver { get; }
 
         #endregion
 
@@ -61,43 +71,190 @@ namespace ITGlobal.MarkDocs.Source.Impl
 
         public AssetTree ReadAssetTree()
         {
-            var consumedFiles = new HashSet<string>();
+            // Scan directory tree and collect "shallow" assets
+            var rootAsset = BranchPage(RootDirectory);
+            rootAsset.ForEach(p => _pages[p.Id] = p);
 
-            var rootPage = BranchPage(RootDirectory, consumedFiles);
-            WalkPages(rootPage, page => consumedFiles.Add(page.AbsolutePath));
-            var attachments = CollectAttachments(consumedFiles);
+            // Read each asset and convert "shallow" assets into "full" ones
+            var rootPage = rootAsset.ReadAsset(this);
 
-            var tree = new AssetTree(_root.SourceTree.Id, _root.SourceInfo, rootPage, attachments);
+            // Make a list of referenced files
+            var files = _files.Values.Where(_ => _ != null).OrderBy(_ => _.Id).ToArray();
 
+            // Assemble an asset tree
+            var tree = new AssetTree(
+                Root.SourceTree.Id,
+                RootDirectory,
+                Root.SourceInfo,
+                rootPage,
+                files
+            );
             return tree;
+        }
 
-            void WalkPages(PageAsset asset, Action<PageAsset> action)
+        public PageMetadata GetMetadata(string filename, bool isIndexFile)
+        {
+            var metadata = _contentMetadataProvider.GetMetadata(
+                sourceTreeRoot: Root,
+                filename: filename,
+                report: Report,
+                isIndexFile: isIndexFile
+            );
+
+            if (string.IsNullOrEmpty(metadata.Title))
             {
-                action(asset);
-                if (asset is BranchPageAsset branchPage)
-                {
-                    foreach (var subpage in branchPage.Subpages)
-                    {
-                        WalkPages(subpage, action);
-                    }
-                }
+                Report.Warning(filename, "No page title found");
             }
+
+            return metadata;
+        }
+
+        public ShallowPageAsset ResolvePageAsset(string path)
+        {
+            if (!_pages.TryGetValue(path, out var page))
+            {
+                return null;
+            }
+
+            return page;
+        }
+
+        public FileAsset ResolveFileAsset(string path)
+        {
+            if (_files.TryGetValue(path, out var file))
+            {
+                return file;
+            }
+
+            file = PhysicalFile(GetAbsolutePath(path));
+            _files[path] = file;
+
+            return file;
+        }
+
+        public void RegisterAsset(GeneratedFileAsset asset)
+        {
+            _files[asset.Id] = asset;
         }
 
         #endregion
 
-        #region private methods
+        #region asset factories
+
+        private ShallowPageAsset BranchPage(string directory)
+        {
+            if (!ScanDirectory(
+                directory,
+                out var indexPageFileName,
+                out var pages))
+            {
+                return null;
+            }
+
+            var id = GetRelativePath(directory);
+            ResourceId.Normalize(ref id);
+
+            if (indexPageFileName == null ||
+                !_contentHashProvider.TryGetContentHash(indexPageFileName, out var contentHash))
+            {
+                contentHash = "";
+            }
+
+            if (indexPageFileName == null)
+            {
+                if (pages.Count > 0)
+                {
+                    Report.Error(directory, $"Directory \"{id}\" has no index page and will be skipped");
+                }
+
+                return null;
+            }
+
+            if (pages.Count == 0)
+            {
+                return new LeafShallowPageAsset(
+                    id: id,
+                    relativePath: id,
+                    absolutePath: indexPageFileName,
+                    contentHash: contentHash
+                );
+            }
+
+            return new BranchShallowPageAsset(
+                id: id,
+                relativePath: id,
+                absolutePath: indexPageFileName,
+                contentHash: contentHash,
+                subpages: pages.ToArray()
+            );
+        }
+
+        private LeafShallowPageAsset LeafPage(string path)
+        {
+            var id = GetRelativePath(path);
+            id = Path.Combine(Path.GetDirectoryName(id), Path.GetFileNameWithoutExtension(id));
+            ResourceId.Normalize(ref id);
+
+            if (!_contentHashProvider.TryGetContentHash(path, out var contentHash))
+            {
+                contentHash = "";
+            }
+
+            return new LeafShallowPageAsset(
+                id: id,
+                relativePath: id,
+                absolutePath: path,
+                contentHash: contentHash
+            );
+        }
+
+        private PhysicalFileAsset PhysicalFile(string path)
+        {
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+
+            var ignoreRules = GetIgnoreRulesForDirectory(Path.GetDirectoryName(path));
+            if (ignoreRules.ShouldIgnore(path))
+            {
+                return null;
+            }
+
+            var id = GetRelativePath(path);
+            ResourceId.Normalize(ref id);
+
+            if (!_contentTypeProvider.TryGetContentType(path, out var contentType))
+            {
+                contentType = Asset.DEFAULT_MIME_TYPE;
+            }
+
+            if (!_contentHashProvider.TryGetContentHash(path, out var contentHash))
+            {
+                contentHash = "";
+            }
+
+            return new PhysicalFileAsset(
+                id: id,
+                relativePath: id,
+                absolutePath: path,
+                contentHash: contentHash,
+                contentType: contentType
+            );
+        }
+
+        #endregion
+
+        #region directory traverse
 
         private bool ScanDirectory(
             string directory,
-            HashSet<string> consumedFiles,
-            out PageMetadata metadata,
             out string indexPageFileName,
-            out List<PageAsset> pages)
+            out List<ShallowPageAsset> pages)
         {
             var ignoreRules = GetIgnoreRulesForDirectory(directory);
 
-            pages = new List<PageAsset>();
+            pages = new List<ShallowPageAsset>();
             foreach (var subDirectory in Directory.EnumerateDirectories(directory))
             {
                 if (ignoreRules.ShouldIgnore(subDirectory))
@@ -105,7 +262,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
                     continue;
                 }
 
-                var page = BranchPage(subDirectory, consumedFiles);
+                var page = BranchPage(subDirectory);
                 if (page != null)
                 {
                     pages.Add(page);
@@ -115,18 +272,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
             var pageFiles = ScanDirectoryFiles(directory, out indexPageFileName);
             foreach (var filename in pageFiles)
             {
-                pages.Add(LeafPage(filename, consumedFiles));
-            }
-
-            metadata = null;
-            if (indexPageFileName != null)
-            {
-                metadata = GetMetadata(indexPageFileName, consumedFiles, true);
-            }
-            metadata = metadata ?? PageMetadata.Empty;
-            if (string.IsNullOrEmpty(metadata.Title))
-            {
-                metadata = metadata.WithTitle(Path.GetFileNameWithoutExtension(directory));
+                pages.Add(LeafPage(filename));
             }
 
             if (pages.Count == 0)
@@ -192,203 +338,13 @@ namespace ITGlobal.MarkDocs.Source.Impl
                     pages.Add(filename);
                 }
             }
+
             return pages;
         }
 
-        private PageAsset BranchPage(string directory, HashSet<string> consumedFiles)
-        {
-            if (!ScanDirectory(
-                directory,
-                consumedFiles,
-                out var metadata,
-                out var indexPageFileName,
-                out var pages))
-            {
-                return null;
-            }
+        private string GetAbsolutePath(string path) => PathHelper.GetAbsolutePath(RootDirectory, path);
 
-            var id = GetRelativePath(directory);
-            ResourceId.Normalize(ref id);
-
-            if (indexPageFileName == null ||
-                !_contentHashProvider.TryGetContentHash(indexPageFileName, out var contentHash))
-            {
-                contentHash = "";
-            }
-
-            if (indexPageFileName == null)
-            {
-                if (pages.Count > 0)
-                {
-                    _report.Error($"Directory \"{id}\" has no index page and will be skipped");
-                }
-
-                return null;
-            }
-
-
-            var ctx = new ReadPageContext(_report.ForFile(indexPageFileName));
-            var (content, pageMetadata) = _format.Read(ctx, indexPageFileName);
-            metadata = metadata.MergeWith(pageMetadata);
-
-            if (pages.Count == 0)
-            {
-                return new LeafPageAsset(
-                    id: id,
-                    relativePath: id,
-                    absolutePath: indexPageFileName,
-                    contentHash: contentHash,
-                    content: content,
-                    metadata: metadata
-                );
-            }
-
-            return new BranchPageAsset(
-                id: id,
-                relativePath: id,
-                absolutePath: indexPageFileName,
-                contentHash: contentHash,
-                content: content,
-                metadata: metadata,
-                subpages: pages.ToArray()
-            );
-        }
-
-        private LeafPageAsset LeafPage(string path, HashSet<string> consumedFiles)
-        {
-            var id = GetRelativePath(path);
-            id = Path.Combine(Path.GetDirectoryName(id), Path.GetFileNameWithoutExtension(id));
-            ResourceId.Normalize(ref id);
-
-            if (!_contentHashProvider.TryGetContentHash(path, out var contentHash))
-            {
-                contentHash = "";
-            }
-
-            var metadata = GetMetadata(path, consumedFiles, false);
-            if (string.IsNullOrEmpty(metadata.Title))
-            {
-                metadata = metadata.WithTitle(Path.GetFileNameWithoutExtension(path));
-            }
-
-            var ctx = new ReadPageContext(_report.ForFile(path));
-            var (content, pageMetadata) = _format.Read(ctx, path);
-            metadata = metadata.MergeWith(pageMetadata);
-
-            return new LeafPageAsset(
-                id: id,
-                relativePath: id,
-                absolutePath: path,
-                contentHash: contentHash,
-                content: content,
-                metadata: metadata
-            );
-        }
-
-        private AttachmentAsset Attachment(string path)
-        {
-            var id = GetRelativePath(path);
-            ResourceId.Normalize(ref id);
-
-            if (!_contentTypeProvider.TryGetContentType(path, out var contentType))
-            {
-                contentType = AttachmentAsset.DEFAULT_MIME_TYPE;
-            }
-
-            if (!_contentHashProvider.TryGetContentHash(path, out var contentHash))
-            {
-                contentHash = "";
-            }
-
-            return new AttachmentAsset(
-                id: id,
-                relativePath: id,
-                absolutePath: path,
-                contentHash: contentHash,
-                contentType: contentType
-            );
-        }
-
-        private string GetRelativePath(string path)
-        {
-            try
-            {
-                var normalizedRootPath = Path.GetFullPath(RootDirectory);
-                var normalizedPath = Path.GetFullPath(path);
-
-                if (!normalizedPath.StartsWith(normalizedRootPath))
-                {
-                    throw new Exception($"\"{normalizedRootPath}\" is not a valid root for \"{normalizedPath}\"");
-                }
-
-                var relativePath = normalizedPath.Substring(normalizedRootPath.Length);
-                relativePath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
-                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, '/');
-                while (relativePath.Length > 0 && relativePath[0] == '/')
-                {
-                    relativePath = relativePath.Substring(1);
-                }
-
-                return relativePath;
-            }
-            catch (Exception e)
-            {
-                throw new InvalidOperationException($"GetRelativePath(\"{RootDirectory}\", \"{path}\") failed", e);
-            }
-        }
-
-        private PageMetadata GetMetadata(
-            string filename,
-            HashSet<string> consumedFiles,
-            bool isIndexFile)
-        {
-            var metadata = _contentMetadataProvider.GetMetadata(
-                sourceTreeRoot: _root,
-                filename: filename,
-                report: _report,
-                consumedFiles: consumedFiles,
-                isIndexFile: isIndexFile
-            );
-
-            if (string.IsNullOrEmpty(metadata.Title))
-            {
-                _report.ForFile(filename).Warning("No page title found");
-            }
-
-            return metadata;
-        }
-
-        private AttachmentAsset[] CollectAttachments(HashSet<string> consumedFiles)
-        {
-            var files = new List<AttachmentAsset>();
-            CollectAttachmentsRec(RootDirectory);
-            return files.ToArray();
-
-            void CollectAttachmentsRec(string directory)
-            {
-                var ignoreRules = GetIgnoreRulesForDirectory(directory);
-                foreach (var subdirectory in Directory.EnumerateDirectories(directory))
-                {
-                    CollectAttachmentsRec(subdirectory);
-                }
-
-                foreach (var filename in Directory.EnumerateFiles(directory))
-                {
-                    if (consumedFiles.Contains(filename))
-                    {
-                        continue;
-                    }
-
-                    if (ignoreRules.ShouldIgnore(filename))
-                    {
-                        continue;
-                    }
-
-                    consumedFiles.Add(filename);
-                    files.Add(Attachment(filename));
-                }
-            }
-        }
+        private string GetRelativePath(string path) => PathHelper.GetRelativePath(RootDirectory, path);
 
         private IIgnoreRule GetIgnoreRulesForDirectory(string path)
         {

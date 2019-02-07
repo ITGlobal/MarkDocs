@@ -14,10 +14,6 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CustomHeading
             _dontRenderFirstHeading = dontRenderFirstHeading;
         }
         
-        private const string NO_RENDER_PROPERTY_KEY = "no-render";
-        
-        public static void DontRender(HeadingBlock block) => block.SetData(NO_RENDER_PROPERTY_KEY, "");
-
         protected override void Write(HtmlRenderer renderer, HeadingBlock block)
         {
             if (_dontRenderFirstHeading)
@@ -31,7 +27,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CustomHeading
                 }
             }
             
-            if (block.GetData(NO_RENDER_PROPERTY_KEY) != null)
+            if (block.IsNoRender())
             {
                 return;
             }

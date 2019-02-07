@@ -1,10 +1,8 @@
+using ITGlobal.MarkDocs.Format;
+using ITGlobal.MarkDocs.Source;
 using System;
 using System.IO;
 using System.Linq;
-using ITGlobal.MarkDocs.Format;
-using ITGlobal.MarkDocs.Storage;
-using Microsoft.Extensions.Logging;
-using Serilog;
 using static ITGlobal.CommandLine.Terminal;
 
 namespace ITGlobal.MarkDocs.Tools.Lint
@@ -16,11 +14,10 @@ namespace ITGlobal.MarkDocs.Tools.Lint
             bool verbose,
             bool summary)
         {
-            IMarkDocService markdocs;
-
-            using (CliHelper.SpinnerSafe("Initializing..."))
+            ICompilationReport report;
+            using (CliHelper.SpinnerSafe("Running linter..."))
             {
-                markdocs = MarkDocsFactory.Create(
+                var markdocs = MarkDocsFactory.Create(
                     config =>
                     {
                         if (verbose)
@@ -28,54 +25,39 @@ namespace ITGlobal.MarkDocs.Tools.Lint
                             config.UseCallback(new LinterCallback());
                         }
 
-                        config.Storage.UseStaticDirectory(path);
-                        config.Cache.Use(_ => new LinterCache());
-                        config.Format.UseMarkdown(new MarkdownOptions
+                        config.FromStaticDirectory(path);
+                        config.UseCache(_ => new LinterCacheProvider());
+                        config.UseResourceUrlResolver(new ResourceUrlResolver());
+                        config.UseMarkdown(markdown =>
                         {
-                            ResourceUrlResolver = new ResourceUrlResolver(),
-                            SyntaxColorizer =
-                                new ServerHighlightJsSyntaxColorizer(Path.Combine(Path.GetTempPath(),
-                                    $"markdocs-lint-{Guid.NewGuid():N}"))
+                            markdown.CodeBlocks.UseServerSideHighlightJs(
+                                Path.Combine(Path.GetTempPath(), $"markdocs-lint-{Guid.NewGuid():N}")
+                            );
                         });
-
-                    },
-                    new LoggerFactory().AddSerilog()
+                        config.UseLog(new SerilogLog());
+                    }
                 );
+                using (markdocs)
+                {
+                    report = markdocs.Documentations[0].CompilationReport;
+                }
             }
 
-            using (markdocs)
+            Program.PrintReport(report, verbose);
+
+            if (summary)
             {
-                using (CliHelper.SpinnerSafe("Running linter..."))
-                {
-                    markdocs.Initialize();
-                }
+                var errors = report.Messages.Values.Sum(_ => _.Count(x => x.Type == CompilationReportMessageType.Error)); ;
+                var warnings = report.Messages.Values.Sum(_ => _.Count(x => x.Type == CompilationReportMessageType.Warning));
 
-                var report = markdocs.Documentations[0].CompilationReport;
-                Program.PrintReport(report, verbose);
-
-                if (summary)
-                {
-                    var errors = report.Common
-                                     .Count(_ => _.Type == CompilationReportMessageType.Error)
-                                 + report.Pages.Select(p =>
-                                         p.Messages.Count(_ => _.Type == CompilationReportMessageType.Error))
-                                     .Sum();
-
-                    var warnigs = report.Common
-                                     .Count(_ => _.Type == CompilationReportMessageType.Warning)
-                                 + report.Pages.Select(p =>
-                                         p.Messages.Count(_ => _.Type == CompilationReportMessageType.Warning))
-                                     .Sum();
-
-                    Stdout.WriteLine("Summary");
-                    Stdout.WriteLine("-------");
-                    Stdout.WriteLine($"  {errors} error(s)");
-                    Stdout.WriteLine($"  {warnigs} warning(s)");
-                }
+                Stdout.WriteLine("Summary");
+                Stdout.WriteLine("-------");
+                Stdout.WriteLine($"  {errors} error(s)");
+                Stdout.WriteLine($"  {warnings} warning(s)");
             }
         }
 
-        public static string GetRelativeResourcePath(IResource resource, IResource relativeTo)
+        public static string GetRelativeResourcePath(IResourceId resource, IResourceId relativeTo)
         {
             var relativeToUrl = new Uri($"http://site{GetResourcePath(relativeTo)}");
             var resourceUrl = new Uri($"http://site{GetResourcePath(resource)}");
@@ -96,7 +78,7 @@ namespace ITGlobal.MarkDocs.Tools.Lint
             return urlstr;
         }
 
-        private static string GetResourcePath(IResource resource)
+        private static string GetResourcePath(IResourceId resource)
         {
             var path = resource.Id;
             if (path == "/")
@@ -104,18 +86,11 @@ namespace ITGlobal.MarkDocs.Tools.Lint
                 path = "/index";
             }
 
-            string extension;
-            switch (resource.Type)
+            if (resource.Type == ResourceType.Page)
             {
-                case ResourceType.Page:
-                    extension = ".html";
-                    break;
-                default:
-                    extension = Path.GetExtension(resource.FileName);
-                    break;
+                path = Path.ChangeExtension(path, ".html");
             }
 
-            path = Path.ChangeExtension(path, extension);
             return path;
         }
     }

@@ -9,7 +9,7 @@ namespace ITGlobal.MarkDocs.Source
             string relativePath,
             string absolutePath,
             string contentHash,
-            IParsedPage content,
+            IPageContent content,
             PageMetadata metadata)
             : base(id, relativePath, absolutePath, contentHash, content, metadata)
         { }

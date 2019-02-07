@@ -1,8 +1,7 @@
-﻿using System.IO;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Hosting;
 using Serilog;
 using Serilog.Events;
+using System.IO;
 
 namespace ITGlobal.MarkDocs.Blog.Example
 {
@@ -14,37 +13,18 @@ namespace ITGlobal.MarkDocs.Blog.Example
                 .Enrich.FromLogContext()
                 .WriteTo.LiterateConsole(
                     outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext} -> {Message}{NewLine}{Exception}")
-                .Filter.ByExcluding(ExclusionPredicate)
                 .MinimumLevel.Verbose()
+                .Filter.ByExcluding(_ => _.Properties.TryGetValue("SourceContext", out var c) && c is ScalarValue s && s.Value is string str && str.StartsWith("Microsoft"))
                 .CreateLogger();
-
-            var loggerFactory = new LoggerFactory();
-            loggerFactory.AddSerilog();
 
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .ConfigureLogging(_=>_.AddSerilog())
+                .ConfigureLogging(logBuilder => logBuilder.AddSerilog())
                 .UseStartup<Startup>()
                 .Build();
 
             host.Run();
-
-            bool ExclusionPredicate(LogEvent e)
-            {
-                if (e.Level >= LogEventLevel.Warning)
-                {
-                    return false;
-                }
-
-                var sourceContext = (e.Properties["SourceContext"] as ScalarValue)?.Value as string;
-                if (string.IsNullOrEmpty(sourceContext))
-                {
-                    return false;
-                }
-
-                return sourceContext.StartsWith("Microsoft") || sourceContext.StartsWith("System");
-            }
         }
     }
 }

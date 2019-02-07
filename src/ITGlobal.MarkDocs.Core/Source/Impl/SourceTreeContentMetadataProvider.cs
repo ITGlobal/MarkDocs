@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ITGlobal.MarkDocs.Source.Impl
+﻿namespace ITGlobal.MarkDocs.Source.Impl
 {
     internal sealed class SourceTreeContentMetadataProvider : IContentMetadataProvider
     {
@@ -8,7 +6,6 @@ namespace ITGlobal.MarkDocs.Source.Impl
             ISourceTreeRoot sourceTreeRoot, 
             string filename,
             ICompilationReportBuilder report,
-            HashSet<string> consumedFiles,
             bool isIndexFile)
         {
             var contentId = sourceTreeRoot.GetContentId(filename);

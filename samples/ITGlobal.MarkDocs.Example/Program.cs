@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
 using System.IO;
+using Serilog.Events;
 
 namespace ITGlobal.MarkDocs.Example
 {
@@ -14,26 +14,13 @@ namespace ITGlobal.MarkDocs.Example
                 .WriteTo.LiterateConsole(
                     outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext} -> {Message}{NewLine}{Exception}")
                 .MinimumLevel.Verbose()
+                .Filter.ByExcluding(_=>_.Properties.TryGetValue("SourceContext", out var c) && c is ScalarValue s && s.Value is string str && str.StartsWith("Microsoft"))
                 .CreateLogger();
 
-            //.ConfigureLogging(_ => _.AddSerilog().AddFilter((category, logLevel) => (category.StartsWith("Microsoft") && logLevel >= LogLevel.Trace)))
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .ConfigureLogging(logBuilder =>
-                {
-                    logBuilder.AddFilter((provider, category, logLevel) =>
-                    {
-                        if (category.StartsWith("Microsoft") && logLevel<= LogLevel.Error)
-                        {
-                            return false;
-                        }
-                        return true;
-                    });
-                    //_.AddFilter("Microsoft.*", LogLevel.Error);
-                    // logBuilder.AddSerilog();
-                    logBuilder.AddConsole();
-                })
+                .ConfigureLogging(logBuilder => logBuilder.AddSerilog())
                 .UseStartup<Startup>()
                 .Build();
 

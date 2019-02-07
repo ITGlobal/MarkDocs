@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -30,18 +29,17 @@ namespace ITGlobal.MarkDocs.Source.Impl
             ISourceTreeRoot sourceTreeRoot,
             string filename,
             ICompilationReportBuilder report,
-            HashSet<string> consumedFiles,
             bool isIndexFile)
         {
             var metadata =PageMetadata.Empty;
             if (isIndexFile)
             {
-                metadata = metadata.MergeWith(GetIndexLevelMetadata(filename, report, consumedFiles));
-                metadata = metadata.MergeWith(GetPlainLevelMetadata(filename, report, consumedFiles));
+                metadata = metadata.MergeWith(GetIndexLevelMetadata(filename, report));
+                metadata = metadata.MergeWith(GetPlainLevelMetadata(filename, report));
             }
             else
             {
-                metadata = metadata.MergeWith(GetPlainLevelMetadata(filename, report, consumedFiles));
+                metadata = metadata.MergeWith(GetPlainLevelMetadata(filename, report));
             }
 
             return metadata;
@@ -51,12 +49,12 @@ namespace ITGlobal.MarkDocs.Source.Impl
 
         #region private methods
 
-        private PageMetadata GetIndexLevelMetadata(string filename, ICompilationReportBuilder report, HashSet<string> consumedFiles)
+        private PageMetadata GetIndexLevelMetadata(string filename, ICompilationReportBuilder report)
         {
             var directory = Path.GetDirectoryName(filename);
             var tocFileName = Path.Combine(Path.GetDirectoryName(directory), TOC_FILE_NAME);
 
-            var tocFile = _entries.GetOrAdd(tocFileName, path => TryReadTocFile(path, report, consumedFiles));
+            var tocFile = _entries.GetOrAdd(tocFileName, path => TryReadTocFile(path, report));
             if (tocFile == null)
             {
                 return PageMetadata.Empty;
@@ -66,11 +64,11 @@ namespace ITGlobal.MarkDocs.Source.Impl
             return properties;
         }
 
-        private PageMetadata GetPlainLevelMetadata(string filename, ICompilationReportBuilder report, HashSet<string> consumedFiles)
+        private PageMetadata GetPlainLevelMetadata(string filename, ICompilationReportBuilder report)
         {
             var tocFileName = Path.Combine(Path.GetDirectoryName(filename), TOC_FILE_NAME);
 
-            var tocFile = _entries.GetOrAdd(tocFileName, path => TryReadTocFile(path, report, consumedFiles));
+            var tocFile = _entries.GetOrAdd(tocFileName, path => TryReadTocFile(path, report));
             if (tocFile == null)
             {
                 return PageMetadata.Empty;
@@ -80,7 +78,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
             return properties;
         }
 
-        private static TocFile TryReadTocFile(string path, ICompilationReportBuilder report, HashSet<string> consumedFiles)
+        private static TocFile TryReadTocFile(string path, ICompilationReportBuilder report)
         {
             if (!File.Exists(path))
             {
@@ -91,12 +89,11 @@ namespace ITGlobal.MarkDocs.Source.Impl
             {
                 var json = File.ReadAllText(path, Encoding.UTF8);
                 var toc = JsonConvert.DeserializeObject<TocFile>(json);
-                consumedFiles.Add(path);
                 return toc;
             }
             catch (Exception e)
             {
-                report.Error($"Unable to read {TOC_FILE_NAME}. {e.Message}");
+                report.Error(path, $"Unable to read {TOC_FILE_NAME}. {e.Message}");
                 return null;
             }
         }

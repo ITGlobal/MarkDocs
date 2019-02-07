@@ -179,17 +179,12 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
             "zephir",
         });
 
-        public bool CanRender(IPageRenderContext ctx, FencedCodeBlock block)
+        public bool CanRender(IPageReadContext ctx, FencedCodeBlock block)
             => SupportedLanguages.Contains(block.Info);
 
-        public void Render(IPageRenderContext ctx, HtmlRenderer renderer, FencedCodeBlock block)
+        public IRenderable CreateRenderable(IPageReadContext ctx, FencedCodeBlock block)
         {
-            var language = block.Info;
-
-            renderer.Write("<pre>");
-            renderer.Write($"<code class=\"{language}\">");
-            renderer.WriteLeafRawLines(block, true, true);
-            renderer.WriteLine("</code></pre>");
+            return new ClientSideHighlightJsRenderable(block);
         }
     }
 }

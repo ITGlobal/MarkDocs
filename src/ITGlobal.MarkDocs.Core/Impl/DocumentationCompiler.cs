@@ -27,38 +27,25 @@ namespace ITGlobal.MarkDocs.Impl
 
             public PageAsset Page { get; }
             public AssetTree AssetTree { get; }
-
-            public CreateAttachmentResult CreateAttachment(byte[] source, IGeneratedAssetContent content)
-                => CreateAttachmentImpl(HashUtil.HashBuffer(source), content);
-
-            public CreateAttachmentResult CreateAttachment(string source, IGeneratedAssetContent content)
-                => CreateAttachmentImpl(HashUtil.HashString(source), content);
-
-            private CreateAttachmentResult CreateAttachmentImpl(string hash, IGeneratedAssetContent content)
+            
+            public CreateAttachmentResult Store(GeneratedFileAsset asset)
             {
-                var filename = content.FormatFileName(hash);
-                var id = $"/{filename}";
-                var asset = new GeneratedAsset(
-                    id: id,
-                    relativePath: filename,
-                    contentType: content.ContentType,
-                    contentHash: hash
-                );
-
-                _compiler.Process(asset, content.Write);
+                _compiler.Process(asset);
 
                 return new CreateAttachmentResult(asset, _compiler._transaction.Read);
             }
-
+            
             public void Warning(string message, int? lineNumber = null, Exception exception = null)
-                => _compiler._reportBuilder.ForFile(Page.RelativePath).Warning(message, lineNumber);
+                => _compiler._reportBuilder.Warning(Page.AbsolutePath, message, lineNumber);
 
             public void Error(string message, int? lineNumber = null)
-                => _compiler._reportBuilder.ForFile(Page.RelativePath).Error(message, lineNumber);
+                => _compiler._reportBuilder.Error(Page.AbsolutePath, message, lineNumber);
 
             public void Error(string message, Exception exception)
-                => _compiler._reportBuilder.ForFile(Page.RelativePath).Error(message);
-            // TODO write to log
+            {
+                // todo write exception to log
+                _compiler._reportBuilder.Error(Page.AbsolutePath, message);
+            }
         }
 
         #endregion
@@ -67,16 +54,18 @@ namespace ITGlobal.MarkDocs.Impl
 
         private readonly ICacheUpdateTransaction _transaction;
 
-        private readonly CompilationReportBuilder _reportBuilder = new CompilationReportBuilder();
-        private readonly List<AttachmentModel> _attachments = new List<AttachmentModel>();
+        private readonly CompilationReportBuilder _reportBuilder;
+        private readonly Dictionary<string, FileModel> _attachments
+            = new Dictionary<string, FileModel>(StringComparer.OrdinalIgnoreCase);
 
         #endregion
 
         #region .ctor
 
-        public DocumentationCompiler(ICacheUpdateTransaction transaction)
+        public DocumentationCompiler(ICacheUpdateTransaction transaction, CompilationReportBuilder reportBuilder)
         {
             _transaction = transaction;
+            _reportBuilder = reportBuilder;
         }
 
         #endregion
@@ -87,7 +76,7 @@ namespace ITGlobal.MarkDocs.Impl
         {
             var rootPage = Process(assetTree, assetTree.RootPage);
 
-            foreach (var asset in assetTree.Attachments)
+            foreach (var asset in assetTree.Files)
             {
                 Process(asset);
             }
@@ -104,10 +93,9 @@ namespace ITGlobal.MarkDocs.Impl
                     LastChangeAuthor = assetTree.SourceInfo.LastChangeAuthor,
                     LastChangeDescription = assetTree.SourceInfo.LastChangeDescription,
                 },
-                Attachments = _attachments.OrderBy(_ => _.Id).ToArray(),
+                Files = _attachments.OrderBy(_ => _.Key).Select(_=>_.Value).ToArray(),
                 RootPage = rootPage,
-                CompilationReport = _reportBuilder.Build(),
-
+                CompilationReport = _reportBuilder.Build(assetTree.RootDirectory),
             };
             _transaction.Store(model);
 
@@ -129,7 +117,7 @@ namespace ITGlobal.MarkDocs.Impl
                 Id = asset.Id,
                 Title = asset.Metadata.Title,
                 Description = asset.Metadata.Description,
-                FileName = asset.RelativePath,
+                RelativePath = asset.RelativePath,
                 Metadata = asset.Metadata,
                 Anchors = asset.Content.Anchors != null && asset.Content.Anchors.Count > 0
                     ? asset.Content.Anchors.Select(MapAnchor).ToArray()
@@ -147,7 +135,7 @@ namespace ITGlobal.MarkDocs.Impl
                 model.Preview = new PagePreviewModel
                 {
                     Id = previewAsset.Id,
-                    FileName = asset.AbsolutePath,
+                    RelativePath = asset.RelativePath,
                 };
             }
 
@@ -164,12 +152,12 @@ namespace ITGlobal.MarkDocs.Impl
             return model;
         }
 
-        private static void RenderPage(PageContext context, IParsedPage page, Stream stream)
+        private static void RenderPage(PageContext context, IPageContent pageContent, Stream stream)
         {
             string html;
             try
             {
-                html = page.Render(context);
+                html = pageContent.Render(context);
             }
             catch (Exception e)
             {
@@ -184,12 +172,12 @@ namespace ITGlobal.MarkDocs.Impl
             }
         }
 
-        private static void RenderPagePreview(PageContext context, IParsedPage page, Stream stream)
+        private static void RenderPagePreview(PageContext context, IPageContent pageContent, Stream stream)
         {
             string html;
             try
             {
-                html = page.RenderPreview(context);
+                html = pageContent.RenderPreview(context);
             }
             catch (Exception e)
             {
@@ -220,21 +208,53 @@ namespace ITGlobal.MarkDocs.Impl
 
         #region attachment rendering
 
-        private void Process(AttachmentAsset asset)
+        private void Process(FileAsset asset)
         {
-            var model = new AttachmentModel
+            if (_attachments.ContainsKey(asset.Id))
             {
-                Id = asset.Id,
-                FileName = asset.AbsolutePath,
-                Type = AttachmentType.File,
-                ContentType = asset.ContentType,
-            };
+                return;
+            }
 
-            _transaction.Store(asset, stream => RenderAttachment(asset, stream));
-            _attachments.Add(model);
+            switch (asset)
+            {
+                case PhysicalFileAsset a:
+                    {
+                        var model = new FileModel
+                        {
+                            Id = a.Id,
+                            RelativePath = a.RelativePath,
+                            Type = AttachmentType.File,
+                            ContentType = a.ContentType,
+                        };
+
+                        _transaction.Store(a, stream => RenderAttachment(a, stream));
+                        _attachments.Add(asset.Id, model);
+                    }
+
+                    break;
+
+                case GeneratedFileAsset a:
+                    {
+                        var model = new FileModel
+                        {
+                            Id = a.Id,
+                            RelativePath = a.RelativePath,
+                            Type = AttachmentType.Generated,
+                            ContentType = a.ContentType,
+                        };
+
+                        _transaction.Store(a, a.Content.Write);
+                        _attachments.Add(asset.Id, model);
+                    }
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"Unknown asset file: \"{asset?.GetType()?.Name}\"");
+               
+            }
         }
 
-        private void RenderAttachment(AttachmentAsset asset, Stream stream)
+        private void RenderAttachment(PhysicalFileAsset asset, Stream stream)
         {
             using (var source = File.OpenRead(asset.AbsolutePath))
             {
@@ -242,18 +262,18 @@ namespace ITGlobal.MarkDocs.Impl
             }
         }
 
-        private void Process(GeneratedAsset asset, Action<Stream> write)
+        private void Process(GeneratedFileAsset asset, Action<Stream> write)
         {
-            var model = new AttachmentModel
+            var model = new FileModel
             {
                 Id = asset.Id,
-                FileName = asset.RelativePath,
+                RelativePath = asset.RelativePath,
                 Type = AttachmentType.Generated,
                 ContentType = asset.ContentType,
             };
 
             _transaction.Store(asset, write);
-            _attachments.Add(model);
+            _attachments.Add(asset.Id, model);
         }
 
         #endregion

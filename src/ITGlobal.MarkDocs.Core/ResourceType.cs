@@ -21,15 +21,15 @@ namespace ITGlobal.MarkDocs
         PagePreview,
 
         /// <summary>
-        ///     Attachment
+        ///     File
         /// </summary>
         [PublicAPI]
-        Attachment,
+        File,
 
         /// <summary>
-        ///     GeneratedAttachment
+        ///     Generated file
         /// </summary>
         [PublicAPI]
-        GeneratedAttachment
+        GeneratedFile
     }
 }

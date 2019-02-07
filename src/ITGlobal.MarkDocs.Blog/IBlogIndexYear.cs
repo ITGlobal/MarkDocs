@@ -6,36 +6,35 @@ namespace ITGlobal.MarkDocs.Blog
     /// <summary>
     ///     Blog post index (per year)
     /// </summary>
+    [PublicAPI]
     public interface IBlogIndexYear
     {
         /// <summary>
         ///     Year number
         /// </summary>
-        [PublicAPI]
         int Year { get; }
 
         /// <summary>
         ///     Gets blog post count
         /// </summary>
-        [PublicAPI]
         int Count { get; }
 
         /// <summary>
         ///     Gets a blog post index by month
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IBlogIndexMonth this[int month] { get; }
 
         /// <summary>
         ///     Gets a blog post index by month
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IReadOnlyDictionary<int, IBlogIndexMonth> Months { get; }
 
         /// <summary>
         ///     Gets a blog posts paged list
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IReadOnlyList<IBlogPost> List(int page, int pageSize = BlogEngineConstants.PageSize);
     }
 }

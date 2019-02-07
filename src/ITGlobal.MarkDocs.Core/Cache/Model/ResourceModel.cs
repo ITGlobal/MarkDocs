@@ -8,6 +8,6 @@ namespace ITGlobal.MarkDocs.Cache.Model
         public string Id { get; set; }
 
         [JsonProperty("filename")]
-        public string FileName { get; set; }
+        public string RelativePath { get; set; }
     }
 }

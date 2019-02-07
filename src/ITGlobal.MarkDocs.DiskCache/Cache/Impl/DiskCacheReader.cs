@@ -25,10 +25,10 @@ namespace ITGlobal.MarkDocs.Cache.Impl
                 case ResourceType.PagePreview:
                     dictionary = _index.PagePreviews;
                     break;
-                case ResourceType.Attachment:
+                case ResourceType.File:
                     dictionary = _index.Files;
                     break;
-                case ResourceType.GeneratedAttachment:
+                case ResourceType.GeneratedFile:
                     dictionary = _index.GeneratedFiles;
                     break;
                 default:

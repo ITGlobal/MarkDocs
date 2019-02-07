@@ -1,10 +1,10 @@
-using ITGlobal.MarkDocs.Format;
+using ITGlobal.MarkDocs.Source;
 
 namespace ITGlobal.MarkDocs.Tools.Lint
 {
     public sealed class ResourceUrlResolver : IResourceUrlResolver
     {
-        public string ResolveUrl(IResource resource, IResource relativeTo)
-            => Linter.GetRelativeResourcePath(resource, relativeTo);
+        public string ResolveUrl(IResourceUrlResolutionContext context, IResourceId resource)
+            => Linter.GetRelativeResourcePath(resource, context.Page);
     }
 }

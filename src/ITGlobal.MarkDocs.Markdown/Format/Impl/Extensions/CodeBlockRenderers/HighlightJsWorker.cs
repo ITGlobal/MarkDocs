@@ -1,14 +1,15 @@
-﻿using System;
+﻿using AngleSharp.Css.Dom;
+using AngleSharp.Css.Parser;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using AngleSharp.Css.Dom;
-using AngleSharp.Css.Parser;
-using AngleSharp.Html.Dom;
-using AngleSharp.Html.Parser;
+using System.Threading.Tasks;
 
 namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
 {
@@ -17,10 +18,13 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
         private readonly HighlightJsStylesheet _stylesheet;
         private readonly HtmlParser _htmlParser;
 
-        private readonly NpmHelper _npm;
-        private readonly NodejsHelper _nodejs;
-        private readonly ICssStyleSheet _styles;
-        private readonly string _renderJs;
+        private NpmHelper _npm;
+        private NodejsHelper _nodejs;
+        private ICssStyleSheet _styles;
+        private string _renderJs;
+
+        private readonly TaskCompletionSource<object> _initialized = new TaskCompletionSource<object>();
+        private ImmutableHashSet<string> _supportedLanguages;
 
         public HighlightJsWorker(HighlightJsOptions options, IMarkDocsLog log)
         {
@@ -32,34 +36,67 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
                 Directory.CreateDirectory(options.TempDirectory);
             }
 
-            _nodejs = new NodejsHelper(log);
-            if (!_nodejs.IsNodeInstalled)
-            {
-                throw new Exception("NodeJS executable is not found in PATH");
-            }
+            Task.Run(Initialize);
 
-            _npm = new NpmHelper(log);
-            if (!_npm.IsNpmInstalled)
-            {
-                throw new Exception("NPM executable is not found in PATH");
-            }
 
-            var listJs = DeployJs(options.TempDirectory, "hljs-list-langs.js");
-            _renderJs = DeployJs(options.TempDirectory, "hljs-render.js");
-            SupportedLanguages = ImmutableHashSet.CreateRange(_nodejs.Invoke<string[]>(listJs));
-
-            if (_stylesheet != HighlightJsStylesheet.None)
+            void Initialize()
             {
-                var css = LoadResource($"styles.{ResourceAttribute.GetId(_stylesheet)}");
-                var cssParser = new CssParser();
-                _styles = cssParser.ParseStyleSheet(css);
+                try
+                {
+                    _nodejs = new NodejsHelper(log);
+                    if (!_nodejs.IsNodeInstalled)
+                    {
+                        throw new Exception("NodeJS executable is not found in PATH");
+                    }
+
+                    _npm = new NpmHelper(log);
+                    if (!_npm.IsNpmInstalled)
+                    {
+                        throw new Exception("NPM executable is not found in PATH");
+                    }
+
+                    DeployResource(options.TempDirectory, "package.json");
+                    var listJs = DeployResource(options.TempDirectory, "hljs-list-langs.js");
+                    _renderJs = DeployResource(options.TempDirectory, "hljs-render.js");
+                    _npm.Install(options.TempDirectory);
+
+                    _supportedLanguages = ImmutableHashSet.CreateRange(_nodejs.Invoke<string[]>(listJs));
+                    if (_supportedLanguages.Contains("cs"))
+                    {
+                        _supportedLanguages = _supportedLanguages.Add("csharp");
+                    }
+
+                    if (_stylesheet != HighlightJsStylesheet.None)
+                    {
+                        var css = LoadResource($"styles.{ResourceAttribute.GetId(_stylesheet)}");
+                        var cssParser = new CssParser();
+                        _styles = cssParser.ParseStyleSheet(css);
+                    }
+
+                    _initialized.TrySetResult(null);
+                }
+                catch (Exception e)
+                {
+                    log.Error(e, "Unable to initiaize hljs");
+                    _initialized.TrySetException(e);
+                    throw;
+                }
             }
         }
 
-        public ImmutableHashSet<string> SupportedLanguages { get; }
+        public ImmutableHashSet<string> SupportedLanguages
+        {
+            get
+            {
+                _initialized.Task.GetAwaiter().GetResult();
+                return _supportedLanguages;
+            }
+        }
 
         public string Render(string language, string sourceCode)
         {
+            _initialized.Task.GetAwaiter().GetResult();
+
             var html = _nodejs.Invoke<string>(_renderJs, new { language, sourceCode });
 
             if (_stylesheet != HighlightJsStylesheet.None)
@@ -92,36 +129,14 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
             }
         }
 
-        private string DeployJs(string tempDirectory, string name)
+        private string DeployResource(string tempDirectory, string name)
         {
             var dir = Path.Combine(tempDirectory);
-            if (!Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-
-            var packageJson = Path.Combine(dir, "package.json");
-            if (!File.Exists(packageJson))
-            {
-                const string packageJsonContent = @"{
-  ""name"": ""ServerHighlightJsSyntaxColorizer"",
-  ""version"": ""1.0.0"",
-  ""description"": ""none"",
-  ""dependencies"": {
-    ""highlightjs"": ""^ 9.10.0""
-  },
-  ""author"": """",
-  ""repository"": ""none"",
-  ""license"": ""MIT""
-}";
-                File.WriteAllText(packageJson, packageJsonContent, Encoding.UTF8);
-            }
+            Directory.CreateDirectory(dir);
 
             var filename = Path.Combine(dir, name);
             var source = LoadResource(name);
             File.WriteAllText(filename, source, Encoding.UTF8);
-
-            _npm.Install(dir);
 
             return filename;
         }

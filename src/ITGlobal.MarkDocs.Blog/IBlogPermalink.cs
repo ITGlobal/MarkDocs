@@ -5,12 +5,13 @@ namespace ITGlobal.MarkDocs.Blog
     /// <summary>
     ///     Blog permalink
     /// </summary>
+    [PublicAPI]
     public interface IBlogPermalink : IBlogResource
     {
         /// <summary>
         ///     Blog post reference
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IBlogPost Post { get; }
     }
 }

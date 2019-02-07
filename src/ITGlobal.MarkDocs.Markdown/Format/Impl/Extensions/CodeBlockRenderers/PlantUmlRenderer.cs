@@ -1,4 +1,4 @@
-using Markdig.Renderers;
+using ITGlobal.MarkDocs.Source;
 using Markdig.Syntax;
 
 namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
@@ -7,29 +7,17 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
     {
         public const string Language = "plantuml";
 
-        public bool CanRender(IPageRenderContext ctx, FencedCodeBlock block)
-            => MarkdownRenderingContext.IsPresent && block.Info == Language;
+        public bool CanRender(IPageReadContext ctx, FencedCodeBlock block)
+            => block.Info == Language;
 
-        public void Render(IPageRenderContext ctx, HtmlRenderer renderer, FencedCodeBlock block)
+        public IRenderable CreateRenderable(IPageReadContext ctx, FencedCodeBlock block)
         {
-            if (!MarkdownRenderingContext.IsPresent)
-            {
-                return;
-            }
-
             var markup = block.GetText();
-            var context = MarkdownRenderingContext.RenderContext;
-            var result = context.CreateAttachment(markup, GenerateContent(markup, block.Line));
-            var resourceUrl = MarkdownRenderingContext.ResourceUrlResolver.ResolveUrl(context, result.Asset);
+            ctx.CreateAttachment(markup, GenerateContent(markup, block.Line), out var asset, out var url);
 
-            renderer.Write("<img src=\"");
-            renderer.WriteEscapeUrl(resourceUrl);
-            renderer.Write("\"");
-            renderer.WriteAttributes(block);
-            renderer.Write(" alt=\"\"");
-            renderer.Write(" />");
+            return new PlantUmlRenderable(block, asset, url);
         }
 
-        protected abstract IGeneratedAssetContent GenerateContent(string source, int? lineNumber);
+        internal abstract IGeneratedAssetContent GenerateContent(string source, int? lineNumber);
     }
 }

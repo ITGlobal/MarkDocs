@@ -2,7 +2,6 @@
 using ITGlobal.MarkDocs.Cache.Model;
 using ITGlobal.MarkDocs.Source;
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace ITGlobal.MarkDocs.Impl
@@ -17,6 +16,7 @@ namespace ITGlobal.MarkDocs.Impl
             _cache = cache;
             Documentation = documentation;
             _model = model;
+            Anchors = new PageAnchors(model.Anchors);
 
             if (model.Preview != null)
             {
@@ -41,17 +41,17 @@ namespace ITGlobal.MarkDocs.Impl
             => new Page(cache, documentation, model, null);
 
         public IDocumentation Documentation { get; }
+        public PageAnchors Anchors { get; }
         public IPage[] NestedPages { get; }
         public IPage Parent { get; }
         public IPagePreview Preview { get; }
 
         public string Id => _model.Id;
-        public string FileName => _model.FileName;
+        public string RelativePath => _model.RelativePath;
         public ResourceType Type => ResourceType.Page;
         public string Title => _model.Title;
         public string Description => _model.Description;
         public PageMetadata Metadata => _model.Metadata;
-        public IReadOnlyDictionary<string, string> Anchors { get; }//todo
 
         public Stream OpenRead() => _cache.Read(this);
     }

@@ -5,30 +5,31 @@ namespace ITGlobal.MarkDocs.Blog
     /// <summary>
     ///     Git source options
     /// </summary>
+    [PublicAPI]
     public sealed class GitOptions
     {
         /// <summary>
         ///     Defines fetch URL
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         public string FetchUrl { get; set; }
 
         /// <summary>
         ///     A username for fetch URL
         /// </summary>
-        [PublicAPI, CanBeNull]
+        [CanBeNull]
         public string UserName { get; set; }
 
         /// <summary>
         ///     A password for fetch UTL
         /// </summary>
-        [PublicAPI, CanBeNull]
+        [CanBeNull]
         public string Password { get; set; }
 
         /// <summary>
         ///     Defines source branch (default is "master")
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         public string Branch { get; set; } = "master";
     }
 }

@@ -1,6 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using ITGlobal.MarkDocs.Source;
+using JetBrains.Annotations;
 using System.Collections.Generic;
-using ITGlobal.MarkDocs.Source;
 
 namespace ITGlobal.MarkDocs
 {
@@ -13,44 +13,44 @@ namespace ITGlobal.MarkDocs
         /// <summary>
         ///     Documentation service
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IMarkDocService Service { get; }
 
         /// <summary>
         ///     Documentation ID
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         string Id { get; }
 
         /// <summary>
         ///     Documentation title
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         string Title { get; }
 
         /// <summary>
         ///     Documentation version
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         ISourceInfo SourceInfo { get; }
 
         /// <summary>
         ///     Root page
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IPage RootPage { get; }
 
         /// <summary>
         ///     Provides errors and warning for documentation
         /// </summary>
-        [PublicAPI]
+        [NotNull]
         ICompilationReport CompilationReport { get; }
 
         /// <summary>
         ///     Documentation attached files
         /// </summary>
-        [PublicAPI, NotNull]
-        IReadOnlyList<IAttachment> Attachments { get; }
+        [NotNull]
+        IReadOnlyList<IFileResource> Files { get; }
 
         /// <summary>
         ///     Gets a documentation page by its ID
@@ -61,19 +61,19 @@ namespace ITGlobal.MarkDocs
         /// <returns>
         ///     A documentation page or null if page doesn't exist
         /// </returns>
-        [PublicAPI, CanBeNull]
+        [CanBeNull]
         IPage GetPage([NotNull] string id);
 
         /// <summary>
         ///     Gets an attachment by its ID
         /// </summary>
         /// <param name="id">
-        ///     Attachment path
+        ///     FileResource path
         /// </param>
         /// <returns>
         ///     An attachment or null if it doesn't exist
         /// </returns>
-        [PublicAPI, CanBeNull]
-        IAttachment GetAttachment([NotNull] string id);
+        [CanBeNull]
+        IFileResource GetAttachment([NotNull] string id);
     }
 }

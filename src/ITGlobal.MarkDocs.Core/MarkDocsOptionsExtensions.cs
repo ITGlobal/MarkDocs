@@ -1,4 +1,5 @@
 ﻿using ITGlobal.MarkDocs.Impl;
+using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +11,30 @@ namespace ITGlobal.MarkDocs
     [PublicAPI]
     public static class MarkDocsOptionsExtensions
     {
+        #region ResourceUrlResolver
+        
+        /// <summary>
+        ///     Sets resource URL resolver implementation
+        /// </summary>
+        [NotNull]
+        public static MarkDocsOptions UseResourceUrlResolver([NotNull] this MarkDocsOptions options, [NotNull] IResourceUrlResolver resolver)
+            => options.UseResourceUrlResolver(_ => resolver);
+
+        /// <summary>
+        ///     Sets resource URL resolver implementation
+        /// </summary>
+        [NotNull]
+        public static MarkDocsOptions UseResourceUrlResolver<T>([NotNull] this MarkDocsOptions options)
+            where T : class, IResourceUrlResolver
+        {
+            options.ConfigureServices(_ => _.AddSingleton<T>());
+            return options.UseResourceUrlResolver(_ => _.GetRequiredService<T>());
+        }
+
+        #endregion
+
+        #region Callback
+
         /// <summary>
         ///     Sets a lifetime event callback
         /// </summary>
@@ -29,6 +54,10 @@ namespace ITGlobal.MarkDocs
             options.ConfigureServices(_ => _.AddSingleton<T>());
             return options.UseCallback(_ => _.GetRequiredService<T>());
         }
+
+        #endregion
+
+        #region Logger
 
         /// <summary>
         ///     Sets a logger implementation
@@ -58,5 +87,7 @@ namespace ITGlobal.MarkDocs
         {
             return options.UseLog<AspNetMarkDocsLog>();
         }
+
+        #endregion
     }
 }

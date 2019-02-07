@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Source
 {
@@ -20,9 +19,6 @@ namespace ITGlobal.MarkDocs.Source
         /// <param name="report">
         ///     Compilation report builder
         /// </param>
-        /// <param name="consumedFiles">
-        ///     Consumed content files
-        /// </param>
         /// <param name="isIndexFile">
         ///     true is <paramref name="filename"/> is an index page file.
         /// </param>
@@ -34,7 +30,6 @@ namespace ITGlobal.MarkDocs.Source
             [NotNull] ISourceTreeRoot sourceTreeRoot,
             [NotNull] string filename,
             [NotNull] ICompilationReportBuilder report,
-            [NotNull] HashSet<string> consumedFiles,
             bool isIndexFile
         );
     }

@@ -20,7 +20,7 @@ namespace ITGlobal.MarkDocs.Impl
 
         public string Id => _model.Id;
         public IDocumentation Documentation { get; }
-        public string FileName => _model.FileName;
+        public string RelativePath => _model.RelativePath;
         public ResourceType Type => ResourceType.Page;
         public IPage Page { get; }
 

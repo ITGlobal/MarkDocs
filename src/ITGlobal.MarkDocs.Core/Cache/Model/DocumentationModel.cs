@@ -13,8 +13,8 @@ namespace ITGlobal.MarkDocs.Cache.Model
         [JsonProperty("root_page")]
         public PageModel RootPage { get; set; }
 
-        [JsonProperty("attachments")]
-        public AttachmentModel[] Attachments { get; set; }
+        [JsonProperty("files")]
+        public FileModel[] Files { get; set; }
 
         [JsonProperty("info")]
         public SourceInfoModel Info { get; set; }

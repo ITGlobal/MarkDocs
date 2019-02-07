@@ -13,17 +13,19 @@ namespace ITGlobal.MarkDocs.Source
 
         public AssetTree(
             [NotNull] string id,
+            [NotNull] string rootDirectory,
             [NotNull] ISourceInfo sourceInfo,
             [NotNull] PageAsset rootPage,
-            [NotNull] AttachmentAsset[] attachments)
+            [NotNull] FileAsset[] files)
         {
             Id = id;
+            RootDirectory = rootDirectory;
             SourceInfo = sourceInfo;
             RootPage = rootPage;
-            Attachments = attachments;
+            Files = files;
 
             Walk(rootPage);
-            foreach (var a in attachments)
+            foreach (var a in files)
             {
                 _assetsById[a.Id] = a;
             }
@@ -51,13 +53,16 @@ namespace ITGlobal.MarkDocs.Source
         public string Id { get; }
 
         [NotNull]
+        public string RootDirectory { get; }
+
+        [NotNull]
         public ISourceInfo SourceInfo { get; }
 
         [NotNull]
         public PageAsset RootPage { get; }
 
         [NotNull]
-        public AttachmentAsset[] Attachments { get; }
+        public FileAsset[] Files { get; }
 
         [CanBeNull]
         public Asset TryGetAsset([NotNull] string id)

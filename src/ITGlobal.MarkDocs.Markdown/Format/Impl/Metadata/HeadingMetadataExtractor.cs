@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using ITGlobal.MarkDocs.Format.Impl.Extensions.CustomHeading;
 using ITGlobal.MarkDocs.Source;
 using Markdig.Syntax;
 
@@ -7,7 +6,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Metadata
 {
     internal sealed class HeadingMetadataExtractor : IMetadataExtractor
     {
-        public PageMetadata Extract(IReadPageContext ctx, MarkdownDocument document)
+        public PageMetadata Extract(IPageReadContext ctx, MarkdownDocument document)
         {
             HeadingBlock header = null;
             string title = null;
@@ -24,7 +23,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Metadata
             var properties = PageMetadata.Empty;
             if (header != null)
             {
-                CustomHeadingRenderer.DontRender(header);
+                header.SetNoRender();
                 properties = properties.WithTitle(title);
             }
 
