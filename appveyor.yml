@@ -5,8 +5,6 @@ image: Visual Studio 2017
 configuration: Release
 build:
   verbosity: minimal
-cache: 
-- 'C:\projects\MarkDocs\scripts\tools'
 build_script:
 - ps: '& ./build.ps1'
 test: 'off'

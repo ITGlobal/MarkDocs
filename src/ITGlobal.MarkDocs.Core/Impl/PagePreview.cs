@@ -7,7 +7,6 @@ namespace ITGlobal.MarkDocs.Impl
     internal sealed class PagePreview : IPagePreview
     {
         private readonly ICacheReader _cache;
-        private readonly IDocumentation _documentation;
         private readonly PagePreviewModel _model;
 
         public PagePreview(ICacheReader cache, IDocumentation documentation, PagePreviewModel model, IPage page)

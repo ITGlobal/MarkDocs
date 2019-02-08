@@ -26,7 +26,6 @@ namespace ITGlobal.MarkDocs.Impl
         private readonly DocumentationModel _model;
 
         private readonly ImmutableDictionary<string, IPage> _pages;
-        private readonly List<IFileResource> _attachments;
         private readonly ImmutableDictionary<string, IFileResource> _attachmentsById;
 
         #endregion
