@@ -106,11 +106,6 @@ namespace ITGlobal.MarkDocs.Blog.Impl
                 isIndexFile: isIndexFile
             );
 
-            if (string.IsNullOrEmpty(metadata.Title))
-            {
-                Report.Warning(filename, "No page title found");
-            }
-
             return metadata;
         }
 

@@ -318,6 +318,8 @@ namespace ITGlobal.MarkDocs.Source
             return value;
         }
 
+        public override string ToString() => JsonConvert.SerializeObject(this, Formatting.Indented);
+
         #endregion
     }
 }

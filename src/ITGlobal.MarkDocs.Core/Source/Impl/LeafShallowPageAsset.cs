@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using ITGlobal.MarkDocs.Format;
 
 namespace ITGlobal.MarkDocs.Source.Impl
 {
@@ -13,19 +13,14 @@ namespace ITGlobal.MarkDocs.Source.Impl
             : base(id, relativePath, absolutePath, contentHash)
         {
         }
-
-        public override PageAsset ReadAsset(IShallowPageAssetReader worker)
+        
+        public override void ForEach(Action<ShallowPageAsset> action)
         {
-            var metadata = worker.GetMetadata(AbsolutePath, false);
-            if (string.IsNullOrEmpty(metadata.Title))
-            {
-                metadata = metadata.WithTitle(Path.GetFileNameWithoutExtension(AbsolutePath));
-            }
+            action(this);
+        }
 
-            var ctx = new PageReadContext(worker, this);
-            var (content, pageMetadata) = worker.Format.Read(ctx, AbsolutePath);
-            metadata = metadata.MergeWith(pageMetadata);
-
+        protected override PageAsset CreateAsset(IShallowPageAssetReader worker, IPageContent content, PageMetadata metadata)
+        {
             return new LeafPageAsset(
                 id: Id,
                 relativePath: RelativePath,
@@ -34,11 +29,6 @@ namespace ITGlobal.MarkDocs.Source.Impl
                 content: content,
                 metadata: metadata
             );
-        }
-
-        public override void ForEach(Action<ShallowPageAsset> action)
-        {
-            action(this);
         }
     }
 }

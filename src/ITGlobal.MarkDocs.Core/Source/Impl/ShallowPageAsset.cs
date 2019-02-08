@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ITGlobal.MarkDocs.Format;
+using System;
+using System.IO;
 
 namespace ITGlobal.MarkDocs.Source.Impl
 {
@@ -22,7 +24,28 @@ namespace ITGlobal.MarkDocs.Source.Impl
         public string AbsolutePath { get; }
         public string ContentHash { get; }
 
-        public abstract PageAsset ReadAsset(IShallowPageAssetReader worker);
+        public PageAsset ReadAsset(IShallowPageAssetReader worker)
+        {
+            var metadata = worker.GetMetadata(AbsolutePath, false);
+
+            var ctx = new PageReadContext(worker, this);
+            var (content, pageMetadata) = worker.Format.Read(ctx, AbsolutePath);
+            metadata = metadata.MergeWith(pageMetadata);
+
+            if (string.IsNullOrEmpty(metadata.Title))
+            {
+                worker.Report.Warning(RelativePath, "No page title found");
+                metadata = metadata.WithTitle(
+                    Path.GetFileNameWithoutExtension(Path.GetDirectoryName(AbsolutePath))
+                );
+            }
+
+            var asset = CreateAsset(worker, content, metadata);
+            return asset;
+        }
+
         public abstract void ForEach(Action<ShallowPageAsset> action);
+
+        protected abstract PageAsset CreateAsset(IShallowPageAssetReader worker, IPageContent content, PageMetadata metadata);
     }
 }

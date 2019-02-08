@@ -1,6 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
+using ITGlobal.MarkDocs.Format;
 
 namespace ITGlobal.MarkDocs.Source.Impl
 {
@@ -18,22 +18,18 @@ namespace ITGlobal.MarkDocs.Source.Impl
         }
 
         public ShallowPageAsset[] Subpages { get; }
-
-        public override PageAsset ReadAsset(IShallowPageAssetReader worker)
+        
+        public override void ForEach(Action<ShallowPageAsset> action)
         {
-            var metadata = worker.GetMetadata(AbsolutePath, true);
-            metadata = metadata ?? PageMetadata.Empty;
-            if (string.IsNullOrEmpty(metadata.Title))
+            action(this);
+            foreach (var subpage in Subpages)
             {
-                metadata = metadata.WithTitle(
-                    Path.GetFileNameWithoutExtension(Path.GetDirectoryName(AbsolutePath))
-                );
+                subpage.ForEach(action);
             }
+        }
 
-            var ctx = new PageReadContext(worker, this);
-            var (content, pageMetadata) = worker.Format.Read(ctx, AbsolutePath);
-            metadata = metadata.MergeWith(pageMetadata);
-
+        protected override PageAsset CreateAsset(IShallowPageAssetReader worker, IPageContent content, PageMetadata metadata)
+        {
             return new BranchPageAsset(
                 id: Id,
                 relativePath: RelativePath,
@@ -43,15 +39,6 @@ namespace ITGlobal.MarkDocs.Source.Impl
                 metadata: metadata,
                 subpages: Subpages.Select(p => p.ReadAsset(worker)).ToArray()
             );
-        }
-
-        public override void ForEach(Action<ShallowPageAsset> action)
-        {
-            action(this);
-            foreach (var subpage in Subpages)
-            {
-                subpage.ForEach(action);
-            }
         }
     }
 }

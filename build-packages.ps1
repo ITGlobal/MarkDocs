@@ -11,7 +11,7 @@ Get-ChildItem -Filter *.csproj -Path "./src" -Recurse -File | % {
         return
     }
 
-    & dotnet pack --output $ARTIFACTS -v q /nologo /p:Version=$VERSION /p:Configuration=$CONFIGURATION $_.FullName
+    & dotnet pack --output $ARTIFACTS --no-restore -v q /nologo /p:Version=$VERSION /p:Configuration=$CONFIGURATION $_.FullName
     if ($LASTEXITCODE -ne 0) {
         Write-Host "'dotnet pack' exited with $LASTEXITCODE"
         exit 1

@@ -3,9 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2E2F3543-25DB-43BD-A8A9-9691F4D6B957}"
-	ProjectSection(SolutionItems) = preProject
-		src\common.props = src\common.props
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{82B0859E-A87A-46BA-9054-B5BC558C423B}"
 EndProject
@@ -25,13 +22,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ITGlobal.MarkDocs.Search", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "markdocs", "src\markdocs\markdocs.csproj", "{11B24E18-8606-4DDC-B865-9D159D77EF40}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITGlobal.MarkDocs.Blog", "src\ITGlobal.MarkDocs.Blog\ITGlobal.MarkDocs.Blog.csproj", "{F18927A4-A828-4A48-81CE-BBAA77D421B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ITGlobal.MarkDocs.Blog", "src\ITGlobal.MarkDocs.Blog\ITGlobal.MarkDocs.Blog.csproj", "{F18927A4-A828-4A48-81CE-BBAA77D421B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITGlobal.MarkDocs.Blog.Example", "samples\ITGlobal.MarkDocs.Blog.Example\ITGlobal.MarkDocs.Blog.Example.csproj", "{146F27F4-8407-4489-AD27-B498173265C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ITGlobal.MarkDocs.Blog.Example", "samples\ITGlobal.MarkDocs.Blog.Example\ITGlobal.MarkDocs.Blog.Example.csproj", "{146F27F4-8407-4489-AD27-B498173265C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITGlobal.MarkDocs.DirectorySource", "src\ITGlobal.MarkDocs.DirectorySource\ITGlobal.MarkDocs.DirectorySource.csproj", "{7EEB65A5-21F7-411F-B9FB-E76CE5A65240}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ITGlobal.MarkDocs.DirectorySource", "src\ITGlobal.MarkDocs.DirectorySource\ITGlobal.MarkDocs.DirectorySource.csproj", "{7EEB65A5-21F7-411F-B9FB-E76CE5A65240}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITGlobal.MarkDocs.DiskCache", "src\ITGlobal.MarkDocs.DiskCache\ITGlobal.MarkDocs.DiskCache.csproj", "{82D5BABB-9BE6-4BE7-83BC-B8A84F9B7A7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ITGlobal.MarkDocs.DiskCache", "src\ITGlobal.MarkDocs.DiskCache\ITGlobal.MarkDocs.DiskCache.csproj", "{82D5BABB-9BE6-4BE7-83BC-B8A84F9B7A7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

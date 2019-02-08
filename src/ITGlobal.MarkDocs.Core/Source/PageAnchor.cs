@@ -23,6 +23,8 @@ namespace ITGlobal.MarkDocs.Source
         [NotNull]
         public PageAnchor[] Nested { get; }
 
+        public override string ToString() => $"{Title} {{#{Id}}}";
+
         [NotNull]
         internal PageAnchorModel ToModel()
         {

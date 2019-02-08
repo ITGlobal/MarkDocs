@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using ITGlobal.MarkDocs.Source;
+﻿using ITGlobal.MarkDocs.Source;
 using Markdig.Renderers.Html;
 using Markdig.Syntax;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace ITGlobal.MarkDocs.Format.Impl.Metadata
 {
@@ -10,25 +11,27 @@ namespace ITGlobal.MarkDocs.Format.Impl.Metadata
     {
         public static PageAnchor[] Read(MarkdownDocument document)
         {
-            var headings = document.OfType<HeadingBlock>().ToArray();
+            var headings = document.Descendants<HeadingBlock>().ToArray();
 
             var tree = GenerateTocTree(headings);
             return tree.ToPageAnchor().Nested;
         }
 
-        private sealed class TocTreeNode 
+        private sealed class TocTreeNode
         {
             private readonly List<TocTreeNode> _children = new List<TocTreeNode>();
 
             private TocTreeNode(HeadingBlock heading)
             {
-                Heading = heading;
+                Id = heading?.GetAttributes().Id ?? "";
+                Title = heading?.Inline.GetText() ?? "";
                 Level = heading?.Level ?? 0;
             }
 
-            private HeadingBlock Heading { get; }
+            private string Id { get; }
+            private string Title { get; }
             public int Level { get; }
-            
+
             public TocTreeNode AppendChild(HeadingBlock heading)
             {
                 var child = new TocTreeNode(heading);
@@ -41,10 +44,35 @@ namespace ITGlobal.MarkDocs.Format.Impl.Metadata
             public PageAnchor ToPageAnchor()
             {
                 return new PageAnchor(
-                    id: Heading?.GetAttributes().Id ?? "",
-                    title: Heading?.Inline.GetText() ?? "",
+                    id: Id,
+                    title: Title,
                     nested: _children.Count > 0 ? _children.Select(_ => _.ToPageAnchor()).ToArray() : null
                 );
+            }
+
+            public override string ToString()
+            {
+                var sb = new StringBuilder();
+                Print(sb);
+                return sb.ToString();
+            }
+
+            private void Print(StringBuilder sb)
+            {
+                for (var i = 0; i < Level; i++)
+                {
+                    sb.Append("    ");
+                }
+
+                sb.Append("\"");
+                sb.Append(Title);
+                sb.Append("\" {#");
+                sb.Append(Id);
+                sb.AppendLine("}");
+                foreach (var c in _children)
+                {
+                    c.Print(sb);
+                }
             }
         }
 

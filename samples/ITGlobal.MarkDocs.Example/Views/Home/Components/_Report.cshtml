@@ -9,12 +9,13 @@
                 @foreach (var m in msgs)
                 {
                     var className = m.Type == CompilationReportMessageType.Error ? "text-danger" : "text-warning";
+                    var typeName = m.Type == CompilationReportMessageType.Error ? "ERROR" : "WARNING";
                     <li class="@className">
                         @if (m.LineNumber != null)
                         {
                             <text>(at @m.LineNumber.Value)</text>
                         }
-                        @m.Message
+                        <strong>@typeName:</strong> @m.Message
                     </li>
                 }
             </ul>

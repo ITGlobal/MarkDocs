@@ -435,7 +435,7 @@ namespace ITGlobal.MarkDocs.Format.Impl
             {
                 var text = link.GetText();
                 ctx.Warning(
-                    $"Link [{text}]({url}#{hash}) can be replaced with {text}](#{hash})",
+                    $"Link [{text}]({url}#{hash}) can be replaced with [{text}](#{hash})",
                     link.Line
                 );
             }

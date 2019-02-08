@@ -17,6 +17,7 @@ namespace ITGlobal.MarkDocs.Impl
             Documentation = documentation;
             _model = model;
             Anchors = new PageAnchors(model.Anchors);
+            Parent = parent;
 
             if (model.Preview != null)
             {
