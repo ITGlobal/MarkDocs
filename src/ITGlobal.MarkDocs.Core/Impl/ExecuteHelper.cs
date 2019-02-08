@@ -168,7 +168,7 @@ namespace ITGlobal.MarkDocs.Impl
                     _output.Add(new OutputLine(OutputStream.Stderr, line));
                 }
 
-                _log.Warning($"{_programName}: > {line}");
+                _log.Debug($"{_programName}: > {line}");
             }
         }
     }

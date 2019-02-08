@@ -180,7 +180,11 @@ namespace ITGlobal.MarkDocs.Source.Impl
                         var id = GitSourceTree.NormalizeId(remote.Name);
                         if (!contentDescriptor.Items.TryGetValue(id, out var item))
                         {
-                            item = new ContentDescriptorItem { Path = Guid.NewGuid().ToString("N") };
+                            item = new ContentDescriptorItem
+                            {
+                                Name = remote.Name,
+                                Path = Guid.NewGuid().ToString("N")
+                            };
                         }
 
                         sourceTree = new GitSourceTree(
@@ -214,7 +218,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
                     }
 
                     // Delete all other directories
-                    CleanOldWorkingCopies(oldState);
+                    CleanOldWorkingCopies(newState);
 
                     NotifyChanged();
                 }
