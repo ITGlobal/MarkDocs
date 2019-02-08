@@ -4,6 +4,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
 {
     internal interface IShallowPageAssetReader
     {
+        IMarkDocsLog Log { get; }
         IFormat Format { get; }
         ISourceTreeRoot Root { get; }
         ICompilationReportBuilder Report { get; }

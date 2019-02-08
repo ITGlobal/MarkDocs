@@ -11,6 +11,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
         private readonly IContentTypeProvider _contentTypeProvider;
         private readonly IContentMetadataProvider _contentMetadataProvider;
         private readonly IResourceUrlResolver _resourceUrlResolver;
+        private readonly IMarkDocsLog _log;
         private readonly string[] _includeFiles;
         private readonly string[] _indexFileNames;
 
@@ -19,13 +20,15 @@ namespace ITGlobal.MarkDocs.Source.Impl
             IContentHashProvider contentHashProvider,
             IContentTypeProvider contentTypeProvider,
             IContentMetadataProvider contentMetadataProvider,
-            IResourceUrlResolver resourceUrlResolver)
+            IResourceUrlResolver resourceUrlResolver,
+            IMarkDocsLog log)
         {
             _format = format;
             _contentHashProvider = contentHashProvider;
             _contentTypeProvider = contentTypeProvider;
             _contentMetadataProvider = contentMetadataProvider;
             _resourceUrlResolver = resourceUrlResolver;
+            _log = log;
 
             _includeFiles = format.FileFilters;
             _indexFileNames = format.IndexFileNames;
@@ -46,7 +49,8 @@ namespace ITGlobal.MarkDocs.Source.Impl
                 indexFileNames: _indexFileNames,
                 ignorePatterns: sourceTreeProvider.IgnorePatterns ?? Array.Empty<string>(),
                 root: sourceTreeRoot,
-                report: report
+                report: report,
+                log: _log
             );
 
             var tree = worker.ReadAssetTree();

@@ -16,7 +16,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
             var normalizedPath = p.Length > 0
                 ? Path.Combine(rootDirectory, p)
                 : rootDirectory;
-            normalizedPath = Path.GetFullPath(normalizedPath);
+            normalizedPath = NormalizePath(normalizedPath);
             return normalizedPath;
         }
 
@@ -24,8 +24,8 @@ namespace ITGlobal.MarkDocs.Source.Impl
         {
             try
             {
-                var normalizedRootPath = Path.GetFullPath(rootDirectory);
-                var normalizedPath = GetAbsolutePath(rootDirectory, path);
+                var normalizedRootPath = NormalizePath(rootDirectory);
+                var normalizedPath = NormalizePath(path);
 
                 if (!normalizedPath.StartsWith(normalizedRootPath))
                 {
@@ -33,8 +33,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
                 }
 
                 var relativePath = normalizedPath.Substring(normalizedRootPath.Length);
-                relativePath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
-                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, '/');
+                relativePath = NormalizePath(relativePath);
                 while (relativePath.Length > 0 && relativePath[0] == '/')
                 {
                     relativePath = relativePath.Substring(1);
@@ -46,6 +45,18 @@ namespace ITGlobal.MarkDocs.Source.Impl
             {
                 throw new InvalidOperationException($"GetRelativePath(\"{rootDirectory}\", \"{path}\") failed", e);
             }
+        }
+
+        private static string NormalizePath(string path)
+        {
+            path= path.Replace(Path.DirectorySeparatorChar, '/');
+            path = path.Replace(Path.AltDirectorySeparatorChar, '/');
+            while (path.Length > 1 && path[path.Length-1] == '/')
+            {
+                path = path.Substring(0, path.Length-1);
+            }
+
+            return path;
         }
     }
 }

@@ -98,7 +98,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Metadata
                 if (relativeDepth < 0)
                 {
                     // End of nested headings
-                    while (relativeDepth < 0)
+                    while (roots.Count > 0&& relativeDepth < 0)
                     {
                         currentRoot = roots.Pop();
                         relativeDepth = heading.Level - (currentRoot.Level + 1);

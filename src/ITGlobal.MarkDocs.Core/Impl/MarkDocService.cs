@@ -184,6 +184,7 @@ namespace ITGlobal.MarkDocs.Impl
             var reportBuilder = new CompilationReportBuilder();
             var tree = sourceTree.ReadAssetTree(reportBuilder);
 
+            _log.Debug($"Processing assets from \"{sourceTree.Id}\"");
             using (var transaction = _cache.BeginTransaction(sourceTree, tree.SourceInfo, forceCacheClear))
             {
                 var compiler = new DocumentationCompiler(transaction, reportBuilder);

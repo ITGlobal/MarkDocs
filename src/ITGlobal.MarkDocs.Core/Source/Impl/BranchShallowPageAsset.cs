@@ -37,7 +37,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
                 contentHash: ContentHash,
                 content: content,
                 metadata: metadata,
-                subpages: Subpages.Select(p => p.ReadAsset(worker)).ToArray()
+                subpages: Subpages.Select(p => p.ReadAsset(worker)).Where(_ => _ != null).ToArray()
             );
         }
     }

@@ -26,22 +26,30 @@ namespace ITGlobal.MarkDocs.Source.Impl
 
         public PageAsset ReadAsset(IShallowPageAssetReader worker)
         {
-            var metadata = worker.GetMetadata(AbsolutePath, false);
-
-            var ctx = new PageReadContext(worker, this);
-            var (content, pageMetadata) = worker.Format.Read(ctx, AbsolutePath);
-            metadata = metadata.MergeWith(pageMetadata);
-
-            if (string.IsNullOrEmpty(metadata.Title))
+            try
             {
-                worker.Report.Warning(RelativePath, "No page title found");
-                metadata = metadata.WithTitle(
-                    Path.GetFileNameWithoutExtension(Path.GetDirectoryName(AbsolutePath))
-                );
-            }
+                var metadata = worker.GetMetadata(AbsolutePath, false);
 
-            var asset = CreateAsset(worker, content, metadata);
-            return asset;
+                var ctx = new PageReadContext(worker, this);
+                var (content, pageMetadata) = worker.Format.Read(ctx, AbsolutePath);
+                metadata = metadata.MergeWith(pageMetadata);
+
+                if (string.IsNullOrEmpty(metadata.Title))
+                {
+                    worker.Report.Warning(RelativePath, "No page title found");
+                    metadata = metadata.WithTitle(
+                        Path.GetFileNameWithoutExtension(Path.GetDirectoryName(AbsolutePath))
+                    );
+                }
+
+                var asset = CreateAsset(worker, content, metadata);
+                return asset;
+            }
+            catch (Exception e)
+            {
+                worker.Log.Error(e, $"Failed to read asset \"{AbsolutePath}\": {e.Message}");
+                return null;
+            }
         }
 
         public abstract void ForEach(Action<ShallowPageAsset> action);

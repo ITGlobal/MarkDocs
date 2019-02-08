@@ -38,7 +38,8 @@ namespace ITGlobal.MarkDocs.Blog.Impl
             string[] includeFiles,
             string[] ignorePatterns,
             ISourceTreeRoot root,
-            ICompilationReportBuilder report)
+            ICompilationReportBuilder report,
+            IMarkDocsLog log)
         {
             Format = format;
 
@@ -52,6 +53,7 @@ namespace ITGlobal.MarkDocs.Blog.Impl
 
             Root = root;
             Report = report;
+            Log = log;
         }
 
         #endregion
@@ -59,7 +61,7 @@ namespace ITGlobal.MarkDocs.Blog.Impl
         #region metadata
 
         public ISourceTreeRoot Root { get; }
-
+        public IMarkDocsLog Log { get; }
         public string RootDirectory => Root.RootDirectory;
         public IFormat Format { get; }
         public ICompilationReportBuilder Report { get; }
@@ -71,8 +73,10 @@ namespace ITGlobal.MarkDocs.Blog.Impl
 
         public AssetTree ReadAssetTree()
         {
+            Log.Debug($"Scanning directory \"{RootDirectory}\"...");
             var shallowAssets = ScanDirectoryFiles(RootDirectory).Select(LeafPage).ToList();
 
+            Log.Debug($"Reading assets from \"{RootDirectory}\"...");
             var pages = shallowAssets.Select(asset => asset.ReadAsset(this)).Where(_ => _ != null).ToArray();
 
             // Make a list of referenced files

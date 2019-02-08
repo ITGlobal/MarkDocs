@@ -38,7 +38,8 @@ namespace ITGlobal.MarkDocs.Source.Impl
             string[] indexFileNames,
             string[] ignorePatterns,
             ISourceTreeRoot root,
-            ICompilationReportBuilder report)
+            ICompilationReportBuilder report,
+            IMarkDocsLog log)
         {
             Format = format;
 
@@ -50,6 +51,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
             _includeFiles = includeFiles;
             _indexFileNames = indexFileNames;
             _ignorePatterns = ignorePatterns;
+            Log = log;
 
             Root = root;
             Report = report;
@@ -61,6 +63,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
 
         public ISourceTreeRoot Root { get; }
         public string RootDirectory => Root.RootDirectory;
+        public IMarkDocsLog Log { get; }
         public IFormat Format { get; }
         public ICompilationReportBuilder Report { get; }
         public IResourceUrlResolver ResourceUrlResolver { get; }
@@ -72,10 +75,12 @@ namespace ITGlobal.MarkDocs.Source.Impl
         public AssetTree ReadAssetTree()
         {
             // Scan directory tree and collect "shallow" assets
+            Log.Debug($"Scanning directory \"{RootDirectory}\"...");
             var rootAsset = BranchPage(RootDirectory);
             rootAsset.ForEach(p => _pages[p.Id] = p);
 
             // Read each asset and convert "shallow" assets into "full" ones
+            Log.Debug($"Reading assets from \"{RootDirectory}\"...");
             var rootPage = rootAsset.ReadAsset(this);
 
             // Make a list of referenced files

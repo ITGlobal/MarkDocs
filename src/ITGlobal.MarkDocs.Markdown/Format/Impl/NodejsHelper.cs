@@ -48,7 +48,11 @@ namespace ITGlobal.MarkDocs.Format.Impl
                 var input = args != null
                     ? JsonConvert.SerializeObject(args, Formatting.None)
                     : null;
-                exec.Run(new[] {module}, input != null ? new[] {input, "\u001A" /* EOF mark */} : null);
+                exec.Run(new[]
+                    {
+                        "--no-deprecation",
+                        module
+                    }, input != null ? new[] {input, "\u001A" /* EOF mark */} : null);
                 exec.ThrowIfFailed();
 
                 var output = string.Join("\n", exec.StandardOutput);

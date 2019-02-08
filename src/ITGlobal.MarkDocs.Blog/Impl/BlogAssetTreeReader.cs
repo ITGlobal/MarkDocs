@@ -1,7 +1,7 @@
-﻿using System;
-using ITGlobal.MarkDocs.Format;
+﻿using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Source;
 using Microsoft.AspNetCore.StaticFiles;
+using System;
 
 namespace ITGlobal.MarkDocs.Blog.Impl
 {
@@ -12,6 +12,7 @@ namespace ITGlobal.MarkDocs.Blog.Impl
         private readonly IContentTypeProvider _contentTypeProvider;
         private readonly IContentMetadataProvider _contentMetadataProvider;
         private readonly IResourceUrlResolver _resourceUrlResolver;
+        private readonly IMarkDocsLog _log;
         private readonly string[] _includeFiles;
 
         public BlogAssetTreeReader(
@@ -19,13 +20,15 @@ namespace ITGlobal.MarkDocs.Blog.Impl
             IContentHashProvider contentHashProvider,
             IContentTypeProvider contentTypeProvider,
             IContentMetadataProvider contentMetadataProvider,
-            IResourceUrlResolver resourceUrlResolver)
+            IResourceUrlResolver resourceUrlResolver,
+            IMarkDocsLog log)
         {
             _format = format;
             _contentHashProvider = contentHashProvider;
             _contentTypeProvider = contentTypeProvider;
             _contentMetadataProvider = contentMetadataProvider;
             _resourceUrlResolver = resourceUrlResolver;
+            _log = log;
 
             _includeFiles = format.FileFilters;
         }
@@ -44,7 +47,8 @@ namespace ITGlobal.MarkDocs.Blog.Impl
                 includeFiles: _includeFiles,
                 ignorePatterns: sourceTreeProvider.IgnorePatterns ?? Array.Empty<string>(),
                 root: sourceTreeRoot,
-                report: report
+                report: report,
+                log: _log
             );
 
             var tree = worker.ReadAssetTree();
