@@ -111,13 +111,14 @@ namespace ITGlobal.MarkDocs
 
         #region Callback
 
-        private Func<IServiceProvider, IMarkDocsEventCallback> _callbackFactory = _ => new MarkDocsEventCallback();
+        private Func<IServiceProvider, MarkDocsEventListener> _callbackFactory =
+            _ => new DefaultMarkDocsEventListener(_.GetRequiredService<IMarkDocsLog>());
 
         /// <summary>
         ///     Sets a lifetime event callback
         /// </summary>
         [NotNull]
-        public MarkDocsOptions UseCallback([NotNull] Func<IServiceProvider, IMarkDocsEventCallback> callbackFactory)
+        public MarkDocsOptions UseCallback([NotNull] Func<IServiceProvider, MarkDocsEventListener> callbackFactory)
         {
             _callbackFactory = callbackFactory;
             return this;

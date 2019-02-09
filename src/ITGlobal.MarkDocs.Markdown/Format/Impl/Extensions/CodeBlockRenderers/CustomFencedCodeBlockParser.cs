@@ -25,20 +25,19 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
             }
 
             var context = MarkdownPageReadContext.Current;
-
-            var codeBlock = (FencedCodeBlock)block;
-            var r = _selector.TrySelect(context, codeBlock);
-            if (r != null)
+            
+            try
             {
-                try
+                var codeBlock = (FencedCodeBlock)block;
+                var renderable = _selector.TryCreateRenderable(context, codeBlock);
+                if (renderable != null)
                 {
-                    var renderable = r.CreateRenderable(context, codeBlock);
                     block.SetCustomRenderable(renderable);
                 }
-                catch
-                {
-                    context.Error("Error while rendering code block", block.Line);
-                }
+            }
+            catch
+            {
+                context.Error("Error while rendering code block", block.Line);
             }
 
             return true;

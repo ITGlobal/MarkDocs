@@ -35,6 +35,19 @@ namespace ITGlobal.MarkDocs.Source.Impl
             return true;
         }
 
+        public bool TryResolveFileResourcePath(string url, out string path)
+        {
+            var file = _worker.ResolveFileAsset(url) as PhysicalFileAsset;
+            if (file == null)
+            {
+                path = null;
+                return false;
+            }
+
+            path = file.AbsolutePath;
+            return true;
+        }
+
         public bool TryResolveFileResource(string url, out string fileId, out string fileUrl)
         {
             var file = _worker.ResolveFileAsset(url);

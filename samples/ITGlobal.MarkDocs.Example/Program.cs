@@ -12,7 +12,7 @@ namespace ITGlobal.MarkDocs.Example
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .WriteTo.LiterateConsole(
-                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext} -> {Message}{NewLine}{Exception}")
+                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} -> {Message}{NewLine}{Exception}")
                 .MinimumLevel.Verbose()
                 .Filter.ByExcluding(_=>_.Properties.TryGetValue("SourceContext", out var c) && c is ScalarValue s && s.Value is string str && str.StartsWith("Microsoft"))
                 .CreateLogger();

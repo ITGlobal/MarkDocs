@@ -25,9 +25,6 @@ namespace ITGlobal.MarkDocs.Impl
 
         private readonly DocumentationModel _model;
 
-        private readonly ImmutableDictionary<string, IPage> _pages;
-        private readonly ImmutableDictionary<string, IFileResource> _attachmentsById;
-
         #endregion
 
         #region .ctor
@@ -46,7 +43,7 @@ namespace ITGlobal.MarkDocs.Impl
             var pages = ImmutableDictionary.CreateBuilder<string, IPage>(StringComparer.OrdinalIgnoreCase);
             RootPage = Page.CreateRootPage(cache, this, model.RootPage ?? DefaultRootPageModel);
             BuildPageIndexRec(RootPage);
-            _pages = pages.ToImmutable();
+            Pages = pages.ToImmutable();
 
             void BuildPageIndexRec(IPage page)
             {
@@ -57,15 +54,13 @@ namespace ITGlobal.MarkDocs.Impl
                 }
             }
 
-            var files = new List<IFileResource>();
+            var files = ImmutableDictionary.CreateBuilder<string, IFileResource>(StringComparer.OrdinalIgnoreCase);
             foreach (var m in model.Files ?? Array.Empty<FileModel>())
             {
                 var file = new FileResource(this, cache, m);
-                files.Add(file);
+                files[file.Id] = file;
             }
-
-            Files = files;
-            _attachmentsById = files.ToImmutableDictionary(_ => _.Id, StringComparer.OrdinalIgnoreCase);
+            Files = files.ToImmutable();
 
             SourceInfo = new SourceInfo(model.Info);
             CompilationReport = new CompilationReport(model.CompilationReport);
@@ -101,6 +96,11 @@ namespace ITGlobal.MarkDocs.Impl
         public IPage RootPage { get; }
 
         /// <summary>
+        ///     All pages
+        /// </summary>
+        public ImmutableDictionary<string, IPage> Pages { get; }
+
+        /// <summary>
         ///     Provides errors and warning for documentation
         /// </summary>
         public ICompilationReport CompilationReport { get; }
@@ -108,7 +108,7 @@ namespace ITGlobal.MarkDocs.Impl
         /// <summary>
         ///     Documentation attached files
         /// </summary>
-        public IReadOnlyList<IFileResource> Files { get; }
+        public ImmutableDictionary<string, IFileResource> Files { get; }
 
         /// <summary>
         ///     Gets a documentation page by its ID
@@ -123,7 +123,7 @@ namespace ITGlobal.MarkDocs.Impl
         {
             ResourceId.Normalize(ref id);
 
-            if (!_pages.TryGetValue(id, out var page))
+            if (!Pages.TryGetValue(id, out var page))
             {
                 return null;
             }
@@ -144,7 +144,7 @@ namespace ITGlobal.MarkDocs.Impl
         {
             ResourceId.Normalize(ref id);
 
-            if (!_attachmentsById.TryGetValue(id, out var attachment))
+            if (!Files.TryGetValue(id, out var attachment))
             {
                 return null;
             }

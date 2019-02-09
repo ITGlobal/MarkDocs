@@ -31,7 +31,7 @@ namespace ITGlobal.MarkDocs.Blog
 
             _builder.UseDiskCache(Path.Combine(_dataDirectory, "cache"));
             _builder.UseResourceUrlResolver(new ResourceUrlResolver(_rootUrl));
-            _markdownOptions.CodeBlocks.UseServerSideHighlightJs(Path.Combine(_dataDirectory, "hljs"));
+            _markdownOptions.AddHighlightJs(Path.Combine(_dataDirectory, "hljs"));
             _markdownOptions.UseChildrenListRenderer<NoneChildrenListRenderer>();
             _markdownOptions.DontRenderFirstHeading();
             _builder.UseMarkdown(_markdownOptions);

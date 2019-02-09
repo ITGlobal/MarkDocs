@@ -7,8 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ITGlobal.MarkDocs.Format.Impl;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.ChildrenList;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.CustomBlockRendering;
+using ITGlobal.MarkDocs.Format.Impl.Extensions.LaTeX;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.Mathematics;
 
 namespace ITGlobal.MarkDocs.Format
@@ -34,13 +36,26 @@ namespace ITGlobal.MarkDocs.Format
         public MarkdownOptions()
         {
             CodeBlocks = new MarkdownCodeBlockRenderingOptions(this);
+            Images = new MarkdownImageRenderingOptions(this);
         }
+        
+        #region Code Blocks
 
+        /// <summary>
+        ///     Code block rendering options
+        /// </summary>
+        [NotNull]
+        public MarkdownCodeBlockRenderingOptions CodeBlocks { get; }
+
+        #endregion
 
         #region Code Blocks
 
+        /// <summary>
+        ///     Image rendering options
+        /// </summary>
         [NotNull]
-        public MarkdownCodeBlockRenderingOptions CodeBlocks { get; }
+        public MarkdownImageRenderingOptions Images { get; }
 
         #endregion
 
@@ -211,6 +226,7 @@ namespace ITGlobal.MarkDocs.Format
             services.AddSingleton<IMetadataExtractor, DefaultMetadataExtractor>();
 
             CodeBlocks.RegisterServices(services);
+            Images.RegisterServices(services);
 
             services.AddSingleton<DefaultChildrenListRenderer>();
         }

@@ -26,10 +26,10 @@ namespace ITGlobal.MarkDocs.Format
         Agate,
 
         /// <summary>
-        ///     Androidstudio
+        ///     AndroidStudio
         /// </summary>
         [Resource("androidstudio.css")]
-        Androidstudio,
+        AndroidStudio,
 
         /// <summary>
         ///     ArduinoLight
@@ -362,22 +362,22 @@ namespace ITGlobal.MarkDocs.Format
         ParaisoLight,
 
         /// <summary>
-        ///     Purebasic
+        ///     PureBasic
         /// </summary>
         [Resource("purebasic.css")]
-        Purebasic,
+        PureBasic,
 
         /// <summary>
-        ///     QtcreatorDark
+        ///     QtCreatorDark
         /// </summary>
         [Resource("qtcreator_dark.css")]
-        QtcreatorDark,
+        QtCreatorDark,
 
         /// <summary>
-        ///     QtcreatorLight
+        ///     QtCreatorLight
         /// </summary>
         [Resource("qtcreator_light.css")]
-        QtcreatorLight,
+        QtCreatorLight,
 
         /// <summary>
         ///     Railscasts

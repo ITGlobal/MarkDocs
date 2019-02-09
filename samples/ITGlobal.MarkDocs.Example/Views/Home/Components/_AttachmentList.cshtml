@@ -7,7 +7,7 @@
 @if (attachments.Count > 0)
 {
     <div class="list-group">
-        @foreach (var attachment in attachments)
+        @foreach (var attachment in attachments.Values)
         {
             <a href="/@Model.Id/@attachment.Id" class="list-group-item">
                 <samp>@attachment.Id</samp>

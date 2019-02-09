@@ -1,8 +1,4 @@
-﻿using AngleSharp.Css.Dom;
-using AngleSharp.Css.Parser;
-using AngleSharp.Html.Dom;
-using AngleSharp.Html.Parser;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -10,8 +6,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using AngleSharp.Css.Dom;
+using AngleSharp.Css.Parser;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 
-namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
+namespace ITGlobal.MarkDocs.Format.Impl.Extensions.HighlightJs
 {
     internal sealed class HighlightJsWorker
     {

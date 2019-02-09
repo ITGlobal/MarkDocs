@@ -25,6 +25,7 @@ namespace ITGlobal.MarkDocs.Cache
         ICacheUpdateTransaction BeginTransaction(
             [NotNull] ISourceTree sourceTree,
             [NotNull] ISourceInfo sourceInfo,
+            [NotNull] CompilationEventListener listener,
             bool forceCacheClear = false
         );
 

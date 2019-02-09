@@ -139,7 +139,11 @@ namespace ITGlobal.MarkDocs.Cache.Impl
             }
         }
 
-        public ICacheUpdateTransaction BeginTransaction(ISourceTree sourceTree, ISourceInfo sourceInfo, bool forceCacheClear = false)
+        public ICacheUpdateTransaction BeginTransaction(
+            ISourceTree sourceTree, 
+            ISourceInfo sourceInfo,
+            CompilationEventListener listener,
+            bool forceCacheClear = false)
         {
             var newSourceHash = HashUtil.HashObject(new { url = sourceInfo.SourceUrl });
 
@@ -170,6 +174,7 @@ namespace ITGlobal.MarkDocs.Cache.Impl
                 sourceHash: newSourceHash,
                 oldDirectory: oldDirectory,
                 oldIndex: oldIndex,
+                listener: listener,
                 forceCacheClear
             );
 

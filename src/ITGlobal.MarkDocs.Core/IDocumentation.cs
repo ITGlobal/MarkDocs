@@ -1,6 +1,7 @@
 ﻿using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace ITGlobal.MarkDocs
 {
@@ -41,6 +42,12 @@ namespace ITGlobal.MarkDocs
         IPage RootPage { get; }
 
         /// <summary>
+        ///     All pages
+        /// </summary>
+        [NotNull]
+        ImmutableDictionary<string, IPage> Pages { get; }
+
+        /// <summary>
         ///     Provides errors and warning for documentation
         /// </summary>
         [NotNull]
@@ -50,7 +57,7 @@ namespace ITGlobal.MarkDocs
         ///     Documentation attached files
         /// </summary>
         [NotNull]
-        IReadOnlyList<IFileResource> Files { get; }
+        ImmutableDictionary<string, IFileResource> Files { get; }
 
         /// <summary>
         ///     Gets a documentation page by its ID

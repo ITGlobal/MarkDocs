@@ -51,7 +51,7 @@ namespace ITGlobal.MarkDocs.Tools.Generate
                     {
                         if (verbose)
                         {
-                            config.UseCallback(new GeneratorCallback());
+                            config.UseEventListener(new GeneratorListener());
                         }
 
                         config.FromStaticDirectory(sourceDir);
@@ -59,11 +59,12 @@ namespace ITGlobal.MarkDocs.Tools.Generate
                         config.UseResourceUrlResolver(_ => new GeneratorResourceUrlResolver());
                         config.UseMarkdown(markdown =>
                         {
-                            markdown.CodeBlocks.UseServerSideHighlightJs(
+                            markdown.AddHighlightJs(
                                 Path.Combine(Path.GetTempPath(), $"markdocs-build-{Guid.NewGuid():N}")
                             );
                         });
                         config.UseLog(new SerilogLog());
+                        config.UseEventListener<GeneratorListener>();
                     }
                 );
 

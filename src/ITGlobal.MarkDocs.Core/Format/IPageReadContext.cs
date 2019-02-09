@@ -26,6 +26,11 @@ namespace ITGlobal.MarkDocs.Format
         bool TryResolvePageResource([NotNull] string url, out string pageId, out string pageUrl);
 
         /// <summary>
+        ///     Resolves a physical path for specified resource
+        /// </summary>
+        bool TryResolveFileResourcePath(string url, out string path);
+
+        /// <summary>
         ///     Resolves an actual URL for specified resource
         /// </summary>
         bool TryResolveFileResource([NotNull] string url, out string fileId, out string fileUrl);

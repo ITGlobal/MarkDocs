@@ -19,6 +19,7 @@ namespace ITGlobal.MarkDocs.Cache.Impl
         private ISourceTree SourceTree => _ctx.SourceTree;
         private string RootDirectory => _ctx.RootDirectory;
         private bool DisableCache => _ctx.DisableCache || OldIndex == null || OldDirectory == null;
+        private CompilationEventListener EventListener => _ctx.EventListener;
 
         [CanBeNull]
         private string OldDirectory => _ctx.OldDirectory;
@@ -50,7 +51,7 @@ namespace ITGlobal.MarkDocs.Cache.Impl
                         {
                             File.Copy(oldFilePath, newFilePath);
                             newAssets.Set(asset.Id, oldAsset.Filename, oldAsset.Hash);
-                            Log.Info($"CACHE {SourceTree.Id}:{asset.Id}");
+                            Cached(asset);
                             return;
                         }
                         catch (Exception e)
@@ -67,7 +68,7 @@ namespace ITGlobal.MarkDocs.Cache.Impl
             }
 
             newAssets.Set(asset.Id, newFileName, newHash);
-            Log.Info($"NEW   {SourceTree.Id}:{asset.Id}");
+            Written(asset);
         }
 
         public Stream ReadAsset(T asset)
@@ -100,7 +101,7 @@ namespace ITGlobal.MarkDocs.Cache.Impl
                     Directory.CreateDirectory(Path.GetDirectoryName(newFilePath));
                     File.Copy(oldFilePath, newFilePath);
                     newAssets.Set(id, oldItem.Filename, oldItem.Hash);
-                    Log.Info($"CACHE {SourceTree.Id}:{id}");
+                    Cached(id);
                 }
             }
         }
@@ -108,5 +109,9 @@ namespace ITGlobal.MarkDocs.Cache.Impl
         protected abstract DiskCacheIndex.Dictionary SelectDictionary(DiskCacheIndex index);
         protected abstract string GetHashCode(T asset);
         protected abstract string GetFileName(T asset);
+
+        protected virtual void Written(T asset)=> EventListener.Written(asset);
+        protected virtual void Cached(T asset)=> EventListener.Cached(asset);
+        protected virtual void Cached(string assetId)=> EventListener.Cached(assetId);
     }
 }

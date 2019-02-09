@@ -13,6 +13,7 @@ namespace ITGlobal.MarkDocs.Impl
         private readonly IMarkDocsLog _log;
         private readonly ICacheProvider _cache;
         private readonly ISourceTreeProvider _sourceTreeProvider;
+        private readonly MarkDocsEventListener _eventListener;
         private readonly ExtensionCollection _extensions;
 
         private readonly object _synchronizationLock = new object();
@@ -24,11 +25,13 @@ namespace ITGlobal.MarkDocs.Impl
             IMarkDocsLog log,
             ICacheProvider cache,
             ISourceTreeProvider sourceTreeProvider,
+            MarkDocsEventListener eventListener,
             ExtensionCollection extensions)
         {
             _log = log;
             _cache = cache;
             _sourceTreeProvider = sourceTreeProvider;
+            _eventListener = eventListener;
             _extensions = extensions;
 
             Initialize();
@@ -58,7 +61,7 @@ namespace ITGlobal.MarkDocs.Impl
 
                 _sourceTreeProvider.Changed += (_, e) =>
                 {
-                    _log.Debug("Source tree list change detected");
+                    _eventListener.SourceChanged();
                     Task.Run(() => Rebuild(fullResync: false));
                 };
             }
@@ -81,7 +84,9 @@ namespace ITGlobal.MarkDocs.Impl
                         documentations.Add(documentation);
                     }
 
-                    return MarkDocState.New(documentations);
+                    var state = MarkDocState.New(documentations);
+                    _log.Info("MarkDocs cache is up to date");
+                    return state;
                 }
                 catch (Exception e)
                 {
@@ -180,50 +185,59 @@ namespace ITGlobal.MarkDocs.Impl
 
         private void Rebuild(ISourceTree sourceTree, bool isUpdate = true, bool forceCacheClear = false)
         {
-            var w = Stopwatch.StartNew();
-            var reportBuilder = new CompilationReportBuilder();
-            var tree = sourceTree.ReadAssetTree(reportBuilder);
-
-            _log.Debug($"Processing assets from \"{sourceTree.Id}\"");
-            using (var transaction = _cache.BeginTransaction(sourceTree, tree.SourceInfo, forceCacheClear))
+            using (var listener = _eventListener.CompilationStarted(sourceTree.Id))
             {
-                var compiler = new DocumentationCompiler(transaction, reportBuilder);
-                var model = compiler.Compile(tree);
+                var w = Stopwatch.StartNew();
+                var reportBuilder = new CompilationReportBuilder(listener);
 
-                var reader = transaction.Commit();
+                listener.ReadingAssetTree();
+                var tree = sourceTree.ReadAssetTree(reportBuilder);
 
-                var documentation = new Documentation(this, reader, model);
-
-                IDisposable disposable = null;
-                try
+                listener.ProcessingAssets(tree);
+                using (var transaction = _cache.BeginTransaction(sourceTree, tree.SourceInfo, listener, forceCacheClear))
                 {
-                    if (!isUpdate)
-                    {
-                        _extensions.Created(documentation);
-                    }
-                    else
-                    {
-                        disposable = _extensions.Updated(documentation);
-                    }
+                    var compiler = new DocumentationCompiler(transaction, reportBuilder, _log);
+                    var model = compiler.Compile(tree);
 
-                    lock (_stateLock)
+                    listener.Committing();
+                    var reader = transaction.Commit();
+
+                    var documentation = new Documentation(this, reader, model);
+
+                    IDisposable disposable = null;
+                    try
                     {
-                        _state = _state.AddOrUpdate(documentation);
+                        if (!isUpdate)
+                        {
+                            _extensions.Created(documentation);
+                        }
+                        else
+                        {
+                            disposable = _extensions.Updated(documentation);
+                        }
+
+                        lock (_stateLock)
+                        {
+                            _state = _state.AddOrUpdate(documentation);
+                        }
+                    }
+                    finally
+                    {
+                        disposable?.Dispose();
                     }
                 }
-                finally
-                {
-                    disposable?.Dispose();
-                }
+
+                w.Stop();
+
+                listener.Completed(w.Elapsed);
             }
-            w.Stop();
-            _log.Info($"Documentation \"{sourceTree.Id}\" has been rebuilt in {w.ElapsedMilliseconds / 1000f:F1}s");
         }
 
         private void OnSourceTreeChanged(object sender, EventArgs e)
         {
             if (sender is ISourceTree sourceTree)
             {
+                _eventListener.SourceChanged(sourceTree);
                 Rebuild(sourceTree);
             }
         }

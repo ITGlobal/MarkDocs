@@ -1,7 +1,7 @@
 ﻿using System;
 using Markdig;
 
-namespace ITGlobal.MarkDocs.Format
+namespace ITGlobal.MarkDocs.Format.Impl
 {
     internal sealed class MarkdownPipelineFactory
     {

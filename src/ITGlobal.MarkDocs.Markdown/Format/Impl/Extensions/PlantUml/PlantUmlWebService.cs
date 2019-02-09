@@ -1,16 +1,16 @@
-using Markdig.Helpers;
 using System;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Markdig.Helpers;
 
-namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
+namespace ITGlobal.MarkDocs.Format.Impl.Extensions.PlantUml
 {
     /// <summary>
     ///    Based on https://bitbucket.org/xact/cs.ff.xact.lib/src/HEAD/XAct.Diagrams/XAct.Diagrams.Uml.PlantUml/Uml/Services/Implementations/PlantUmlDiagramService.cs
     /// </summary>
-    internal static class PlantUml
+    internal static class PlantUmlWebService
     {
         public static byte[] Render(string baseUrl, string markup)
             => RenderAsync(baseUrl, markup).GetAwaiter().GetResult();

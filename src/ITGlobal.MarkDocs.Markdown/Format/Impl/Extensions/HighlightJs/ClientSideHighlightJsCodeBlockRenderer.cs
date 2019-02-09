@@ -1,8 +1,7 @@
 ﻿using System.Collections.Immutable;
-using Markdig.Renderers;
 using Markdig.Syntax;
 
-namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
+namespace ITGlobal.MarkDocs.Format.Impl.Extensions.HighlightJs
 {
     internal sealed class ClientSideHighlightJsCodeBlockRenderer : ICodeBlockRenderer
     {
@@ -179,11 +178,13 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
             "zephir",
         });
 
-        public bool CanRender(IPageReadContext ctx, FencedCodeBlock block)
-            => SupportedLanguages.Contains(block.Info);
-
-        public IRenderable CreateRenderable(IPageReadContext ctx, FencedCodeBlock block)
+        public IRenderable TryCreateRenderable(IPageReadContext ctx, FencedCodeBlock block)
         {
+            if (!SupportedLanguages.Contains(block.Info))
+            {
+                return null;
+            }
+
             return new ClientSideHighlightJsRenderable(block);
         }
     }

@@ -21,14 +21,12 @@ namespace ITGlobal.MarkDocs.Format
         private readonly Dictionary<string, List<Func<IServiceProvider, ICodeBlockRenderer>>> _specificImplementations
             = new Dictionary<string, List<Func<IServiceProvider, ICodeBlockRenderer>>>(StringComparer.OrdinalIgnoreCase);
 
-        private readonly MarkdownOptions _options;
-
         internal MarkdownCodeBlockRenderingOptions(MarkdownOptions options)
         {
-            _options = options;
+            RootOptions = options;
         }
 
-        internal MarkdownOptions RootOptions => _options;
+        internal MarkdownOptions RootOptions { get; }
 
         /// <summary>
         ///     Adds a code block renderer implementation into chain
@@ -37,7 +35,7 @@ namespace ITGlobal.MarkDocs.Format
         public MarkdownOptions Use([NotNull] Func<IServiceProvider, ICodeBlockRenderer> factory)
         {
             _defaultImplementations.Add(factory);
-            return _options;
+            return RootOptions;
         }
 
         /// <summary>
@@ -49,7 +47,7 @@ namespace ITGlobal.MarkDocs.Format
         {
             _customRegistrations.Add(_ => _.AddSingleton<T>());
             _defaultImplementations.Add(_ => _.GetRequiredService<T>());
-            return _options;
+            return RootOptions;
         }
 
         /// <summary>
@@ -64,7 +62,7 @@ namespace ITGlobal.MarkDocs.Format
                 _specificImplementations.Add(lang, list);
             }
             list.Add(factory);
-            return _options;
+            return RootOptions;
         }
 
         /// <summary>
@@ -81,7 +79,7 @@ namespace ITGlobal.MarkDocs.Format
                 _specificImplementations.Add(lang, list);
             }
             list.Add(_ => _.GetRequiredService<T>());
-            return _options;
+            return RootOptions;
         }
 
         internal void RegisterServices(IServiceCollection services)

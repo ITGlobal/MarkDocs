@@ -11,11 +11,13 @@ namespace ITGlobal.MarkDocs.Tools.Generate
     {
         private readonly string _directory;
         private readonly ITemplate _template;
-        
-        public OutputCacheUpdateTransaction(string directory, ITemplate template)
+        private readonly CompilationEventListener _listener;
+
+        public OutputCacheUpdateTransaction(string directory, ITemplate template, CompilationEventListener listener)
         {
             _directory = directory;
             _template = template;
+            _listener = listener;
 
             if (Directory.Exists(_directory))
             {
@@ -57,6 +59,8 @@ namespace ITGlobal.MarkDocs.Tools.Generate
             {
                 write(stream);
             }
+
+            _listener.Written(asset);
         }
 
         private Stream Read(Asset asset)

@@ -18,7 +18,7 @@ namespace ITGlobal.MarkDocs.Blog.Impl
         public BlogIndex(IBlogEngine engine, IDocumentation documentation, ICompilationReportBuilder report)
         {
             // Collect resources
-            foreach (var attachment in documentation.Files)
+            foreach (var attachment in documentation.Files.Values)
             {
                 if (Resources.ContainsKey(attachment.Id))
                 {

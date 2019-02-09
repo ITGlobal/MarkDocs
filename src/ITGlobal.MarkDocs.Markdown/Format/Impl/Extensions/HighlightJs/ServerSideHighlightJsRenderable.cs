@@ -3,7 +3,7 @@ using System.Text;
 using ITGlobal.MarkDocs.Source;
 using Markdig.Renderers;
 
-namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
+namespace ITGlobal.MarkDocs.Format.Impl.Extensions.HighlightJs
 {
     internal sealed class ServerSideHighlightJsRenderable : IRenderable
     {

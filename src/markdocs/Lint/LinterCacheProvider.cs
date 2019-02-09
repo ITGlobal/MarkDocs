@@ -8,8 +8,11 @@ namespace ITGlobal.MarkDocs.Tools.Lint
     {
         public CacheDocumentationModel[] Load() => Array.Empty<CacheDocumentationModel>();
 
-        public ICacheUpdateTransaction BeginTransaction(ISourceTree sourceTree, ISourceInfo sourceInfo,
-            bool forceCacheClear = false) => new LinterCacheUpdateTransaction();
+        public ICacheUpdateTransaction BeginTransaction(
+            ISourceTree sourceTree, 
+            ISourceInfo sourceInfo,
+            CompilationEventListener listener,
+            bool forceCacheClear = false) => new LinterCacheUpdateTransaction(listener);
 
         public void Drop(string documentationId) { }
     }

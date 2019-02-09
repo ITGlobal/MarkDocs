@@ -1,6 +1,6 @@
 ﻿using Markdig.Extensions.Mathematics;
 
-namespace ITGlobal.MarkDocs.Format.Impl.Extensions.Mathematics
+namespace ITGlobal.MarkDocs.Format.Impl.Extensions.LaTeX
 {
     /// <summary>
     ///     A MathML/Tex/LaTex renderer that uses http://latex.codecogs.com

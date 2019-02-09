@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Source
@@ -24,7 +25,10 @@ namespace ITGlobal.MarkDocs.Source
             RootPage = rootPage;
             Files = files;
 
+            var pages = ImmutableDictionary.CreateBuilder<string, PageAsset>();
             Walk(rootPage);
+            Pages = pages.ToImmutable();
+
             foreach (var a in files)
             {
                 _assetsById[a.Id] = a;
@@ -32,6 +36,8 @@ namespace ITGlobal.MarkDocs.Source
 
             void Walk(PageAsset page, BranchPageAsset parent = null)
             {
+                pages[page.Id] = page;
+
                 if (parent != null)
                 {
                     _parentPages[page.Id] = parent;
@@ -60,6 +66,9 @@ namespace ITGlobal.MarkDocs.Source
 
         [NotNull]
         public PageAsset RootPage { get; }
+
+        [NotNull]
+        public ImmutableDictionary<string, PageAsset> Pages { get; }
 
         [NotNull]
         public FileAsset[] Files { get; }

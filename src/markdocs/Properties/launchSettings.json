@@ -2,7 +2,11 @@
   "profiles": {
     "markdocs-lint": {
       "commandName": "Project",
-      "commandLineArgs": "lint ../../../../../docs"
+      "commandLineArgs": "lint -v ../../../../../docs"
+    },
+    "markdocs-build": {
+      "commandName": "Project",
+      "commandLineArgs": "build ../../../../../docs"
     }
   }
 }

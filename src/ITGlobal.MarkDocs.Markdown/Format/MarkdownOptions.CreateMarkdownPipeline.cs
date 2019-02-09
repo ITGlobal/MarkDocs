@@ -10,6 +10,7 @@ using ITGlobal.MarkDocs.Format.Impl.Extensions.CustomBlockRendering;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.CustomHeading;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.Cut;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.Icons;
+using ITGlobal.MarkDocs.Format.Impl.Extensions.Images;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.Mathematics;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.TableOfContents;
 
@@ -130,6 +131,12 @@ namespace ITGlobal.MarkDocs.Format
                 builder.Extensions.Add(new CustomCodeBlockRenderingExtension(codeBlockRendererSelector));
             }
 
+            var imageRendererSelector = serviceProvider.GetService<ImageRendererSelector>();
+            if (imageRendererSelector != null)
+            {
+                builder.Extensions.Add(new ImageRenderingExtension(imageRendererSelector));
+            }
+
             builder.Extensions.AddIfNotAlready(new CustomHeadingExtension(_dontRenderFirstHeading));
 
             if (_useAdmonition)
@@ -148,7 +155,7 @@ namespace ITGlobal.MarkDocs.Format
             {
                 builder.Extensions.Add(new CustomBlockRenderingExtension(_htmlRendererOverrides));
             }
-
+            
             return builder.Build();
         }
     }

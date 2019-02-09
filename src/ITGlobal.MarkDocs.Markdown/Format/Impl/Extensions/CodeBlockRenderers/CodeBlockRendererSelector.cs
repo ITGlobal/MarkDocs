@@ -18,13 +18,14 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
         }
         
         [CanBeNull]
-        public ICodeBlockRenderer TrySelect([NotNull] IPageReadContext ctx, [NotNull] FencedCodeBlock block)
+        public IRenderable TryCreateRenderable([NotNull] IPageReadContext ctx, [NotNull] FencedCodeBlock block)
         {
             foreach (var renderer in EnumerateRenderers(block))
             {
-                if (renderer.CanRender(ctx, block))
+                var renderable = renderer.TryCreateRenderable(ctx, block);
+                if (renderable != null)
                 {
-                    return renderer;
+                    return renderable;
                 }
             }
 

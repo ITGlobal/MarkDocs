@@ -3,7 +3,7 @@ using System.IO;
 using System.Net.Http;
 using ITGlobal.MarkDocs.Source;
 
-namespace ITGlobal.MarkDocs.Format.Impl.Extensions.Mathematics
+namespace ITGlobal.MarkDocs.Format.Impl.Extensions.LaTeX
 {
     internal sealed class CodecogsGeneratedAsset : IGeneratedAssetContent
     {

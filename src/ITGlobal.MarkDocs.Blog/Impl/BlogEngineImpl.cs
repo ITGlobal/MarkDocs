@@ -105,7 +105,7 @@ namespace ITGlobal.MarkDocs.Blog.Impl
 
         internal void Update(IMarkDocState state)
         {
-            var report = new CompilationReportBuilder();
+            var report = new BlogCompilationReportBuilder();
             if (state.List.Length > 1)
             {
                 report.Error($"More than one source found. Choosing \"{state.List[0].Id}\" arbitrarily");
@@ -116,7 +116,7 @@ namespace ITGlobal.MarkDocs.Blog.Impl
 
         internal void Update(IDocumentation documentation)
         {
-            var report = new CompilationReportBuilder();
+            var report = new BlogCompilationReportBuilder();
             State = new BlogEngineState(this, documentation, report);
         }
 

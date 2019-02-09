@@ -15,14 +15,14 @@ namespace ITGlobal.MarkDocs.Tools.Lint
             bool summary)
         {
             ICompilationReport report;
-            using (CliHelper.SpinnerSafe("Running linter..."))
+           // using (CliHelper.SpinnerSafe("Running linter..."))
             {
                 var markdocs = MarkDocsFactory.Create(
                     config =>
                     {
                         if (verbose)
                         {
-                            config.UseCallback(new LinterCallback());
+                            config.UseEventListener(new LinterListener());
                         }
 
                         config.FromStaticDirectory(path);
@@ -30,11 +30,12 @@ namespace ITGlobal.MarkDocs.Tools.Lint
                         config.UseResourceUrlResolver(new ResourceUrlResolver());
                         config.UseMarkdown(markdown =>
                         {
-                            markdown.CodeBlocks.UseServerSideHighlightJs(
+                            markdown.AddHighlightJs(
                                 Path.Combine(Path.GetTempPath(), $"markdocs-lint-{Guid.NewGuid():N}")
                             );
                         });
                         config.UseLog(new SerilogLog());
+                        config.UseEventListener<LinterListener>();
                     }
                 );
                 using (markdocs)

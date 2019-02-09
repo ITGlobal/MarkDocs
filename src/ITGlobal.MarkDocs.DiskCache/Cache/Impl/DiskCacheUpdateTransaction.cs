@@ -24,6 +24,8 @@ namespace ITGlobal.MarkDocs.Cache.Impl
 
         [CanBeNull]
         private readonly DiskCacheIndex _oldIndex;
+
+        private readonly CompilationEventListener _listener;
         private readonly DiskCacheIndex _newIndex = new DiskCacheIndex();
 
         private readonly bool _clearCache;
@@ -46,6 +48,7 @@ namespace ITGlobal.MarkDocs.Cache.Impl
             string sourceHash,
             [CanBeNull] string oldDirectory,
             [CanBeNull] DiskCacheIndex oldIndex,
+            CompilationEventListener listener,
             bool clearCache
             )
         {
@@ -55,6 +58,7 @@ namespace ITGlobal.MarkDocs.Cache.Impl
             _sourceHash = sourceHash;
             _oldDirectory = oldDirectory;
             _oldIndex = oldIndex;
+            _listener = listener;
             _clearCache = clearCache;
 
             while (true)
@@ -88,6 +92,7 @@ namespace ITGlobal.MarkDocs.Cache.Impl
         ISourceTree IAssetStoreContext.SourceTree => _sourceTree;
         string IAssetStoreContext.RootDirectory => _provider.RootDirectory;
         bool IAssetStoreContext.DisableCache => _clearCache;
+        CompilationEventListener IAssetStoreContext.EventListener => _listener;
 
         string IAssetStoreContext.OldDirectory => _oldDirectory;
         string IAssetStoreContext.NewDirectory => _newDirectory;

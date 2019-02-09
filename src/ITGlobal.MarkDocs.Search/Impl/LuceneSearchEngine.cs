@@ -319,7 +319,11 @@ namespace ITGlobal.MarkDocs.Search.Impl
                 };
                 using (var writer = new IndexWriter(FSDirectory.Open(path), config))
                 {
-                    IndexPage(writer, documentation.RootPage);
+                    foreach (var page in documentation.Pages.Values)
+                    {
+                        IndexPage(writer, page);
+                    }
+
                     writer.Commit();
                 }
             }
@@ -327,8 +331,6 @@ namespace ITGlobal.MarkDocs.Search.Impl
 
         private void IndexPage(IndexWriter writer, IPage page)
         {
-            _log.Debug($"Indexing page {page.Documentation.Id}:{page.Id}...");
-
             // Render page into plain text
             var plainText = page.RenderPlainText();
 
@@ -341,11 +343,7 @@ namespace ITGlobal.MarkDocs.Search.Impl
             };
 
             writer.AddDocument(document);
-
-            foreach (var nestedPage in page.NestedPages)
-            {
-                IndexPage(writer, nestedPage);
-            }
+            _log.Debug($"[{page.Documentation.Id}]: indexed page {page.Id}");
         }
 
         private void CleanupOldIndices()

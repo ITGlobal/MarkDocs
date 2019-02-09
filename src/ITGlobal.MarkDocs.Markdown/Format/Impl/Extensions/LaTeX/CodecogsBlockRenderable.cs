@@ -3,17 +3,17 @@ using ITGlobal.MarkDocs.Source;
 using Markdig.Extensions.Mathematics;
 using Markdig.Renderers;
 
-namespace ITGlobal.MarkDocs.Format.Impl.Extensions.Mathematics
+namespace ITGlobal.MarkDocs.Format.Impl.Extensions.LaTeX
 {
-    internal sealed class CodecogsInlineRenderable : IRenderable
+    internal sealed class CodecogsBlockRenderable : IRenderable
     {
-        private readonly MathInline _inline;
+        private readonly MathBlock _block;
         private readonly GeneratedFileAsset _asset;
         private readonly string _url;
 
-        public CodecogsInlineRenderable(MathInline inline, GeneratedFileAsset asset, string url)
+        public CodecogsBlockRenderable(MathBlock block, GeneratedFileAsset asset, string url)
         {
-            _inline = inline;
+            _block = block;
             _asset = asset;
             _url = url;
         }
@@ -28,14 +28,14 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.Mathematics
                 renderer.Write("<img src=\"");
                 renderer.WriteEscapeUrl(_url);
                 renderer.Write("\"");
-                renderer.WriteAttributes(_inline);
+                renderer.WriteAttributes(_block);
                 renderer.Write(" alt=\"\"");
                 renderer.Write(" />");
             }
             catch (Exception e)
             {
-                ctx.Error($"Failed to render math inline. {e.Message}", _inline.Line);
-                renderer.WriteError("Failed to render math inline");
+                ctx.Error($"Failed to render math block. {e.Message}", _block.Line);
+                renderer.WriteError("Failed to render math block");
             }
         }
     }

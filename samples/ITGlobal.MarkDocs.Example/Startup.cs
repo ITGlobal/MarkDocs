@@ -37,9 +37,9 @@ namespace ITGlobal.MarkDocs.Example
 
                 config.UseMarkdown(markdown =>
                 {
-                    markdown.UseCodecogsMathRenderer();
-                    markdown.CodeBlocks.UseServerSideHighlightJs(Path.Combine(Env.ContentRootPath, "Data", "hljs"));
-                    markdown.CodeBlocks.UsePlantUmlWebService();
+                    markdown.AddCodecogsMathRenderer();
+                    markdown.AddHighlightJs(Path.Combine(Env.ContentRootPath, "Data", "hljs"));
+                    markdown.AddPlantUmlWebService();
                 });
                 
                 config.UseDiskCache(Path.Combine(Env.ContentRootPath, "Data", "cache"));

@@ -2,7 +2,6 @@ using ITGlobal.MarkDocs.Cache.Model;
 using ITGlobal.MarkDocs.Source;
 using ITGlobal.MarkDocs.Source.Impl;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ITGlobal.MarkDocs.Impl
 {
@@ -53,31 +52,35 @@ namespace ITGlobal.MarkDocs.Impl
         }
 
         private readonly List<Msg> _messages = new List<Msg>();
+        private readonly CompilationEventListener _listener;
 
-        public void Warning(string message)
+        public CompilationReportBuilder(CompilationEventListener listener)
         {
-            _messages.Add(Msg.Warning(message));
+            _listener = listener;
         }
 
         public void Error(string message)
         {
             _messages.Add(Msg.Error(message));
+            _listener.Error(message);
         }
 
         public void Warning(string path, string message, int? lineNumber = null)
         {
             _messages.Add(Msg.Warning(message, path, lineNumber));
+            _listener.Warning(path, message, lineNumber != null ? $":{lineNumber}" : null);
         }
 
         public void Error(string path, string message, int? lineNumber = null)
         {
             _messages.Add(Msg.Error(message, path, lineNumber));
+            _listener.Error(path, message, lineNumber != null ? $":{lineNumber}" : null);
         }
 
         public CompilationReportModel Build(string rootDirectory)
         {
             var messages = new CompilationReportMessageModel[_messages.Count];
-            for (int i = 0; i < _messages.Count; i++)
+            for (var i = 0; i < _messages.Count; i++)
             {
                 var (type, text, path, lineNumber) = _messages[i];
                 if (path != null)
@@ -98,42 +101,6 @@ namespace ITGlobal.MarkDocs.Impl
             {
                 Messages = messages
             };
-        }
-
-        public CompilationReportModel Merge(ICompilationReport report)
-        {
-            return new CompilationReportModel
-            {
-                Messages = Iterator().ToArray()
-            };
-
-            IEnumerable<CompilationReportMessageModel> Iterator()
-            {
-                foreach (var (path, messages) in report.Messages)
-                {
-                    foreach (var message in messages)
-                    {
-                        yield return new CompilationReportMessageModel
-                        {
-                            Type = message.Type,
-                            Message = message.Message,
-                            Filename = path,
-                            LineNumber = message.LineNumber
-                        };
-                    }
-                }
-
-                foreach (var (type, text, path, lineNumber) in _messages)
-                {
-                    yield return new CompilationReportMessageModel
-                    {
-                        Type = type,
-                        Message = text,
-                        Filename = path,
-                        LineNumber = lineNumber
-                    };
-                }
-            }
         }
     }
 }

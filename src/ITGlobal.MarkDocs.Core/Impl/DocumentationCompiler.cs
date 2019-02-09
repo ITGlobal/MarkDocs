@@ -43,7 +43,7 @@ namespace ITGlobal.MarkDocs.Impl
 
             public void Error(string message, Exception exception)
             {
-                // todo write exception to log
+                _compiler._log.Error(exception, message);
                 _compiler._reportBuilder.Error(Page.AbsolutePath, message);
             }
         }
@@ -55,6 +55,8 @@ namespace ITGlobal.MarkDocs.Impl
         private readonly ICacheUpdateTransaction _transaction;
 
         private readonly CompilationReportBuilder _reportBuilder;
+        private readonly IMarkDocsLog _log;
+
         private readonly Dictionary<string, FileModel> _attachments
             = new Dictionary<string, FileModel>(StringComparer.OrdinalIgnoreCase);
 
@@ -62,10 +64,14 @@ namespace ITGlobal.MarkDocs.Impl
 
         #region .ctor
 
-        public DocumentationCompiler(ICacheUpdateTransaction transaction, CompilationReportBuilder reportBuilder)
+        public DocumentationCompiler(
+            ICacheUpdateTransaction transaction, 
+            CompilationReportBuilder reportBuilder,
+            IMarkDocsLog log)
         {
             _transaction = transaction;
             _reportBuilder = reportBuilder;
+            _log = log;
         }
 
         #endregion

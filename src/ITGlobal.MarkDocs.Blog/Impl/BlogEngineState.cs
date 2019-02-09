@@ -10,7 +10,7 @@ namespace ITGlobal.MarkDocs.Blog.Impl
     {
         private readonly IDocumentation _documentation;
 
-        public BlogEngineState(IBlogEngine engine, IDocumentation documentation, CompilationReportBuilder report)
+        public BlogEngineState(IBlogEngine engine, IDocumentation documentation, BlogCompilationReportBuilder report)
         {
             _documentation = documentation;
 

@@ -6,11 +6,13 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
     {
         public const string Language = "mermaid";
         
-        public bool CanRender(IPageReadContext ctx, FencedCodeBlock block) 
-            => block.Info == Language;
-
-        public IRenderable CreateRenderable(IPageReadContext ctx, FencedCodeBlock block)
+        public IRenderable TryCreateRenderable(IPageReadContext ctx, FencedCodeBlock block)
         {
+            if (block.Info != Language)
+            {
+                return null;
+            }
+
             return new MermaidRenderable(block);
         }
     }

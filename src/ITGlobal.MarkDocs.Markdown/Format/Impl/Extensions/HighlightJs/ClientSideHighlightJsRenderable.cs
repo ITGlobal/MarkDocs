@@ -1,7 +1,7 @@
 ﻿using Markdig.Renderers;
 using Markdig.Syntax;
 
-namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
+namespace ITGlobal.MarkDocs.Format.Impl.Extensions.HighlightJs
 {
     internal sealed class ClientSideHighlightJsRenderable : IRenderable
     {

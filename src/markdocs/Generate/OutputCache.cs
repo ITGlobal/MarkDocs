@@ -18,9 +18,13 @@ namespace ITGlobal.MarkDocs.Tools.Generate
 
         public CacheDocumentationModel[] Load() => Array.Empty<CacheDocumentationModel>();
 
-        public ICacheUpdateTransaction BeginTransaction(ISourceTree sourceTree, ISourceInfo sourceInfo, bool forceCacheClear = false)
+        public ICacheUpdateTransaction BeginTransaction(
+            ISourceTree sourceTree, 
+            ISourceInfo sourceInfo,
+            CompilationEventListener listener, 
+            bool forceCacheClear = false)
         {
-            return new OutputCacheUpdateTransaction(_directory, _template);
+            return new OutputCacheUpdateTransaction(_directory, _template, listener);
         }
 
         public void Drop(string documentationId) { }

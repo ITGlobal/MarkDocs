@@ -36,20 +36,20 @@ namespace ITGlobal.MarkDocs
         #region Callback
 
         /// <summary>
-        ///     Sets a lifetime event callback
+        ///     Sets a lifetime event listener
         /// </summary>
         [NotNull]
-        public static MarkDocsOptions UseCallback([NotNull] this MarkDocsOptions options, [NotNull] IMarkDocsEventCallback callback)
+        public static MarkDocsOptions UseEventListener([NotNull] this MarkDocsOptions options, [NotNull] MarkDocsEventListener listener)
         {
-            return options.UseCallback(_ => callback);
+            return options.UseCallback(_ => listener);
         }
 
         /// <summary>
-        ///     Sets a lifetime event callback
+        ///     Sets a lifetime event listener
         /// </summary>
         [NotNull]
-        public static MarkDocsOptions UseCallback<T>([NotNull] this MarkDocsOptions options)
-            where T: class, IMarkDocsEventCallback
+        public static MarkDocsOptions UseEventListener<T>([NotNull] this MarkDocsOptions options)
+            where T: MarkDocsEventListener
         {
             options.ConfigureServices(_ => _.AddSingleton<T>());
             return options.UseCallback(_ => _.GetRequiredService<T>());

@@ -19,7 +19,7 @@ namespace ITGlobal.MarkDocs.Format.Impl
         private readonly IMarkDocsLog _log;
         private readonly IMetadataExtractor _metadataExtractor;
         private readonly IResourceUrlResolver _resourceUrlResolver;
-        private readonly IMarkDocsEventCallback _callback;
+        private readonly MarkDocsEventListener _listener;
         private readonly MarkdownPipeline _pipeline;
 
         internal static readonly HashSet<string> Extensions = new HashSet<string>(StringComparer.CurrentCultureIgnoreCase)
@@ -43,12 +43,12 @@ namespace ITGlobal.MarkDocs.Format.Impl
             [NotNull] IMarkDocsLog log,
             [NotNull] IMetadataExtractor metadataExtractor,
             [NotNull] IResourceUrlResolver resourceUrlResolver,
-            [NotNull] IMarkDocsEventCallback callback)
+            [NotNull] MarkDocsEventListener listener)
         {
             _log = log;
             _metadataExtractor = metadataExtractor;
             _resourceUrlResolver = resourceUrlResolver;
-            _callback = callback;
+            _listener = listener;
 
             _pipeline = pipelineFactory.Create();
         }

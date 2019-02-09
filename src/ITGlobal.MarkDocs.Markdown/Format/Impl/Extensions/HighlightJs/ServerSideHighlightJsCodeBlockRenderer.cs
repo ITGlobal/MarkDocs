@@ -1,9 +1,9 @@
-﻿using Markdig.Syntax;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using ITGlobal.MarkDocs.Source;
+using Markdig.Syntax;
 
-namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
+namespace ITGlobal.MarkDocs.Format.Impl.Extensions.HighlightJs
 {
     internal sealed class ServerSideHighlightJsCodeBlockRenderer : ICodeBlockRenderer
     {
@@ -47,12 +47,14 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers
             _hljs = hljs;
         }
 
-        public bool CanRender(IPageReadContext ctx, FencedCodeBlock block)
-            => _hljs.SupportedLanguages.Contains(block.Info);
-
-        public IRenderable CreateRenderable(IPageReadContext ctx, FencedCodeBlock block)
+        public IRenderable TryCreateRenderable(IPageReadContext ctx, FencedCodeBlock block)
         {
             var language = block.Info;
+            if (!_hljs.SupportedLanguages.Contains(language))
+            {
+                return null;
+            }
+            
             var markup = block.GetText();
 
             ctx.CreateAttachment(
