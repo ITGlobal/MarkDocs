@@ -55,6 +55,7 @@ namespace ITGlobal.MarkDocs.Search.Impl
         {
             _log = log;
             _indexRootDirectory = options.IndexDirectory;
+            System.IO.Directory.CreateDirectory(_indexRootDirectory);
 
             Directory.CreateDirectory(_indexRootDirectory);
             lock (_descriptorLock)
