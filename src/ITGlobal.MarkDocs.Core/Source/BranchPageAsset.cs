@@ -1,9 +1,17 @@
-﻿using ITGlobal.MarkDocs.Format;
+using ITGlobal.MarkDocs.Format;
+using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Source
 {
+    /// <summary>
+    ///     Branch page asset
+    /// </summary>
+    [PublicAPI]
     public sealed class BranchPageAsset : PageAsset
     {
+        /// <summary>
+        ///     .ctor
+        /// </summary>
         public BranchPageAsset(
             string id,
             string relativePath,
@@ -17,6 +25,10 @@ namespace ITGlobal.MarkDocs.Source
             Subpages = subpages;
         }
 
+        /// <summary>
+        ///     Nested pages assets
+        /// </summary>
+        [NotNull]
         public PageAsset[] Subpages { get; }
     }
 }

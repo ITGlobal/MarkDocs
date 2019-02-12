@@ -7,9 +7,19 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.PlantUml
     {
         public const string Language = "plantuml";
 
-        public IRenderable CreateRenderable(IPageReadContext ctx, MarkdownObject obj, string markup)
+        public IRenderable CreateRenderable(IPageReadContext ctx, MarkdownObject obj, string markup, string filename = null)
         {
-            ctx.CreateAttachment(markup, GenerateContent(markup, obj.Line), out var asset, out var url);
+            GeneratedFileAsset asset;
+            string url;
+
+            if (!string.IsNullOrEmpty(filename))
+            {
+                ctx.CreateAttachment(markup, filename, GenerateContent(markup, obj.Line), out asset, out url);
+            }
+            else
+            {
+                ctx.CreateAttachment(markup, GenerateContent(markup, obj.Line), out asset, out url);
+            }
 
             return new PlantUmlRenderable(obj, asset, url);
         }

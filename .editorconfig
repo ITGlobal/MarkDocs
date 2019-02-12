@@ -1,0 +1,12 @@
+root = true
+
+[*]
+end_of_line = crlf
+charset = utf-8
+
+[*.cs]
+dotnet_naming_symbols.constant_fields.applicable_kinds = field
+dotnet_naming_symbols.constant_fields.required_modifiers = const
+dotnet_naming_rule.constant_fields_must_be_pascal_case.severity = warning
+dotnet_naming_rule.constant_fields_must_be_pascal_case.symbols = constant_fields
+dotnet_naming_rule.constant_fields_must_be_pascal_case.style = const_case

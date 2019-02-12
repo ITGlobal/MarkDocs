@@ -1,11 +1,11 @@
-﻿@model ListModel
+@model ListModel
 
 @{
     ViewData["Title"] = $"Blog (page {Model.Page})";
 }
 
 @{
-    Html.RenderPartial("_List", Model.Posts);
+    await Html.RenderPartialAsync("_List", Model.Posts);
 }
 
 <nav>

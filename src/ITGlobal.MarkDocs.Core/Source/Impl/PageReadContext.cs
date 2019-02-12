@@ -86,6 +86,26 @@ namespace ITGlobal.MarkDocs.Source.Impl
             url = _worker.ResourceUrlResolver.ResolveUrl(this, asset);
         }
 
+        public void CreateAttachment(byte[] source, string filename, IGeneratedAssetContent content, out GeneratedFileAsset asset, out string url)
+            => CreateAttachmentImpl(HashUtil.HashBuffer(source), content, out asset, out url);
+
+        public void CreateAttachment(string source, string filename, IGeneratedAssetContent content, out GeneratedFileAsset asset, out string url)
+            => CreateAttachmentImpl(HashUtil.HashString(source), content, out asset, out url);
+
+        private void CreateAttachmentImpl(string hash, string filename, IGeneratedAssetContent content, out GeneratedFileAsset asset, out string url)
+        {
+            var id = $"/{filename}";
+            asset = new GeneratedFileAsset(
+                id: id,
+                relativePath: filename,
+                content: content,
+                contentHash: hash
+            );
+
+            _worker.RegisterAsset(asset);
+            url = _worker.ResourceUrlResolver.ResolveUrl(this, asset);
+        }
+
         public void Warning(string message, int? lineNumber = null)
         {
             _worker.Report.Warning(_asset.AbsolutePath, message, lineNumber);

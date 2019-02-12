@@ -1,11 +1,11 @@
-﻿@model TagModel
+@model TagModel
 
 @{
     ViewData["Title"] = "All posts by tag \"{Model.Tag.Name}\"";
 }
 
 @{
-    Html.RenderPartial("_List", Model.Posts);
+    await Html.RenderPartialAsync("_List", Model.Posts);
 }
 
 <nav>

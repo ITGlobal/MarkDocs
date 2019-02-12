@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
 using Markdig.Renderers;
@@ -13,6 +14,6 @@ namespace ITGlobal.MarkDocs.Format
         /// <summary>
         ///     Renders a TOC into HTML
         /// </summary>
-        void Render(HtmlRenderer renderer, PageAnchor[] anchors);
+        void Render(HtmlRenderer renderer, IReadOnlyList<PageAnchor> anchors);
     }
 }

@@ -23,6 +23,9 @@ namespace ITGlobal.MarkDocs.Source
 
         #region .ctor
 
+        /// <summary>
+        ///     .ctor
+        /// </summary>
         public PageMetadata(
             string contentId = null,
             string lastChangedBy = null,
@@ -51,55 +54,67 @@ namespace ITGlobal.MarkDocs.Source
         ///     Page permanent identifier
         /// </summary>
         [JsonProperty("content_id", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [NotNull]
         public string ContentId { get; }
 
         /// <summary>
         ///     Page's last change author
         /// </summary>
         [JsonProperty("last_changed_by", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [NotNull]
         public string LastChangedBy { get; }
 
         /// <summary>
         ///     Page title
         /// </summary>
         [JsonProperty("title", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [NotNull]
         public string Title { get; }
 
         /// <summary>
         ///     Page description
         /// </summary>
         [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [NotNull]
         public string Description { get; }
 
         /// <summary>
         ///     Page order
         /// </summary>
         [JsonProperty("order", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CanBeNull]
         public int? Order { get; }
 
         /// <summary>
         ///     Page tags
         /// </summary>
         [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [NotNull]
         public string[] Tags { get; }
 
         /// <summary>
         ///     Page meta tags (HTML)
         /// </summary>
         [JsonProperty("meta_tags", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [NotNull]
         public string[] MetaTags { get; }
 
         /// <summary>
         ///     Custom properties
         /// </summary>
         [JsonProperty("props", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [NotNull]
         public ImmutableDictionary<string, string> Properties { get; }
 
         #endregion
 
         #region methods
 
-        public PageMetadata WithContentId(string value)
+        /// <summary>
+        ///     Updates the <see cref="ContentId"/> property
+        /// </summary>
+        [NotNull]
+        public PageMetadata WithContentId([NotNull] string value)
         {
             if (ContentId == value)
             {
@@ -118,6 +133,10 @@ namespace ITGlobal.MarkDocs.Source
             );
         }
 
+        /// <summary>
+        ///     Updates the <see cref="LastChangedBy"/> property
+        /// </summary>
+        [NotNull]
         public PageMetadata WithLastChangedBy(string value)
         {
             if (LastChangedBy == value)
@@ -137,7 +156,11 @@ namespace ITGlobal.MarkDocs.Source
             );
         }
 
-        public PageMetadata WithOrder(int? value)
+        /// <summary>
+        ///     Updates the <see cref="Order"/> property
+        /// </summary>
+        [NotNull]
+        public PageMetadata WithOrder([CanBeNull] int? value)
         {
             if (Order == value)
             {
@@ -156,7 +179,11 @@ namespace ITGlobal.MarkDocs.Source
             );
         }
 
-        public PageMetadata WithDescription(string value)
+        /// <summary>
+        ///     Updates the <see cref="Description"/> property
+        /// </summary>
+        [NotNull]
+        public PageMetadata WithDescription([NotNull] string value)
         {
             if (Description == value)
             {
@@ -175,7 +202,11 @@ namespace ITGlobal.MarkDocs.Source
             );
         }
 
-        public PageMetadata WithTitle(string value)
+        /// <summary>
+        ///     Updates the <see cref="Title"/> property
+        /// </summary>
+        [NotNull]
+        public PageMetadata WithTitle([NotNull] string value)
         {
             if (Title == value)
             {
@@ -194,7 +225,11 @@ namespace ITGlobal.MarkDocs.Source
             );
         }
 
-        public PageMetadata WithTags(string[] value)
+        /// <summary>
+        ///     Updates the <see cref="Tags"/> property
+        /// </summary>
+        [NotNull]
+        public PageMetadata WithTags([NotNull] string[] value)
         {
             return new PageMetadata(
                 contentId: ContentId,
@@ -208,7 +243,11 @@ namespace ITGlobal.MarkDocs.Source
             );
         }
 
-        public PageMetadata WithMetaTags(string[] value)
+        /// <summary>
+        ///     Updates the <see cref="MetaTags"/> property
+        /// </summary>
+        [NotNull]
+        public PageMetadata WithMetaTags([NotNull] string[] value)
         {
             return new PageMetadata(
                 contentId: ContentId,
@@ -222,7 +261,11 @@ namespace ITGlobal.MarkDocs.Source
             );
         }
 
-        public PageMetadata With(string key, string value)
+        /// <summary>
+        ///     Updates the <see cref="Properties"/> property
+        /// </summary>
+        [NotNull]
+        public PageMetadata With([NotNull] string key, [NotNull] string value)
         {
             return new PageMetadata(
                 contentId: ContentId,
@@ -236,7 +279,11 @@ namespace ITGlobal.MarkDocs.Source
             );
         }
 
-        public PageMetadata MergeWith(PageMetadata other)
+        /// <summary>
+        ///     Merges two values of <see cref="PageMetadata"/> together
+        /// </summary>
+        [NotNull]
+        public PageMetadata MergeWith([CanBeNull] PageMetadata other)
         {
             if (other == null || ReferenceEquals(other, Empty))
             {
@@ -308,7 +355,11 @@ namespace ITGlobal.MarkDocs.Source
             }
         }
 
-        public string GetString(string key)
+        /// <summary>
+        ///     Gets a custom string property by its key
+        /// </summary>
+        [CanBeNull]
+        public string GetString([NotNull] string key)
         {
             if (!Properties.TryGetValue(key, out var value))
             {
@@ -318,6 +369,7 @@ namespace ITGlobal.MarkDocs.Source
             return value;
         }
 
+        /// <inheritdoc />
         public override string ToString() => JsonConvert.SerializeObject(this, Formatting.Indented);
 
         #endregion

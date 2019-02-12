@@ -26,7 +26,7 @@ namespace ITGlobal.MarkDocs.Impl
 
             switch (model.Type)
             {
-                case AttachmentType.Generated:
+                case FileType.Generated:
                     Type = ResourceType.GeneratedFile;
                     break;
                 default:

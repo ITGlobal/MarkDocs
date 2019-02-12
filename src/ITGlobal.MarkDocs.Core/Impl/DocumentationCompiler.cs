@@ -27,14 +27,14 @@ namespace ITGlobal.MarkDocs.Impl
 
             public PageAsset Page { get; }
             public AssetTree AssetTree { get; }
-            
+
             public CreateAttachmentResult Store(GeneratedFileAsset asset)
             {
                 _compiler.Process(asset);
 
                 return new CreateAttachmentResult(asset, _compiler._transaction.Read);
             }
-            
+
             public void Warning(string message, int? lineNumber = null, Exception exception = null)
                 => _compiler._reportBuilder.Warning(Page.AbsolutePath, message, lineNumber);
 
@@ -65,7 +65,7 @@ namespace ITGlobal.MarkDocs.Impl
         #region .ctor
 
         public DocumentationCompiler(
-            ICacheUpdateTransaction transaction, 
+            ICacheUpdateTransaction transaction,
             CompilationReportBuilder reportBuilder,
             IMarkDocsLog log)
         {
@@ -82,7 +82,7 @@ namespace ITGlobal.MarkDocs.Impl
         {
             var rootPage = Process(assetTree, assetTree.RootPage);
 
-            foreach (var asset in assetTree.Files)
+            foreach (var (_, asset) in assetTree.Files)
             {
                 Process(asset);
             }
@@ -99,7 +99,7 @@ namespace ITGlobal.MarkDocs.Impl
                     LastChangeAuthor = assetTree.SourceInfo.LastChangeAuthor,
                     LastChangeDescription = assetTree.SourceInfo.LastChangeDescription,
                 },
-                Files = _attachments.OrderBy(_ => _.Key).Select(_=>_.Value).ToArray(),
+                Files = _attachments.OrderBy(_ => _.Key).Select(_ => _.Value).ToArray(),
                 RootPage = rootPage,
                 CompilationReport = _reportBuilder.Build(assetTree.RootDirectory),
             };
@@ -229,7 +229,7 @@ namespace ITGlobal.MarkDocs.Impl
                         {
                             Id = a.Id,
                             RelativePath = a.RelativePath,
-                            Type = AttachmentType.File,
+                            Type = FileType.File,
                             ContentType = a.ContentType,
                         };
 
@@ -245,7 +245,7 @@ namespace ITGlobal.MarkDocs.Impl
                         {
                             Id = a.Id,
                             RelativePath = a.RelativePath,
-                            Type = AttachmentType.Generated,
+                            Type = FileType.Generated,
                             ContentType = a.ContentType,
                         };
 
@@ -256,7 +256,7 @@ namespace ITGlobal.MarkDocs.Impl
 
                 default:
                     throw new InvalidOperationException($"Unknown asset file: \"{asset?.GetType()?.Name}\"");
-               
+
             }
         }
 
@@ -266,20 +266,6 @@ namespace ITGlobal.MarkDocs.Impl
             {
                 source.CopyTo(stream);
             }
-        }
-
-        private void Process(GeneratedFileAsset asset, Action<Stream> write)
-        {
-            var model = new FileModel
-            {
-                Id = asset.Id,
-                RelativePath = asset.RelativePath,
-                Type = AttachmentType.Generated,
-                ContentType = asset.ContentType,
-            };
-
-            _transaction.Store(asset, write);
-            _attachments.Add(asset.Id, model);
         }
 
         #endregion

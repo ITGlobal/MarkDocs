@@ -1,6 +1,5 @@
-﻿using ITGlobal.MarkDocs.Source;
+using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace ITGlobal.MarkDocs

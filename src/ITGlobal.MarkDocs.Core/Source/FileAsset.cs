@@ -1,8 +1,17 @@
-﻿namespace ITGlobal.MarkDocs.Source
+﻿using JetBrains.Annotations;
+
+namespace ITGlobal.MarkDocs.Source
 {
+    /// <summary>
+    ///     File asset
+    /// </summary>
+    [PublicAPI]
     public abstract class FileAsset : Asset
     {
-        protected FileAsset(
+        /// <summary>
+        ///     .ctor
+        /// </summary>
+        internal FileAsset(
             string id,
             string contentHash,
             string contentType)
@@ -12,7 +21,16 @@
             ContentType = contentType;
         }
 
+        /// <summary>
+        ///     File content hash
+        /// </summary>
+        [NotNull]
         public string ContentHash { get; }
+
+        /// <summary>
+        ///     File MIME type
+        /// </summary>
+        [NotNull]
         public string ContentType { get; }
     }
 }

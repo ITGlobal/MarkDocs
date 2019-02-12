@@ -1,5 +1,10 @@
-﻿namespace ITGlobal.MarkDocs.Cache.Model
+﻿using JetBrains.Annotations;
+
+namespace ITGlobal.MarkDocs.Cache.Model
 {
-    public sealed class PagePreviewModel : ResourceModel
-    { }
+    /// <summary>
+    ///     A page model
+    /// </summary>
+    [PublicAPI]
+    public sealed class PagePreviewModel : ResourceModel { }
 }

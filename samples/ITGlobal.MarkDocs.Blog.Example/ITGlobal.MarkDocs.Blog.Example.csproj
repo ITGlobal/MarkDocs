@@ -1,16 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>MarkDocs.Blog.Example</AssemblyName>
     <OutputType>Exe</OutputType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Data\**" />
-    <Resource Remove="Data\**" />
     <EmbeddedResource Remove="Data\**" />
     <Content Remove="Data\**" />
+    <None Remove="Data\**" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\ITGlobal.MarkDocs.Blog\ITGlobal.MarkDocs.Blog.csproj" />

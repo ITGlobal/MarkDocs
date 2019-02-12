@@ -26,7 +26,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
         public Dictionary<string, string> MetaTags { get; set; }
 
         /// <summary>
-        ///     Converts current object into <see cref="Metadata"/>
+        ///     Converts current object into <see cref="PageMetadata"/>
         /// </summary>
         public PageMetadata GetMetadata()
         {

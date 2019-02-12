@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -56,7 +56,7 @@
                 @RenderBody()
             </div>
             <div class="col-sm-3">
-                @{ Html.RenderPartial("_Sidebar"); }
+                @{ await Html.RenderPartialAsync("_Sidebar"); }
             </div>
         </div>
 

@@ -48,6 +48,22 @@ Foo1 -> Foo5 : To database
 
 ***
 
+Use the following markup to embed [PlantUML](http://plantuml.com/) diagrams from a separate file:
+
+:::col-md-6
+
+    ![](/images/example.plantuml)
+
+:::
+
+:::col-md-6
+
+![](/images/example.plantuml)
+
+:::
+
+***
+
 ## Mermaid
 
 ### Flowcharts

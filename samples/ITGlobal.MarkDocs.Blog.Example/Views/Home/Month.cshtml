@@ -1,11 +1,11 @@
-﻿@model MonthModel
+@model MonthModel
 
 @{
     ViewData["Title"] = $"Blog ({Model.Year}/{Model.Month})";
 }
 
 @{
-    Html.RenderPartial("_List", Model.Posts);
+    await Html.RenderPartialAsync("_List", Model.Posts);
 }
 
 <nav>

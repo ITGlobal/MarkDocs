@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using System.Collections.Generic;
 
 namespace ITGlobal.MarkDocs
 {
@@ -12,19 +12,19 @@ namespace ITGlobal.MarkDocs
         /// <summary>
         ///     A page
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IPage Page { get; }
 
         /// <summary>
         ///     Relative name of source file
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         string SourceFileName { get; }
 
         /// <summary>
         ///     List of errors and warnings
         /// </summary>
-        [PublicAPI, NotNull]
+        [NotNull]
         IReadOnlyList<ICompilationReportMessage> Messages { get; }
     }
 }

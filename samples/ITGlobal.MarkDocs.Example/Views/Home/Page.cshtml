@@ -1,4 +1,4 @@
-﻿@using ITGlobal.MarkDocs
+@using ITGlobal.MarkDocs
 @using ITGlobal.MarkDocs.Example.Model
 @model PageModel
 @{
@@ -6,7 +6,7 @@
 }
 
 @section head
-{
+    {
     @if (Model.Page.Metadata.MetaTags != null)
     {
         foreach (var metaTag in Model.Page.Metadata.MetaTags)
@@ -18,7 +18,7 @@
 
 <div class="page-layout-root">
     <div class="page-breadcrumbs">
-        @Html.Partial("Components/_Breadcrumbs", Model.Page)
+        @(await Html.PartialAsync("Components/_Breadcrumbs", Model.Page))
     </div>
 
     <div class="page-sidebar">

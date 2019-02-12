@@ -6,12 +6,13 @@
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>MarkDocs.Example</AssemblyName>
     <OutputType>Exe</OutputType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Data\**" />
-    <Resource Remove="Data\**" />
     <EmbeddedResource Remove="Data\**" />
     <Content Remove="Data\**" />
+    <None Remove="Data\**" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\ITGlobal.MarkDocs\ITGlobal.MarkDocs.csproj" />

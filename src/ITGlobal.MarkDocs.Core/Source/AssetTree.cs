@@ -4,6 +4,10 @@ using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Source
 {
+    /// <summary>
+    ///     Asset tree
+    /// </summary>
+    [PublicAPI]
     public sealed class AssetTree
     {
         private readonly Dictionary<string, Asset> _assetsById
@@ -12,6 +16,9 @@ namespace ITGlobal.MarkDocs.Source
         private readonly Dictionary<string, BranchPageAsset> _parentPages
             = new Dictionary<string, BranchPageAsset>();
 
+        /// <summary>
+        ///     .ctor
+        /// </summary>
         public AssetTree(
             [NotNull] string id,
             [NotNull] string rootDirectory,
@@ -23,7 +30,7 @@ namespace ITGlobal.MarkDocs.Source
             RootDirectory = rootDirectory;
             SourceInfo = sourceInfo;
             RootPage = rootPage;
-            Files = files;
+            Files = files.ToImmutableDictionary(_=>_.Id);
 
             var pages = ImmutableDictionary.CreateBuilder<string, PageAsset>();
             Walk(rootPage);
@@ -55,24 +62,45 @@ namespace ITGlobal.MarkDocs.Source
             }
         }
 
+        /// <summary>
+        ///     Source tree ID
+        /// </summary>
         [NotNull]
         public string Id { get; }
 
+        /// <summary>
+        ///     Source tree root directory
+        /// </summary>
         [NotNull]
         public string RootDirectory { get; }
 
+        /// <summary>
+        ///     Content version information
+        /// </summary>
         [NotNull]
         public ISourceInfo SourceInfo { get; }
 
+        /// <summary>
+        ///     Root page asset
+        /// </summary>
         [NotNull]
         public PageAsset RootPage { get; }
 
+        /// <summary>
+        ///     Page assets by ID
+        /// </summary>
         [NotNull]
         public ImmutableDictionary<string, PageAsset> Pages { get; }
 
+        /// <summary>
+        ///     File assets by ID
+        /// </summary>
         [NotNull]
-        public FileAsset[] Files { get; }
+        public ImmutableDictionary<string, FileAsset> Files { get; }
 
+        /// <summary>
+        ///     Gets an assets by its ID
+        /// </summary>
         [CanBeNull]
         public Asset TryGetAsset([NotNull] string id)
         {
@@ -80,6 +108,9 @@ namespace ITGlobal.MarkDocs.Source
             return asset;
         }
 
+        /// <summary>
+        ///     Gets a parent page asset for a specified page asset ID
+        /// </summary>
         [CanBeNull]
         public BranchPageAsset TryGetParentPage([NotNull] string id)
         {

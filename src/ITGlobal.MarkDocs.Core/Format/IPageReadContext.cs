@@ -56,6 +56,28 @@ namespace ITGlobal.MarkDocs.Format
         );
 
         /// <summary>
+        ///     Adds a generated attachment
+        /// </summary>
+        void CreateAttachment(
+            [NotNull] byte[] source,
+            [NotNull] string filename,
+            [NotNull] IGeneratedAssetContent content,
+            out GeneratedFileAsset asset,
+            out string url
+        );
+
+        /// <summary>
+        ///     Adds a generated attachment
+        /// </summary>
+        void CreateAttachment(
+            [NotNull] string source,
+            [NotNull] string filename,
+            [NotNull] IGeneratedAssetContent content,
+            out GeneratedFileAsset asset,
+            out string url
+        );
+
+        /// <summary>
         ///     Adds a warning to compilation report
         /// </summary>
         void Warning(string message, int? lineNumber = null);

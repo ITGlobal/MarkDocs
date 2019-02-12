@@ -34,8 +34,10 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.PlantUml
                 return null;
             }
 
+            var filename = $"{obj.Url}.png";
+
             var markup = File.ReadAllText(path, Encoding.UTF8);
-            return _renderer.CreateRenderable(ctx, obj, markup);
+            return _renderer.CreateRenderable(ctx, obj, markup, filename);
         }
     }
 }

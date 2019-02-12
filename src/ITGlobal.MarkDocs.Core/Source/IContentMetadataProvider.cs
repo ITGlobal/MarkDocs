@@ -5,6 +5,7 @@ namespace ITGlobal.MarkDocs.Source
     /// <summary>
     ///     Provides asset metadata from various sources
     /// </summary>
+    [PublicAPI]
     public interface IContentMetadataProvider
     {
         /// <summary>

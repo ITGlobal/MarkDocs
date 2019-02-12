@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace ITGlobal.MarkDocs.Format
 {
     /// <summary>
-    ///     A page that has been parsed already
+    ///     A page asset content
     /// </summary>
     [PublicAPI]
     public interface IPageContent

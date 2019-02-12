@@ -1,14 +1,15 @@
-﻿using ITGlobal.MarkDocs.Source;
+﻿using System.Collections.Generic;
+using ITGlobal.MarkDocs.Source;
 using Markdig.Renderers;
 
 namespace ITGlobal.MarkDocs.Format.Impl.Extensions.TableOfContents
 {
     internal sealed class DefaultTocRenderer : ITocRenderer
     {
-        public void Render(HtmlRenderer renderer, PageAnchor[] anchors)
+        public void Render(HtmlRenderer renderer, IReadOnlyList<PageAnchor> anchors)
         {
             renderer.WriteLine("<ul>");
-            for (var index = 0; index < anchors.Length; index++)
+            for (var index = 0; index < anchors.Count; index++)
             {
                 Render(renderer, anchors[index], index, 1);
             }
