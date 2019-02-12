@@ -10,7 +10,6 @@ build_script:
 test: 'off'
 artifacts:
 - path: artifacts\**\*.nupkg
-- path: artifacts\**\*.zip
 environment:
   CHOCO_PUSH_PUBLIC: 0
   CHOCO_PUSH_PRIVATE: 1
