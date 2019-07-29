@@ -1,6 +1,10 @@
-﻿using ITGlobal.MarkDocs.Source;
+using AngleSharp.Dom;
+using AngleSharp.Html.Parser;
+using ITGlobal.MarkDocs.Source;
 using Markdig.Renderers.Html;
 using Markdig.Syntax;
+using Markdig.Syntax.Inlines;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,12 +13,56 @@ namespace ITGlobal.MarkDocs.Format.Impl.Metadata
 {
     internal static class PageAnchorReader
     {
+        private static readonly HtmlParser _HtmlParser = new HtmlParser();
+
         public static PageAnchor[] Read(MarkdownDocument document)
         {
-            var headings = document.Descendants<HeadingBlock>().ToArray();
+            var anchors = new Dictionary<string, PageAnchor>();
 
+            var headings = document.Descendants<HeadingBlock>().ToArray();
             var tree = GenerateTocTree(headings);
-            return tree.ToPageAnchor().Nested;
+            foreach (var anchor in tree.ToPageAnchor().Nested)
+            {
+                anchors[anchor.Id] = anchor;
+            }
+
+            foreach (var htmlBlock in document.Descendants<HtmlBlock>())
+            {
+                ProcessHtmlNode(htmlBlock.Lines.ToString());
+            }
+            foreach (var htmlInline in document.Descendants().OfType<HtmlInline>())
+            {
+                ProcessHtmlNode(htmlInline.Tag);
+            }
+
+            return anchors.Values.OrderBy(_ => _.Id).ToArray();
+
+            void ProcessHtmlNode(string markup)
+            {
+                try
+                {
+                    var html = _HtmlParser.ParseDocument(markup);
+                    foreach (var domNode in html.All)
+                    {
+                        if (!string.IsNullOrEmpty(domNode.Id))
+                        {
+                            var anchor = new PageAnchor(domNode.Id, domNode.Text(), Array.Empty<PageAnchor>());
+                            anchors[anchor.Id] = anchor;
+                        }
+
+                        if (domNode.TagName == "A")
+                        {
+                            var name = domNode.GetAttribute("name");
+                            if (!string.IsNullOrEmpty(name))
+                            {
+                                var anchor = new PageAnchor(name, domNode.Text(), Array.Empty<PageAnchor>());
+                                anchors[anchor.Id] = anchor;
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
         }
 
         private sealed class TocTreeNode
@@ -98,7 +146,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Metadata
                 if (relativeDepth < 0)
                 {
                     // End of nested headings
-                    while (roots.Count > 0&& relativeDepth < 0)
+                    while (roots.Count > 0 && relativeDepth < 0)
                     {
                         currentRoot = roots.Pop();
                         relativeDepth = heading.Level - (currentRoot.Level + 1);

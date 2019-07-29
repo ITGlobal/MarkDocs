@@ -1,4 +1,4 @@
-﻿using ITGlobal.MarkDocs.Format.Impl.Extensions.Cut;
+using ITGlobal.MarkDocs.Format.Impl.Extensions.Cut;
 using ITGlobal.MarkDocs.Format.Impl.Metadata;
 using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
@@ -231,15 +231,18 @@ namespace ITGlobal.MarkDocs.Format.Impl
                 if (!string.IsNullOrEmpty(hash))
                 {
                     validateAnchorsQueue.Enqueue(new ValidateAnchorQueueItem(pageId, hash, link));
-                }
 
-                if (pageId == ctx.Page.Id)
-                {
-                    var text = link.GetText();
-                    ctx.Warning(
-                        $"Link [{text}]({url}#{hash}) can be replaced with [{text}](#{hash})",
-                        link.Line
-                    );
+                    if (pageId == ctx.Page.Id)
+                    {
+                        var text = link.GetText();
+                        ctx.Warning(
+                            $"Link [{text}]({url}#{hash}) can be replaced with [{text}](#{hash})",
+                            link.Line
+                        );
+                    }
+
+                    pageUrl = $"{pageUrl}#{hash}";
+                    return pageUrl;
                 }
 
                 return pageUrl;
