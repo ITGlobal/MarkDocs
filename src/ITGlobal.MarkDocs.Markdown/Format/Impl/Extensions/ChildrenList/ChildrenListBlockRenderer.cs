@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Markdig.Renderers;
 using Markdig.Renderers.Html;
 
@@ -19,8 +19,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.ChildrenList
             {
                 return;
             }
-
-
+            
             var ctx = MarkdownPageRenderContext.Current;
             try
             {

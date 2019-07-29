@@ -1,4 +1,4 @@
-﻿@using ITGlobal.MarkDocs
+@using ITGlobal.MarkDocs
 @model ITGlobal.MarkDocs.IPage
 
 @{
@@ -16,7 +16,7 @@
     @while (nodes.Count > 0)
     {
         var node = nodes.Pop();
-        var url = $"/{Uri.EscapeDataString(Model.Documentation.Id)}/{node.Id}";
+        var url = $"/{Uri.EscapeDataString(Model.Documentation.Id)}{node.Id}";
         var isActive = node.Id == Model.Id;
 
         <li class="@(isActive ? "active" : "")">

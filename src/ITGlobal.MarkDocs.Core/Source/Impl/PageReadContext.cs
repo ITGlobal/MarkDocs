@@ -1,4 +1,7 @@
-﻿using ITGlobal.MarkDocs.Format;
+using System;
+using System.IO;
+using System.Linq;
+using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Impl;
 
 namespace ITGlobal.MarkDocs.Source.Impl
@@ -12,11 +15,17 @@ namespace ITGlobal.MarkDocs.Source.Impl
         {
             _worker = worker;
             _asset = asset;
+
+            var filename = Path.GetFileName(asset.AbsolutePath);
+            IsIndexPage = worker.Format.IndexFileNames.Any(
+                n => string.Equals(filename, n, StringComparison.OrdinalIgnoreCase)
+            );
         }
 
         public string SourceTreeId => _worker.Root.SourceTree.Id;
         public IResourceId Page => _asset;
         public bool IsBranchPage => _asset is BranchShallowPageAsset;
+        public bool IsIndexPage { get; }
 
         public bool TryResolvePageResource(string url, out string pageId, out string pageUrl)
         {

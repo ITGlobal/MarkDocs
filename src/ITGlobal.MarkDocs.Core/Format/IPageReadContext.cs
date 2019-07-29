@@ -21,6 +21,11 @@ namespace ITGlobal.MarkDocs.Format
         bool IsBranchPage { get; }
 
         /// <summary>
+        ///     Returns true if current page is an index page
+        /// </summary>
+        bool IsIndexPage { get; }
+
+        /// <summary>
         ///     Resolves an actual URL for specified resource
         /// </summary>
         bool TryResolvePageResource([NotNull] string url, out string pageId, out string pageUrl);

@@ -1,9 +1,9 @@
-﻿@using ITGlobal.MarkDocs
+@using ITGlobal.MarkDocs
 @model ITGlobal.MarkDocs.IDocumentation
 <dl>
-    @foreach (var (path, msgs) in Model.CompilationReport.Messages)
+    @foreach (var (path, msgs) in Model.CompilationReport.Messages.OrderBy(_ => _.Key))
     {
-        <dt>@path</dt>
+        <dt>~/@path</dt>
         <dd>
             <ul>
                 @foreach (var m in msgs)

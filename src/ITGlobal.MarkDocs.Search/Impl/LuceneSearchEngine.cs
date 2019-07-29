@@ -1,4 +1,4 @@
-﻿using ITGlobal.MarkDocs.Extensions;
+using ITGlobal.MarkDocs.Extensions;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
@@ -44,6 +44,8 @@ namespace ITGlobal.MarkDocs.Search.Impl
 
         private readonly object _reindexLock = new object();
 
+        private readonly bool _verbose;
+
         #endregion
 
         #region .ctor
@@ -55,7 +57,9 @@ namespace ITGlobal.MarkDocs.Search.Impl
         {
             _log = log;
             _indexRootDirectory = options.IndexDirectory;
-            System.IO.Directory.CreateDirectory(_indexRootDirectory);
+            _verbose = options.VerboseLogging;
+
+            Directory.CreateDirectory(_indexRootDirectory);
 
             Directory.CreateDirectory(_indexRootDirectory);
             lock (_descriptorLock)
@@ -344,7 +348,11 @@ namespace ITGlobal.MarkDocs.Search.Impl
             };
 
             writer.AddDocument(document);
-            _log.Debug($"[{page.Documentation.Id}]: indexed page {page.Id}");
+
+            if (_verbose)
+            {
+                _log.Debug($"[{page.Documentation.Id}]: indexed page {page.Id}");
+            }
         }
 
         private void CleanupOldIndices()

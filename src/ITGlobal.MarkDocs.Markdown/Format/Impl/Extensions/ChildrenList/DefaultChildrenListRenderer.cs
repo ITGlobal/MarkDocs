@@ -1,4 +1,4 @@
-﻿using ITGlobal.MarkDocs.Source;
+using ITGlobal.MarkDocs.Source;
 using Markdig.Renderers;
 
 namespace ITGlobal.MarkDocs.Format.Impl.Extensions.ChildrenList
@@ -35,23 +35,21 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.ChildrenList
 
             var context = MarkdownPageRenderContext.Current;
 
-            var parentPage = assetTree.TryGetParentPage(page.Id);
-            if (parentPage == null)
+            switch (page)
             {
-                return;
+                case BranchPageAsset branchPage:
+                    renderer.WriteLine("<ul>");
+                    foreach (var p in branchPage.Subpages)
+                    {
+                        var url = _resolver.ResolveUrl(new ChildPageIResourceUrlResolutionContext(context), p);
+
+                        renderer.WriteLine("<li>");
+                        renderer.Write($"<a href=\"{url}\">{p.Metadata.Title}</a>");
+                        renderer.WriteLine("</li>");
+                    }
+                    renderer.WriteLine("</ul>");
+                    break;
             }
-
-            renderer.WriteLine("<ul>");
-
-            foreach (var p in parentPage.Subpages)
-            {
-                var url = _resolver.ResolveUrl(new ChildPageIResourceUrlResolutionContext(context), p);
-
-                renderer.WriteLine("<li>");
-                renderer.Write($"<a href=\"{url}\">{p.Metadata.Title}</a>");
-                renderer.WriteLine("</li>");
-            }
-            renderer.WriteLine("</ul>");
         }
     }
 }

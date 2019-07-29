@@ -4,6 +4,7 @@ using ITGlobal.MarkDocs.Source;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Resources;
 using System.Threading.Tasks;
 
 namespace ITGlobal.MarkDocs.Impl
@@ -21,6 +22,8 @@ namespace ITGlobal.MarkDocs.Impl
         private readonly object _stateLock = new object();
         private MarkDocState _state = MarkDocState.Empty;
 
+        private readonly DebounceAction<ISourceTree> _rebuldSourceTreeAction;
+
         public MarkDocService(
             IMarkDocsLog log,
             ICacheProvider cache,
@@ -33,6 +36,8 @@ namespace ITGlobal.MarkDocs.Impl
             _sourceTreeProvider = sourceTreeProvider;
             _eventListener = eventListener;
             _extensions = extensions;
+
+            _rebuldSourceTreeAction = new DebounceAction<ISourceTree>(_log, sourceTree => Rebuild(sourceTree));
 
             Initialize();
         }
@@ -240,7 +245,7 @@ namespace ITGlobal.MarkDocs.Impl
                 if (sender is ISourceTree sourceTree)
                 {
                     _eventListener.SourceChanged(sourceTree);
-                    Rebuild(sourceTree);
+                    _rebuldSourceTreeAction.Trigger(sourceTree);
                 }
             }
             catch (Exception ex)

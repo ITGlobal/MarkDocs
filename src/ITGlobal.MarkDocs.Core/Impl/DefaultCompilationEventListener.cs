@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ITGlobal.MarkDocs.Source;
 
 namespace ITGlobal.MarkDocs.Impl
@@ -16,32 +16,32 @@ namespace ITGlobal.MarkDocs.Impl
 
         public override void ReadingAssetTree()
         {
-            _log.Debug($"[{_id}]: reading asset tree");
+          //  _log.Debug($"[{_id}]: reading asset tree");
         }
 
         public override void ProcessingAssets(AssetTree tree)
         {
-            _log.Debug($"[{_id}]: processing assets");
+          //  _log.Debug($"[{_id}]: processing assets");
         }
 
         public override void Cached(Asset asset)
         {
-            _log.Info($"[{_id}]: cached {asset.Id}");
+           // _log.Info($"[{_id}]: cached {asset.Id}");
         }
 
         public override void Cached(string assetId)
         {
-            _log.Info($"[{_id}]: cached {assetId}");
+           // _log.Info($"[{_id}]: cached {assetId}");
         }
 
         public override void Written(Asset asset)
         {
-            _log.Info($"[{_id}]: written {asset.Id}");
+            //_log.Info($"[{_id}]: written {asset.Id}");
         }
 
         public override void Committing()
         {
-            _log.Info($"[{_id}]: flushing...");
+            //_log.Info($"[{_id}]: flushing...");
         }
 
         public override void Completed(TimeSpan elapsed)

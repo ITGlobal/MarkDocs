@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml;
 
 namespace ITGlobal.MarkDocs.Format.Impl
 {
@@ -232,7 +233,7 @@ namespace ITGlobal.MarkDocs.Format.Impl
                 {
                     validateAnchorsQueue.Enqueue(new ValidateAnchorQueueItem(pageId, hash, link));
 
-                    if (pageId == ctx.Page.Id)
+                    if (pageId == ctx.Page.Id && link.Url != $"#{hash}")
                     {
                         var text = link.GetText();
                         ctx.Warning(
@@ -267,15 +268,16 @@ namespace ITGlobal.MarkDocs.Format.Impl
 
         private static string NormalizeResourcePath(IPageReadContext ctx, string resourceUrl)
         {
-            var basePath = ctx.Page.Id;
+            var normalizedUrl = NormalizeResourcePath(ctx.Page.Id, resourceUrl, ctx.IsBranchPage || ctx.IsIndexPage);
+            return normalizedUrl;
+        }
 
+        private static string NormalizeResourcePath(string basePath, string resourceUrl, bool isIndexPage)
+        {
             var basePathSegments = basePath.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
             var basePathLen = basePathSegments.Length;
-            //if (!page.PageTreeNode.IsIndexPage)
-            //{
-            //    basePathLen--;
-            //}
-            if (!ctx.IsBranchPage)
+
+            if (!isIndexPage)
             {
                 basePathLen--;
             }
@@ -434,7 +436,7 @@ namespace ITGlobal.MarkDocs.Format.Impl
                     link.Line
                 );
             }
-            else if (page.Id == ctx.Page.Id)
+            else if (page.Id == ctx.Page.Id && link.Url != $"#{hash}")
             {
                 var text = link.GetText();
                 ctx.Warning(

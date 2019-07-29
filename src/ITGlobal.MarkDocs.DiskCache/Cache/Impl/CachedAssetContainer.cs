@@ -122,7 +122,14 @@ namespace ITGlobal.MarkDocs.Cache.Impl
             {
                 try
                 {
-                    File.Copy(source, destination);
+                    File.Copy(source, destination, overwrite: false);
+                }
+                catch (IOException) when (i < attempts)
+                {
+                    if (File.Exists(destination))
+                    {
+                        return;
+                    }
                 }
                 catch (Exception e) when (i < attempts)
                 {

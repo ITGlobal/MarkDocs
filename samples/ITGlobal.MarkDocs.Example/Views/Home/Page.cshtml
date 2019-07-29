@@ -87,7 +87,18 @@
             </li>
             <li role="presentation">
                 <a href="#report" data-toggle="tab">
-                    <i class="fa fa-check-circle"></i> Compilation report
+                    @{
+                        var color = "text-success";
+                        if (Model.Documentation.CompilationReport.Messages.Any(_ => _.Value.Any(x => x.Type == CompilationReportMessageType.Error)))
+                        {
+                            color = "text-danger";
+                        }
+                        else if (Model.Documentation.CompilationReport.Messages.Any(_ => _.Value.Any(x => x.Type == CompilationReportMessageType.Warning)))
+                        {
+                            color = "text-warning";
+                        }
+                    }
+                    <i class="fa fa-check-circle @color"></i> Compilation report
                 </a>
             </li>
         </ul>

@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Search
 {
@@ -13,5 +13,10 @@ namespace ITGlobal.MarkDocs.Search
         /// </summary>
         [NotNull]
         public string IndexDirectory { get; set; }
+
+        /// <summary>
+        ///     True to enable verbose logging
+        /// </summary>
+        public bool VerboseLogging { get; set; }
     }
 }
