@@ -1,4 +1,4 @@
-﻿using ITGlobal.MarkDocs.Source;
+using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
 using System;
 using System.IO;
@@ -49,7 +49,7 @@ namespace ITGlobal.MarkDocs.Cache.Impl
                         var oldFilePath = Path.Combine(RootDirectory, OldDirectory, oldAsset.Filename);
                         try
                         {
-                            File.Copy(oldFilePath, newFilePath);
+                            SafeFileCopy(oldFilePath, newFilePath);
                             newAssets.Set(asset.Id, oldAsset.Filename, oldAsset.Hash);
                             Cached(asset);
                             return;
@@ -99,7 +99,7 @@ namespace ITGlobal.MarkDocs.Cache.Impl
                     var newFilePath = Path.Combine(RootDirectory, NewDirectory, oldItem.Filename);
 
                     Directory.CreateDirectory(Path.GetDirectoryName(newFilePath));
-                    File.Copy(oldFilePath, newFilePath);
+                    SafeFileCopy(oldFilePath, newFilePath);
                     newAssets.Set(id, oldItem.Filename, oldItem.Hash);
                     Cached(id);
                 }
@@ -110,8 +110,25 @@ namespace ITGlobal.MarkDocs.Cache.Impl
         protected abstract string GetHashCode(T asset);
         protected abstract string GetFileName(T asset);
 
-        protected virtual void Written(T asset)=> EventListener.Written(asset);
-        protected virtual void Cached(T asset)=> EventListener.Cached(asset);
-        protected virtual void Cached(string assetId)=> EventListener.Cached(assetId);
+        protected virtual void Written(T asset) => EventListener.Written(asset);
+        protected virtual void Cached(T asset) => EventListener.Cached(asset);
+        protected virtual void Cached(string assetId) => EventListener.Cached(assetId);
+
+        private void SafeFileCopy(string source, string destination)
+        {
+            const int attempts = 10;
+
+            for (var i = 0; ; i++)
+            {
+                try
+                {
+                    File.Copy(source, destination);
+                }
+                catch (Exception e) when (i < attempts)
+                {
+                    Log.Error($"Unable to copy asset '{source}' into '{destination}', will retry ({e.Message})");
+                }
+            }
+        }
     }
 }

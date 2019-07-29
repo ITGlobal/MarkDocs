@@ -1,4 +1,4 @@
-﻿using ITGlobal.MarkDocs.Cache;
+using ITGlobal.MarkDocs.Cache;
 using ITGlobal.MarkDocs.Extensions;
 using ITGlobal.MarkDocs.Source;
 using System;
@@ -235,10 +235,17 @@ namespace ITGlobal.MarkDocs.Impl
 
         private void OnSourceTreeChanged(object sender, EventArgs e)
         {
-            if (sender is ISourceTree sourceTree)
+            try
             {
-                _eventListener.SourceChanged(sourceTree);
-                Rebuild(sourceTree);
+                if (sender is ISourceTree sourceTree)
+                {
+                    _eventListener.SourceChanged(sourceTree);
+                    Rebuild(sourceTree);
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex, $"Unable to handle SourceTreeChangeEvent");
             }
         }
     }
