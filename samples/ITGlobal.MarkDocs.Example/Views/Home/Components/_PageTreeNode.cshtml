@@ -1,4 +1,4 @@
-﻿@using ITGlobal.MarkDocs.Example.Model
+@using ITGlobal.MarkDocs.Example.Model
 @model ITGlobal.MarkDocs.Example.Model.PageTreeNodeModel
 
 @{
@@ -10,18 +10,18 @@
     var isActive = Model.SelectedPage.Id == Model.Page.Id;
 }
 
-<li data-id="@Html.Encode(Model.Page)" class="@(isActive?"active":"")">
+<li data-id="@Html.Encode(Model.Page)" class="@(isActive?" active":"")" title="@Model.Page.Metadata.Title">
     <a href="@url">
         @Html.Raw(icon)
-        <span>@Model.Page.Title</span>
+        <span>@(!string.IsNullOrEmpty(Model.Page.Metadata.ShortTitle)?Model.Page.Metadata.ShortTitle: Model.Page.Metadata.Title)</span>
     </a>
     @if (isFolder)
     {
-        <ul>
-            @foreach (var page in Model.Page.NestedPages)
-            {
-                @(await Html.PartialAsync("Components/_PageTreeNode", new PageTreeNodeModel(page, Model.SelectedPage)))
-            }
-        </ul>
+    <ul>
+        @foreach (var page in Model.Page.NestedPages)
+        {
+        @(await Html.PartialAsync("Components/_PageTreeNode", new PageTreeNodeModel(page, Model.SelectedPage)))
+        }
+    </ul>
     }
 </li>

@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -30,15 +30,17 @@ namespace ITGlobal.MarkDocs.Source
             string contentId = null,
             string lastChangedBy = null,
             string title = null,
+            string shortTitle = null,
             string description = null,
             int? order = null,
             string[] tags = null,
             string[] metaTags = null,
-            ImmutableDictionary<string, string> properties=null)
+            ImmutableDictionary<string, string> properties = null)
         {
             ContentId = contentId ?? "";
             LastChangedBy = lastChangedBy ?? "";
             Title = title ?? "";
+            ShortTitle = shortTitle ?? title ?? "";
             Description = description ?? "";
             Order = order;
             Tags = tags ?? Array.Empty<string>();
@@ -70,6 +72,13 @@ namespace ITGlobal.MarkDocs.Source
         [JsonProperty("title", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [NotNull]
         public string Title { get; }
+
+        /// <summary>
+        ///     Page short title
+        /// </summary>
+        [JsonProperty("short_title", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [NotNull]
+        public string ShortTitle { get; }
 
         /// <summary>
         ///     Page description
@@ -125,6 +134,7 @@ namespace ITGlobal.MarkDocs.Source
                 contentId: value,
                 lastChangedBy: LastChangedBy,
                 title: Title,
+                shortTitle: ShortTitle,
                 description: Description,
                 order: Order,
                 tags: Tags,
@@ -148,6 +158,7 @@ namespace ITGlobal.MarkDocs.Source
                 contentId: ContentId,
                 lastChangedBy: value,
                 title: Title,
+                shortTitle: ShortTitle,
                 description: Description,
                 order: Order,
                 tags: Tags,
@@ -171,6 +182,7 @@ namespace ITGlobal.MarkDocs.Source
                 contentId: ContentId,
                 lastChangedBy: LastChangedBy,
                 title: Title,
+                shortTitle: ShortTitle,
                 description: Description,
                 order: value,
                 tags: Tags,
@@ -194,6 +206,7 @@ namespace ITGlobal.MarkDocs.Source
                 contentId: ContentId,
                 lastChangedBy: LastChangedBy,
                 title: Title,
+                shortTitle: ShortTitle,
                 description: value,
                 order: Order,
                 tags: Tags,
@@ -217,6 +230,31 @@ namespace ITGlobal.MarkDocs.Source
                 contentId: ContentId,
                 lastChangedBy: LastChangedBy,
                 title: value,
+                shortTitle: ShortTitle,
+                description: Description,
+                order: Order,
+                tags: Tags,
+                metaTags: MetaTags,
+                properties: Properties
+            );
+        }
+
+        /// <summary>
+        ///     Updates the <see cref="ShortTitle"/> property
+        /// </summary>
+        [NotNull]
+        public PageMetadata WithShortTitle([NotNull] string value)
+        {
+            if (ShortTitle == value)
+            {
+                return this;
+            }
+
+            return new PageMetadata(
+                contentId: ContentId,
+                lastChangedBy: LastChangedBy,
+                title: Title,
+                shortTitle: value,
                 description: Description,
                 order: Order,
                 tags: Tags,
@@ -235,6 +273,7 @@ namespace ITGlobal.MarkDocs.Source
                 contentId: ContentId,
                 lastChangedBy: LastChangedBy,
                 title: Title,
+                shortTitle: ShortTitle,
                 description: Description,
                 order: Order,
                 tags: value,
@@ -253,6 +292,7 @@ namespace ITGlobal.MarkDocs.Source
                 contentId: ContentId,
                 lastChangedBy: LastChangedBy,
                 title: Title,
+                shortTitle: ShortTitle,
                 description: Description,
                 order: Order,
                 tags: Tags,
@@ -271,6 +311,7 @@ namespace ITGlobal.MarkDocs.Source
                 contentId: ContentId,
                 lastChangedBy: LastChangedBy,
                 title: Title,
+                shortTitle: ShortTitle,
                 description: Description,
                 order: Order,
                 tags: Tags,
@@ -299,6 +340,7 @@ namespace ITGlobal.MarkDocs.Source
                 contentId: MergeString(ContentId, other.ContentId),
                 lastChangedBy: MergeString(LastChangedBy, other.LastChangedBy),
                 title: MergeString(Title, other.Title),
+                shortTitle: MergeString(ShortTitle, other.ShortTitle),
                 description: MergeString(Description, other.Description),
                 order: Order ?? other.Order,
                 tags: MergeArray(Tags, other.Tags),

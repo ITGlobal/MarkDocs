@@ -1,4 +1,4 @@
-﻿using ITGlobal.MarkDocs.Source;
+using ITGlobal.MarkDocs.Source;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
 using SharpYaml.Serialization;
@@ -67,7 +67,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Metadata
                     {
                         if (GetStringMetadata(node, out var value))
                         {
-                            metadata = metadata.WithTitle(value);
+                            metadata = metadata.WithShortTitle(value);
                         }
                     }
                     break;
@@ -99,6 +99,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Metadata
                     }
                     break;
 
+                case "descr":
                 case "description":
                     {
                         if (GetStringMetadata(node, out var value))

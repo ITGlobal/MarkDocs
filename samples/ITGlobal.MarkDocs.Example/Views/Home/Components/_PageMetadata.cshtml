@@ -1,4 +1,4 @@
-﻿@model ITGlobal.MarkDocs.IPage
+@model ITGlobal.MarkDocs.IPage
 
 <ul class="list-group">
     @if (!string.IsNullOrEmpty(Model.Metadata.ContentId))
@@ -11,6 +11,12 @@
     {
         <li class="list-group-item">
             <samp>title=@Model.Metadata.Title</samp>
+        </li>
+    }
+    @if (!string.IsNullOrEmpty(Model.Metadata.ShortTitle))
+    {
+        <li class="list-group-item">
+            <samp>short_title=@Model.Metadata.ShortTitle</samp>
         </li>
     }
     @if (Model.Metadata.Order != 0)

@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Encodings.Web;
-using ITGlobal.MarkDocs.Format;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
@@ -15,6 +14,9 @@ namespace ITGlobal.MarkDocs.Source.Impl
     {
         [JsonProperty("title")]
         public string Title { get; set; }
+
+        [JsonProperty("short_title")]
+        public string ShortTitle { get; set; }
 
         [JsonProperty("order")]
         public int? Order { get; set; }
@@ -32,6 +34,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
         {
             return new PageMetadata(
                 title: Title,
+                shortTitle: ShortTitle,
                 tags: Tags,
                 order: Order,
                 metaTags: MetaTags

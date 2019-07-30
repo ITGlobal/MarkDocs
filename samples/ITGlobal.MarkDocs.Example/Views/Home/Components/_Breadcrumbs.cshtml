@@ -18,9 +18,10 @@
         var node = nodes.Pop();
         var url = $"/{Uri.EscapeDataString(Model.Documentation.Id)}{node.Id}";
         var isActive = node.Id == Model.Id;
+        var title = !string.IsNullOrEmpty(node.Metadata.ShortTitle) ? node.Metadata.ShortTitle : node.Metadata.Title;
 
-        <li class="@(isActive ? "active" : "")">
-            <a href="@url">@node.Title</a>
+        <li class="@(isActive ? "active" : "")" title="@node.Metadata.Title">
+            <a href="@url">@title</a>
         </li>
     }
 </ol>
