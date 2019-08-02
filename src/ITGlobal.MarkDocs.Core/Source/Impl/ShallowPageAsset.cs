@@ -1,4 +1,4 @@
-﻿using ITGlobal.MarkDocs.Format;
+using ITGlobal.MarkDocs.Format;
 using System;
 using System.IO;
 
@@ -28,11 +28,11 @@ namespace ITGlobal.MarkDocs.Source.Impl
         {
             try
             {
-                var metadata = worker.GetMetadata(AbsolutePath, false);
-
                 var ctx = new PageReadContext(worker, this);
+
+                var assetMetadata = worker.GetMetadata(AbsolutePath, ctx.IsIndexPage);
                 var (content, pageMetadata) = worker.Format.Read(ctx, AbsolutePath);
-                metadata = metadata.MergeWith(pageMetadata);
+                var metadata = assetMetadata.MergeWith(pageMetadata);
 
                 if (string.IsNullOrEmpty(metadata.Title))
                 {
