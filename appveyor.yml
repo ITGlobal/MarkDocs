@@ -22,7 +22,7 @@ environment:
   CHOCO_PRIVATE_API_KEY:
     secure: +otm426DP2sxI+6uwbY9OKDwwo9GHQOmNjk1AcDgL0nroXmr0YQs7Z8A7Xy6hVPm
 deploy_script:
-- ps: '& ./push.ps1'
+- ps: '& ./push.ps1 all'
 notifications:
 - provider: Slack
   incoming_webhook: a7TE9Xu2mdPphDJSk5r/BQn+2npcVDiJIrzR8tYselHQvWmSleO8NGdGVaLAxVw6yhVyzQh2IT9rEDXYssazCgdoW96THTdfjK2X2e0iLzk=
