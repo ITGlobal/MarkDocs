@@ -6,7 +6,7 @@ configuration: Release
 build:
   verbosity: minimal
 build_script:
-- ps: '& ./build.ps1'
+- ps: '& ./build.ps1 all'
 test: 'off'
 artifacts:
 - path: artifacts\**\*.nupkg

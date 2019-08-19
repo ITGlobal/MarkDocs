@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +30,8 @@ namespace ITGlobal.MarkDocs.Example
             services.AddMarkDocs(config =>
             {
                 config.FromStaticDirectory(
-                    Path.GetFullPath(Path.Combine(Env.ContentRootPath, "../../docs")),
+                    //Path.GetFullPath(Path.Combine(Env.ContentRootPath, "../../docs")),
+                    @"d:\crex\techdocs",
                     watchForChanges: true
                 );
                 config.UseResourceUrlResolver<ResourceUrlResolver>();
@@ -79,5 +80,6 @@ namespace ITGlobal.MarkDocs.Example
         }
     }
 }
+
 
 
