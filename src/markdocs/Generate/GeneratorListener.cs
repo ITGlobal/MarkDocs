@@ -72,7 +72,7 @@ namespace ITGlobal.MarkDocs.Tools.Generate
 
             public override void Completed(TimeSpan elapsed)
             {
-                Log.Information($"Completed in {elapsed.TotalSeconds:F1}s");
+                Log.Information("Completed in {T:F1}s", elapsed.TotalSeconds);
                 _progressBar.Write(100);
             }
 
