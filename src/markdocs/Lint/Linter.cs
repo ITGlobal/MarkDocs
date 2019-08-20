@@ -3,7 +3,6 @@ using ITGlobal.MarkDocs.Source;
 using System;
 using System.IO;
 using System.Linq;
-using static ITGlobal.CommandLine.Terminal;
 
 namespace ITGlobal.MarkDocs.Tools.Lint
 {
@@ -15,7 +14,7 @@ namespace ITGlobal.MarkDocs.Tools.Lint
             bool summary)
         {
             ICompilationReport report;
-           // using (CliHelper.SpinnerSafe("Running linter..."))
+            using (CliHelper.SpinnerSafe("Running linter..."))
             {
                 var markdocs = MarkDocsFactory.Create(
                     config =>
@@ -51,10 +50,10 @@ namespace ITGlobal.MarkDocs.Tools.Lint
                 var errors = report.Messages.Values.Sum(_ => _.Count(x => x.Type == CompilationReportMessageType.Error)); ;
                 var warnings = report.Messages.Values.Sum(_ => _.Count(x => x.Type == CompilationReportMessageType.Warning));
 
-                Stdout.WriteLine("Summary");
-                Stdout.WriteLine("-------");
-                Stdout.WriteLine($"  {errors} error(s)");
-                Stdout.WriteLine($"  {warnings} warning(s)");
+                Console.Error.WriteLine("Summary");
+                Console.Error.WriteLine("-------");
+                Console.Error.WriteLine($"  {errors} error(s)");
+                Console.Error.WriteLine($"  {warnings} warning(s)");
             }
         }
 

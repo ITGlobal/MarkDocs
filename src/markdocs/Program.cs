@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 using ITGlobal.CommandLine;
@@ -6,7 +6,6 @@ using ITGlobal.CommandLine.Parsing;
 using ITGlobal.MarkDocs.Tools.Generate;
 using ITGlobal.MarkDocs.Tools.Lint;
 using Serilog;
-using static ITGlobal.CommandLine.Terminal;
 
 namespace ITGlobal.MarkDocs.Tools
 {
@@ -25,7 +24,7 @@ namespace ITGlobal.MarkDocs.Tools
                 var parser = CliParser.NewTreeParser();
                 parser.ExecutableName("markdocs");
                 parser.HelpText("Markdocs command line tool");
-                parser.SuppressLogo(true);
+                parser.SuppressLogo();
 
                 var verboseSwitch = parser.Switch('v', "verbose").HelpText("Enable verbose output");
                 var versionSwitch = parser.Switch("version").HelpText("Display version number");
@@ -34,7 +33,7 @@ namespace ITGlobal.MarkDocs.Tools
                 {
                     if (versionSwitch.IsSet)
                     {
-                        Stdout.WriteLine(Version);
+                        Console.Out.WriteLine(Version);
                         ctx.Break();
                     }
 
@@ -46,7 +45,7 @@ namespace ITGlobal.MarkDocs.Tools
                         .HelpText("Run a linter on a documentation");
 
                     var pathParameter = lintCommand
-                        .Argument("path", 0)
+                        .Argument("path")
                         .DefaultValue(".")
                         .HelpText("Path to documentation root directory")
                         .Required();
@@ -68,7 +67,7 @@ namespace ITGlobal.MarkDocs.Tools
                         .HelpText("Generate static website from documentation");
 
                     var pathParameter = buildCommand
-                        .Argument("path",0)
+                        .Argument("path")
                         .DefaultValue(".")
                         .HelpText("Path to documentation root directory")
                         .Required();
@@ -107,41 +106,40 @@ namespace ITGlobal.MarkDocs.Tools
         {
             if (report.Messages.Count == 0)
             {
-                Stdout.WriteLine("Everything is OK".WithForeground(ConsoleColor.Green));
+                Console.Error.WriteLine("Everything is OK".Green());
                 return;
             }
-            
+
             foreach (var (filename, list) in report.Messages)
             {
                 foreach (var error in list)
                 {
-                    Stdout.Write(filename);
+                    Console.Error.Write(filename);
                     if (error.LineNumber != null)
                     {
-                        Stdout.Write(":");
-                        Stdout.Write(error.LineNumber.Value + 1);
+                        Console.Error.Write($":{error.LineNumber.Value + 1}");
                     }
 
-                    Stdout.Write(": ");
+                    Console.Error.Write(": ");
 
                     switch (error.Type)
                     {
                         case CompilationReportMessageType.Warning:
-                            Stdout.Write("warning: ".WithForeground(ConsoleColor.Yellow));
+                            Console.Error.Write("warning: ".Yellow());
                             break;
                         case CompilationReportMessageType.Error:
-                            Stdout.Write("error: ".WithForeground(ConsoleColor.Red));
+                            Console.Error.Write("error: ".Red());
                             break;
                         default:
-                            Stdout.Write($"{error.Type:G}: ".WithForeground(ConsoleColor.Magenta));
+                            Console.Error.Write($"{error.Type:G}: ".Magenta());
                             break;
                     }
 
-                    Stdout.WriteLine(error.Message);
+                    Console.Error.WriteLine(error.Message);
                 }
             }
         }
-        
+
         private static void SetupLogger(bool verbose)
         {
             var configuration = new LoggerConfiguration();
