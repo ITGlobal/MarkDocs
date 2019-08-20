@@ -30,7 +30,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ITGlobal.MarkDocs.Directory
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ITGlobal.MarkDocs.DiskCache", "src\ITGlobal.MarkDocs.DiskCache\ITGlobal.MarkDocs.DiskCache.csproj", "{82D5BABB-9BE6-4BE7-83BC-B8A84F9B7A7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "markdocs-site", "src\markdocs-site\markdocs-site.csproj", "{F3100A5B-3310-4993-8824-BC68B16B6573}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "markdocs-site", "src\markdocs-site\markdocs-site.csproj", "{F3100A5B-3310-4993-8824-BC68B16B6573}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

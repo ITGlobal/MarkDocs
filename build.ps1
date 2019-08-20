@@ -58,8 +58,8 @@ function build-clean() {
     }
     
     Get-ChildItem -Path $ARTIFACTS | Remove-Item -Force -Recurse
-    Get-ChildItem -Filter "bin" -Directory -Recurse | Remove-Item -Force -Recurse
-    Get-ChildItem -Filter "obj" -Directory -Recurse | Remove-Item -Force -Recurse
+    Get-ChildItem -Filter "bin" -Directory -Recurse -ErrorAction "SilentlyContinue" | Remove-Item -Force -Recurse -ErrorAction "SilentlyContinue"
+    Get-ChildItem -Filter "obj" -Directory -Recurse -ErrorAction "SilentlyContinue" | Remove-Item -Force -Recurse -ErrorAction "SilentlyContinue"
 }
 
 function build-restore() {
@@ -108,15 +108,9 @@ function build-tools() {
         $VERSION = "0.0.0-dev"
     }
     
-    dotnet restore --runtime win7-x64 ./src/markdocs/markdocs.csproj /nologo /p:Version=$VERSION
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "'dotnet restore' exited with $LASTEXITCODE"
-        exit 1
-    }
-    
     dotnet publish --runtime win7-x64 --configuration $CONFIGURATION -v q `
         --output $ARTIFACTS/markdocs-win7-x64 `
-        ./src/markdocs/markdocs.csproj /nologo /p:Version=$VERSION
+        ./src/markdocs/markdocs.csproj /nologo /p:Version=$VERSION /p:PackAsTool=false
     if ($LASTEXITCODE -ne 0) {
         Write-Host "'dotnet publish' exited with $LASTEXITCODE"
         exit 1
