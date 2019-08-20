@@ -85,7 +85,7 @@ function build-packages() {
     }
     
     Get-ChildItem -Filter *.csproj -Path "./src" -Recurse -File | % {
-        if ($_.Name -eq "markdocs.csproj") {
+        if ($_.Name -eq "markdocs-site.csproj") {
             return
         }
     

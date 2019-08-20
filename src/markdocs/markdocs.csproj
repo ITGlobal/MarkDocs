@@ -1,18 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="../../src/common.props" />
-  <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <AssemblyName>markdocs</AssemblyName>
-    <OutputType>Exe</OutputType>
-    <RuntimeIdentifiers>win7-x64;ubuntu.14.04-x64</RuntimeIdentifiers>
-    <RootNamespace>ITGlobal.MarkDocs.Tools</RootNamespace>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\ITGlobal.MarkDocs\ITGlobal.MarkDocs.csproj" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.4" />
-    <PackageReference Include="Serilog.Sinks.Literate" Version="3.0.0" />
-    <PackageReference Include="ITGlobal.CLI" Version="3.0.18" />
-  </ItemGroup>
+    <Import Project="../../src/common.props" />
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <AssemblyName>markdocs</AssemblyName>
+        <OutputType>Exe</OutputType>
+        <RuntimeIdentifiers>win7-x64;ubuntu.14.04-x64</RuntimeIdentifiers>
+        <RootNamespace>ITGlobal.MarkDocs.Tools</RootNamespace>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <PackageId>ITGlobal.MarkDocs.CommandLineTool</PackageId>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>markdocs</ToolCommandName>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\ITGlobal.MarkDocs\ITGlobal.MarkDocs.csproj" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.4" />
+        <PackageReference Include="Serilog.Sinks.Literate" Version="3.0.0" />
+        <PackageReference Include="ITGlobal.CLI" Version="3.0.18" />
+    </ItemGroup>
 </Project>
