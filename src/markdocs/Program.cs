@@ -1,11 +1,14 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using ITGlobal.CommandLine;
 using ITGlobal.CommandLine.Parsing;
 using ITGlobal.MarkDocs.Tools.Generate;
 using ITGlobal.MarkDocs.Tools.Lint;
 using Serilog;
+using Serilog.Events;
 
 namespace ITGlobal.MarkDocs.Tools
 {
@@ -19,25 +22,25 @@ namespace ITGlobal.MarkDocs.Tools
 
         public static int Main(string[] args)
         {
-            return TerminalErrorHandler.Handle(() =>
-            {
-                var parser = CliParser.NewTreeParser();
+            var parser = CliParser.NewTreeParser();
                 parser.ExecutableName("markdocs");
                 parser.HelpText("Markdocs command line tool");
                 parser.SuppressLogo();
 
-                var verboseSwitch = parser.Switch('v', "verbose").HelpText("Enable verbose output");
-                var versionSwitch = parser.Switch("version").HelpText("Display version number");
+                var tempDir = parser.Option("temp-dir").HelpText("Path to temp directory");
+                var verbosity = parser.RepeatableSwitch('v', "verbose").HelpText("Enable verbose output");
+                var quiet = parser.Switch('q', "quiet").HelpText("Enable quiet output");
+                var version = parser.Switch("version").HelpText("Display version number");
 
                 parser.BeforeExecute(ctx =>
                 {
-                    if (versionSwitch.IsSet)
+                    if (version)
                     {
                         Console.Out.WriteLine(Version);
                         ctx.Break();
                     }
 
-                    SetupLogger(verboseSwitch.IsSet);
+                    SetupLogger(verbosity, quiet);
                 });
 
                 {
@@ -50,15 +53,14 @@ namespace ITGlobal.MarkDocs.Tools
                         .HelpText("Path to documentation root directory")
                         .Required();
 
-                    var summarySwitch = lintCommand
-                        .Switch("summary")
+                    var summary = lintCommand
+                        .Switch('s', "summary")
                         .HelpText("Display summary");
 
                     lintCommand.OnExecute(_ =>
                     {
-                        SetupLogger(verboseSwitch.IsSet);
-                        var path = Path.GetFullPath(pathParameter.Value);
-                        Linter.Run(path, verboseSwitch.IsSet, summarySwitch.IsSet);
+                        var path = Path.GetFullPath(pathParameter);
+                        Linter.Run(path, DetectTempDir(tempDir, path), quiet, summary);
                     });
                 }
 
@@ -89,20 +91,42 @@ namespace ITGlobal.MarkDocs.Tools
                             : "";
 
                         var exitCode = Generator.Run(
-                            path,
-                            outputPath,
-                            templateName,
-                            verboseSwitch.IsSet
+                            sourceDir: path,
+                            targetDir: outputPath,
+                            templateName: templateName,
+                            tempDir: DetectTempDir(tempDir, path),
+                            quiet: quiet
                         );
                         ctx.Break(exitCode);
                     });
                 }
 
+            return TerminalErrorHandler.Handle(() =>
+            {
+                
                 return parser.Parse(args).Run();
             });
         }
 
-        public static void PrintReport(ICompilationReport report, bool verbose)
+        private static string DetectTempDir(string tempPath, string sourcePath)
+        {
+            if (!string.IsNullOrWhiteSpace(tempPath))
+            {
+                return tempPath;
+            }
+
+            string hash;
+            using (var md5 = MD5.Create())
+            {
+                hash=BitConverter.ToString(md5.ComputeHash(Encoding.UTF8.GetBytes(sourcePath)))
+                    .Replace("-", "")
+                    .ToLowerInvariant();
+            }
+
+            return Path.Combine(Path.GetTempPath(), "markdocs", "wrk", hash);
+        }
+
+        public static void PrintReport(ICompilationReport report, bool quiet)
         {
             if (report.Messages.Count == 0)
             {
@@ -140,18 +164,39 @@ namespace ITGlobal.MarkDocs.Tools
             }
         }
 
-        private static void SetupLogger(bool verbose)
+        private static void SetupLogger(int verbosity, bool quiet)
         {
             var configuration = new LoggerConfiguration();
             configuration.Enrich.FromLogContext();
-            configuration.WriteTo.LiterateConsole(outputTemplate: "{Message}{NewLine}{Exception}");
-            if (verbose)
+            configuration.WriteTo.LiterateConsole(
+                outputTemplate: "{Message}{NewLine}{Exception}",
+                standardErrorFromLevel: LogEventLevel.Verbose
+            );
+
+            if (quiet)
             {
-                configuration.MinimumLevel.Verbose();
+                configuration.MinimumLevel.Fatal();
             }
             else
             {
-                configuration.MinimumLevel.Error();
+                switch (verbosity)
+                {
+                    case 0:
+                        configuration.MinimumLevel.Error();
+                        break;
+                    case 1:
+                        configuration.MinimumLevel.Warning();
+                        break;
+                    case 2:
+                        configuration.MinimumLevel.Information();
+                        break;
+                    case 3:
+                        configuration.MinimumLevel.Debug();
+                        break;
+                    default:
+                        configuration.MinimumLevel.Verbose();
+                        break;
+                }
             }
 
             Log.Logger = configuration.CreateLogger();

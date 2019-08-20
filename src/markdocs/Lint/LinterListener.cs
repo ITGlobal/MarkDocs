@@ -1,38 +1,42 @@
 using ITGlobal.MarkDocs.Source;
 using System;
-using ITGlobal.CommandLine;
 using Serilog;
 
 namespace ITGlobal.MarkDocs.Tools.Lint
 {
     public sealed class LinterListener : MarkDocsEventListener
     {
+        private readonly ITerminalOutput _output;
+
+        public LinterListener(ITerminalOutput output)
+        {
+            _output = output;
+        }
+
         public override CompilationEventListener CompilationStarted(string id)
-            => new LinterCompilationEventListener();
+            => new LinterCompilationEventListener(_output);
 
         private sealed class LinterCompilationEventListener : CompilationEventListener
         {
-            private readonly ILiveOutputManager _manager;
-            private readonly ITerminalLiveProgressBar _progressBar;
+            private readonly ITerminalOutput _output;
+
             private int _processedAssetCount;
             private int _assetCount;
 
-            public LinterCompilationEventListener()
+            public LinterCompilationEventListener(ITerminalOutput output)
             {
-                _manager = LiveOutputManager.Create();
-                _progressBar = _manager.CreateProgressBar("preparing");
-                _progressBar.WipeAfter();
+                _output = output;
             }
 
             public override void ReadingAssetTree()
             {
-                _progressBar.Write(0, "reading assets");
+                _output.Write(0, "reading assets");
             }
 
             public override void ProcessingAssets(AssetTree tree)
             {
                 _assetCount = tree.Pages.Count;
-                _progressBar.Write(0, "compiling assets");
+                _output.Write(0, "compiling assets");
             }
 
             public override void Cached(Asset asset)
@@ -42,7 +46,7 @@ namespace ITGlobal.MarkDocs.Tools.Lint
                     case PageAsset _:
                         _processedAssetCount++;
                         var progress = (int)Math.Ceiling(100f * _processedAssetCount / _assetCount);
-                        _progressBar.Write(progress);
+                        _output.Write(progress);
                         break;
                 }
 
@@ -61,7 +65,7 @@ namespace ITGlobal.MarkDocs.Tools.Lint
                     case PageAsset _:
                         _processedAssetCount++;
                         var progress = (int)Math.Ceiling(100f * _processedAssetCount / _assetCount);
-                        _progressBar.Write(progress);
+                        _output.Write(progress);
                         break;
                 }
 
@@ -73,12 +77,7 @@ namespace ITGlobal.MarkDocs.Tools.Lint
             public override void Completed(TimeSpan elapsed)
             {
                 Log.Information("Completed in {T:F1}s", elapsed.TotalSeconds);
-                _progressBar.Write(100);
-            }
-
-            public override void Dispose()
-            {
-                _manager.Dispose();
+                _output.Write(100);
             }
         }
     }

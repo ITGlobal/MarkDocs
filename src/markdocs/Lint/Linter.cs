@@ -8,33 +8,25 @@ namespace ITGlobal.MarkDocs.Tools.Lint
 {
     public static class Linter
     {
-        public static void Run(
-            string path,
-            bool verbose,
-            bool summary)
+        public static void Run(string path, string tempDir, bool quiet, bool summary)
         {
             ICompilationReport report;
-            using (CliHelper.SpinnerSafe("Running linter..."))
+            
+            using (var liveOutput = TerminalOutput.Create("running linter...", quiet))
             {
                 var markdocs = MarkDocsFactory.Create(
                     config =>
                     {
-                        if (verbose)
-                        {
-                            config.UseEventListener(new LinterListener());
-                        }
+                        config.UseEventListener(new LinterListener(liveOutput));
 
                         config.FromStaticDirectory(path);
                         config.UseCache(_ => new LinterCacheProvider());
                         config.UseResourceUrlResolver(new ResourceUrlResolver());
                         config.UseMarkdown(markdown =>
                         {
-                            markdown.AddHighlightJs(
-                                Path.Combine(Path.GetTempPath(), $"markdocs-lint-{Guid.NewGuid():N}")
-                            );
+                            markdown.AddHighlightJs(tempDir);
                         });
                         config.UseLog(new SerilogLog());
-                        config.UseEventListener<LinterListener>();
                     }
                 );
                 using (markdocs)
@@ -43,9 +35,9 @@ namespace ITGlobal.MarkDocs.Tools.Lint
                 }
             }
 
-            Program.PrintReport(report, verbose);
+            Program.PrintReport(report, quiet);
 
-            if (summary)
+            if (summary && !quiet)
             {
                 var errors = report.Messages.Values.Sum(_ => _.Count(x => x.Type == CompilationReportMessageType.Error)); ;
                 var warnings = report.Messages.Values.Sum(_ => _.Count(x => x.Type == CompilationReportMessageType.Warning));

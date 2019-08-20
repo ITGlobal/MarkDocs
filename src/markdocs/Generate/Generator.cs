@@ -13,7 +13,8 @@ namespace ITGlobal.MarkDocs.Tools.Generate
             string sourceDir,
             string targetDir,
             string templateName,
-            bool verbose)
+            string tempDir,
+            bool quiet)
         {
             ITemplate template;
             switch ((templateName ?? "").ToLowerInvariant())
@@ -35,27 +36,21 @@ namespace ITGlobal.MarkDocs.Tools.Generate
             Console.Error.WriteLine($"Generating static website from {sourceDir.Cyan()} into {targetDir.Cyan()} using {template.Name.Cyan()} template.");
 
             ICompilationReport report;
-            using (CliHelper.SpinnerSafe("Running..."))
+            using (var liveOutput = TerminalOutput.Create("running linter...", quiet))
             {
                 var markdocs = MarkDocsFactory.Create(
                     config =>
                     {
-                        if (verbose)
-                        {
-                            config.UseEventListener(new GeneratorListener());
-                        }
+                        config.UseEventListener(new GeneratorListener(liveOutput));
 
                         config.FromStaticDirectory(sourceDir);
                         config.UseCache(_ => new OutputCache(targetDir, template));
                         config.UseResourceUrlResolver(_ => new GeneratorResourceUrlResolver());
                         config.UseMarkdown(markdown =>
                         {
-                            markdown.AddHighlightJs(
-                                Path.Combine(Path.GetTempPath(), $"markdocs-build-{Guid.NewGuid():N}")
-                            );
+                            markdown.AddHighlightJs(tempDir);
                         });
                         config.UseLog(new SerilogLog());
-                        config.UseEventListener<GeneratorListener>();
                     }
                 );
 
@@ -82,7 +77,7 @@ namespace ITGlobal.MarkDocs.Tools.Generate
                 }
             }
 
-            Program.PrintReport(report, verbose);
+            Program.PrintReport(report, quiet);
 
             return 0;
         }
