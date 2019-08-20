@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "markdocs_site": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:5000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DOC_SOURCE_DIR": "../../docs"
+      }
+    }
+  }
+}

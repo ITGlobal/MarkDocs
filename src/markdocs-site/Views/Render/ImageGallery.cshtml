@@ -1,0 +1,12 @@
+@model ITGlobal.MarkDocs.Site.Models.ImageGalleryModel
+@{
+    Layout = null;
+}
+<div class="d-flex justify-content-center align-items-center pr-2" data-gallery>
+    @foreach (var image in Model.Images)
+    {
+        <a href="@image.Url" data-gallery-item data-caption="@image.Title" class="shadow ml-2">
+            <img src="@image.Url" alt="@image.Alt" style="max-height: 300px;" />
+        </a>
+    }
+</div>

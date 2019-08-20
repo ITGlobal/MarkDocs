@@ -1,0 +1,84 @@
+@using System.Text
+@using ITGlobal.MarkDocs.Site.Extensions
+@model ITGlobal.MarkDocs.Site.Models.SearchPageModel
+@{
+    ViewBag.Title = "Search";
+}
+
+<div class="container">
+    <div class="page-header">
+        @if (!string.IsNullOrEmpty(Model.Query))
+        {
+            <h1>Search results for &quot;@Model.Query&quot; </h1>
+        }
+        else
+        {
+            <h1>Search</h1>
+        }
+    </div>
+
+    <form action="@Url.Action("Search")" method="get">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search..." name="q" value="@Model.Query">
+            <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-search"></i> Go
+                </button>
+            </span>
+        </div>
+    </form>
+
+    @if (Model.HasSuggestions)
+    {
+        var str = new StringBuilder();
+        str.Append("Did you mean ");
+        for (var index = 0; index < Model.Suggestions.Count; index++)
+        {
+            var suggestion = Model.Suggestions[index];
+            str.AppendFormat("<a href=\"{0}\">{1}</a>", Url.Action("Search", "Home", new { q = suggestion }), suggestion);
+
+            if (index != Model.Suggestions.Count - 1)
+            {
+                str.Append(", ");
+            }
+        }
+        str.Append("?");
+
+        <p>
+            @Html.Raw(str.ToString())
+        </p>
+    }
+
+    @if (Model.HasSearchResults)
+    {
+        if (Model.SearchResults.Count > 0)
+        {
+            <div>
+                @foreach (var result in Model.SearchResults)
+                {
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="@result.Page.GetResourceUrl()">
+                                    @result.Page.Title
+                                </a>
+                            </h5>
+                            <p class="card-text">
+                                <a href="@result.Page.GetResourceUrl()">
+                                    ...@Html.Raw(result.Preview)...
+                                </a>
+                            </p>
+                            <a href="@result.Page.GetResourceUrl()" class="btn btn-primary">View page</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p>
+                Nothing is found
+            </p>
+        }
+    }
+</div>

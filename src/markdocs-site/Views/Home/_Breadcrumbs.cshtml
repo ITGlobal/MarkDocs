@@ -1,0 +1,53 @@
+@using ITGlobal.MarkDocs
+@model ITGlobal.MarkDocs.IPage
+@{
+    var nodes = new Stack<IPage>();
+    var p = Model;
+    while (p != null)
+    {
+        nodes.Push(p);
+        p = p.Parent;
+    }
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        @while (nodes.TryPop(out var node))
+        {
+            var isActive = node.Id == Model.Id;
+            var title = !string.IsNullOrEmpty(node.Metadata.ShortTitle)
+                ? node.Metadata.ShortTitle
+                : node.Metadata.Title;
+
+            if (!isActive)
+            {
+                if (node.Parent == null)
+                {
+                    <li class="breadcrumb-item" title="@node.Metadata.Title">
+                        <a href="@node.Id"><i class="fa fa-home"></i></a>
+                    </li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item" title="@node.Metadata.Title">
+                        <a href="@node.Id">@title</a>
+                    </li>
+                }
+            }
+            else
+            {
+                if (node.Parent == null)
+                {
+                    <li class="breadcrumb-item active" aria-current="page" title="@node.Metadata.Title">
+                        <i class="fa fa-home"></i>
+                    </li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item active" aria-current="page" title="@node.Metadata.Title">
+                        @title
+                    </li>
+                }
+            }
+        }
+    </ol>
+</nav>

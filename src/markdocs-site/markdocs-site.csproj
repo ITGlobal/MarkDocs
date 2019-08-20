@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <RootNamespace>ITGlobal.MarkDocs.Site</RootNamespace>
+        <OutputType>Exe</OutputType>
+        <StartupObject>ITGlobal.MarkDocs.Site.Program</StartupObject>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+    <ItemGroup>
+      <Compile Remove="wwwroot\lib\jquery\**" />
+      <Content Remove="wwwroot\lib\jquery\**" />
+      <EmbeddedResource Remove="wwwroot\lib\jquery\**" />
+      <None Remove="wwwroot\lib\jquery\**" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="ITGlobal.CLI" Version="3.0.18" />
+        <PackageReference Include="Microsoft.AspNetCore.App" />
+        <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+        <PackageReference Include="Serilog" Version="2.8.0" />
+        <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.4" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+        <PackageReference Include="SerilogAnalyzer" Version="0.15.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\ITGlobal.MarkDocs\ITGlobal.MarkDocs.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="wwwroot\lib\bootstrap\css\" />
+      <Folder Include="wwwroot\lib\font-awesome\css\" />
+      <Folder Include="wwwroot\lib\font-awesome\fonts\" />
+      <Folder Include="wwwroot\lib\luminous\" />
+    </ItemGroup>
+</Project>

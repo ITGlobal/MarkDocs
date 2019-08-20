@@ -1,0 +1,31 @@
+@using ITGlobal.MarkDocs
+@model ITGlobal.MarkDocs.IPage
+@functions
+{
+
+    static object MapPageToJson(IPage page)
+    {
+        return new
+        {
+            id = page.Id,
+            title = page.Title,
+            shortTitle = page.Metadata.ShortTitle,
+            isHyperlink = true,
+            pages = page.NestedPages
+                .OrderBy(_ => _.Metadata.Order ?? int.MaxValue)
+                .ThenBy(_ => _.Metadata.ShortTitle)
+                .ThenBy(_ => _.Metadata.Title)
+                .Select(MapPageToJson)
+                .ToArray(),
+        };
+    }
+
+}
+<script>
+    $(function() {
+        var sidebarModel = @Json.Serialize(MapPageToJson(Model.Documentation.RootPage));
+        createSidebar($('#sidebar-content'), sidebarModel, '@Model.Id');
+    });
+</script>
+
+<div id="sidebar-content"></div>

@@ -1,0 +1,15 @@
+.vs
+.vscode
+.git
+bin
+obj
+*.ps1
+**/*/bin
+**/*/obj
+*.user
+*.DotSettings
+**/*.md
+.gitignore
+.gitattributes
+.editorconfig
+*.Dockerfile
