@@ -1,5 +1,5 @@
 using System;
-using ITGlobal.CommandLine.ProgressBars;
+using ITGlobal.CommandLine;
 using ITGlobal.MarkDocs.Source;
 using Serilog;
 
@@ -12,24 +12,27 @@ namespace ITGlobal.MarkDocs.Tools.Generate
 
         private sealed class GeneratorCompilationEventListener : CompilationEventListener
         {
-            private readonly IProgressBar _progressBar;
+            private readonly ILiveOutputManager _manager;
+            private readonly ITerminalLiveProgressBar _progressBar;
             private int _processedAssetCount;
             private int _assetCount;
 
             public GeneratorCompilationEventListener()
             {
-                _progressBar = TerminalProgressBar.Create();
+                _manager = LiveOutputManager.Create();
+                _progressBar = _manager.CreateProgressBar("preparing");
+                _progressBar.WipeAfter();
             }
 
             public override void ReadingAssetTree()
             {
-                _progressBar.SetState(0, "reading assets");
+                _progressBar.Write(0, "reading assets");
             }
 
             public override void ProcessingAssets(AssetTree tree)
             {
                 _assetCount = tree.Pages.Count;
-                _progressBar.SetState(0, "compiling assets");
+                _progressBar.Write(0, "compiling assets");
             }
 
             public override void Cached(Asset asset)
@@ -39,7 +42,7 @@ namespace ITGlobal.MarkDocs.Tools.Generate
                     case PageAsset _:
                         _processedAssetCount++;
                         var progress = (int)Math.Ceiling(100f * _processedAssetCount / _assetCount);
-                        _progressBar.SetState(progress);
+                        _progressBar.Write(progress);
                         break;
                 }
 
@@ -58,7 +61,7 @@ namespace ITGlobal.MarkDocs.Tools.Generate
                     case PageAsset _:
                         _processedAssetCount++;
                         var progress = (int)Math.Ceiling(100f * _processedAssetCount / _assetCount);
-                        _progressBar.SetState(progress);
+                        _progressBar.Write(progress);
                         break;
                 }
 
@@ -70,12 +73,12 @@ namespace ITGlobal.MarkDocs.Tools.Generate
             public override void Completed(TimeSpan elapsed)
             {
                 Log.Information($"Completed in {elapsed.TotalSeconds:F1}s");
-                _progressBar.SetState(100);
+                _progressBar.Write(100);
             }
 
             public override void Dispose()
             {
-                _progressBar.Dispose();
+                _manager.Dispose();
             }
         }
     }

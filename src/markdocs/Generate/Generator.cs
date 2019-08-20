@@ -1,10 +1,9 @@
-﻿using ITGlobal.CommandLine;
+using ITGlobal.CommandLine;
 using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Source;
 using System;
 using System.IO;
 using System.Text;
-using static ITGlobal.CommandLine.Terminal;
 
 namespace ITGlobal.MarkDocs.Tools.Generate
 {
@@ -28,20 +27,12 @@ namespace ITGlobal.MarkDocs.Tools.Generate
                     break;
 
                 default:
-                    Stdout.WriteLine(
-                        $"Unable to find template {templateName}".WithForeground(ConsoleColor.Red)
-                    );
+                    Console.Error.WriteLine($"Unable to find template {templateName}".Red());
                     return 1;
             }
 
-            Stdout.WriteLine();
-            Stdout.Write("Generating static website from ");
-            Stdout.Write(sourceDir.WithForeground(ConsoleColor.Cyan));
-            Stdout.Write(" into ");
-            Stdout.Write(targetDir.WithForeground(ConsoleColor.Cyan));
-            Stdout.Write(" using ");
-            Stdout.Write(template.Name.WithForeground(ConsoleColor.Cyan));
-            Stdout.WriteLine(" template");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine($"Generating static website from {sourceDir.Cyan()} into {targetDir.Cyan()} using {template.Name.Cyan()} template.");
 
             ICompilationReport report;
             using (CliHelper.SpinnerSafe("Running..."))
@@ -89,7 +80,6 @@ namespace ITGlobal.MarkDocs.Tools.Generate
                         RenderPage(nestedPage);
                     }
                 }
-
             }
 
             Program.PrintReport(report, verbose);

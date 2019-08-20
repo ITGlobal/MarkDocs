@@ -1,19 +1,34 @@
-﻿using System;
+using System;
 using ITGlobal.CommandLine;
-using ITGlobal.CommandLine.Spinners;
 
 namespace ITGlobal.MarkDocs.Tools
 {
     public static class CliHelper
     {
+        private sealed class SpinnerWrapper : IDisposable
+        {
+            private readonly ILiveOutputManager _manager;
+
+            public SpinnerWrapper(string title)
+            {
+                _manager = LiveOutputManager.Create();
+                _manager.CreateSpinner(title).WipeAfter();
+            }
+
+            public void Dispose()
+            {
+                _manager.Dispose();
+            }
+        }
+
         public static IDisposable SpinnerSafe(string title)
         {
             if (!Console.IsOutputRedirected)
             {
-                return TerminalSpinner.Create(title);
+                return new SpinnerWrapper(title);
             }
 
-            Terminal.Stderr.WriteLine(title);
+            Console.WriteLine(title);
             return null;
         }
     }
