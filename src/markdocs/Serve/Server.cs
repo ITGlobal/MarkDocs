@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore;
@@ -24,6 +25,7 @@ namespace ITGlobal.MarkDocs.Tools.Serve
                     log.AddSerilog();
                 })
                 .UseUrls(config.ListenUrl)
+                .UseContentRoot(Path.GetDirectoryName(typeof(Server).Assembly.Location))
                 .UseStartup<Startup>();
             using (var host = builder.Build())
             {
