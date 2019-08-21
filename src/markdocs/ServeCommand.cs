@@ -8,9 +8,11 @@ using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Search;
 using ITGlobal.MarkDocs.Source;
 using ITGlobal.MarkDocs.Tools.Serve;
+using ITGlobal.MarkDocs.Tools.Serve.Controllers;
 using ITGlobal.MarkDocs.Tools.Serve.Extensions;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 namespace ITGlobal.MarkDocs.Tools
@@ -219,7 +221,7 @@ namespace ITGlobal.MarkDocs.Tools
                 config.AddSearch(Path.Combine(CacheDirectory, "search"));
 
                 config.UseCallback(_ => new DefaultEventListener(Quiet));
-                config.AddExtension(_ => new CompilationReportExtensionFactory(Quiet));
+                config.AddExtension(_ => new CompilationReportExtensionFactory(_.GetRequiredService<DevConnectionManager>(), Quiet));
             }
         }
 

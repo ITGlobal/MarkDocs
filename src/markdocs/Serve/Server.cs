@@ -26,7 +26,9 @@ namespace ITGlobal.MarkDocs.Tools.Serve
                     log.AddSerilog();
                 })
                 .UseUrls(config.ListenUrl)
+#if !DEBUG
                 .UseContentRoot(Path.GetDirectoryName(typeof(Server).Assembly.Location))
+#endif
                 .UseStartup<Startup>();
             using (var host = builder.Build())
             {

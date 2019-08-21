@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ITGlobal.MarkDocs.Tools.Serve.Controllers;
 using ITGlobal.MarkDocs.Tools.Serve.Middlewares;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Builder;
@@ -9,12 +10,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 namespace ITGlobal.MarkDocs.Tools.Serve
 {
-    public class Startup :StartupBase
+    public class Startup : StartupBase
     {
         public static IServiceProvider ApplicationServices { get; private set; }
         public static IServerConfig Config { get; set; }
@@ -31,13 +33,20 @@ namespace ITGlobal.MarkDocs.Tools.Serve
 
             services.Configure<RazorViewEngineOptions>(o =>
             {
-                o.ViewLocationFormats.Clear(); 
+                o.ViewLocationFormats.Clear();
                 o.ViewLocationFormats.Add("/Serve/Views/{1}/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Serve/Views/Shared/{0}" + RazorViewEngine.ViewExtension);
 #if DEBUG
                 o.AllowRecompilingViewsOnFileChange = true;
 #endif
             });
+
+            
+            services.AddSingleton<DevConnectionManager>();
+            if (Config.EnableDeveloperMode)
+            {
+                services.AddConnections();
+            }
         }
 
         [UsedImplicitly]
@@ -45,7 +54,6 @@ namespace ITGlobal.MarkDocs.Tools.Serve
         {
             ApplicationServices = app.ApplicationServices;
 
-            var env = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
             var lifetime = app.ApplicationServices.GetRequiredService<IApplicationLifetime>();
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -62,6 +70,10 @@ namespace ITGlobal.MarkDocs.Tools.Serve
             app.UseResponseCaching();
             app.UseResponseCompression();
             app.UseStaticFiles();
+            if (Config.EnableDeveloperMode)
+            {
+                app.UseConnections(_ => { _.MapConnectionHandler<DevConnectionHandler>("/__dev"); });
+            }
             app.UseMvc();
 
             // Trigger documentation initialization
@@ -83,5 +95,10 @@ namespace ITGlobal.MarkDocs.Tools.Serve
                     }
                 }));
         }
+    }
+
+    public sealed class DevHub : Hub
+    {
+
     }
 }

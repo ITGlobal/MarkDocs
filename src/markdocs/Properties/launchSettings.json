@@ -10,7 +10,7 @@
     },
     "markdocs-serve": {
       "commandName": "Project",
-      "commandLineArgs": "serve ../../docs"
+      "commandLineArgs": "serve ../../docs -d"
     }
   }
 }
