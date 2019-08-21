@@ -7,6 +7,12 @@
     <AssemblyName>ITGlobal.MarkDocs.Search</AssemblyName>
     <PackageId>ITGlobal.MarkDocs.Search</PackageId>
   </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>@(NoWarn);NU5104</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.csproj" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.12.1" />
     <PackageReference Include="Lucene.Net" Version="4.8.0-beta00006" />
@@ -19,9 +25,8 @@
     <PackageReference Include="Lucene.Net.Codecs" Version="4.8.0-beta00006" />
     <PackageReference Include="Lucene.Net.Facet" Version="4.8.0-beta00006" />
     <PackageReference Include="Lucene.Net.Grouping" Version="4.8.0-beta00006" />
-    <PackageReference Include="Lucene.Net.Highlighter" Version="4.8.0-beta00006" />   
+    <PackageReference Include="Lucene.Net.Highlighter" Version="4.8.0-beta00006" />
     <PackageReference Include="Lucene.Net.Misc" Version="4.8.0-beta00006" />
     <PackageReference Include="Lucene.Net.Join" Version="4.8.0-beta00006" />
-    <ProjectReference Include="..\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.csproj" />
   </ItemGroup>
 </Project>

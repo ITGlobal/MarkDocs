@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../common.props" />
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyTitle>MarkDocs.Core</AssemblyTitle>
@@ -15,5 +16,4 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="2.2.0" />
   </ItemGroup>
-  <Import Project="../common.props" />
 </Project>

@@ -17,6 +17,8 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\ITGlobal.MarkDocs\ITGlobal.MarkDocs.csproj" />
+    </ItemGroup>
+    <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.0" />
         <PackageReference Include="Serilog.Sinks.Literate" Version="3.0.0" />

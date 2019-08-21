@@ -91,8 +91,11 @@ function build-packages() {
             exit 1
         }
     
-        Write-Host "Compiled package $($_.Name)"
+        Write-Host "Compiled project $($_.Name)"
     }
+
+    Write-Host "Generated NuGet packages:"
+    Get-ChildItem -Path $ARTIFACTS -Filter *.nupkg -File | %{ Write-Host "  $($_.Name)" }
 }
 
 function build-tools() {
@@ -124,6 +127,8 @@ function build-tools() {
     }
     
     Write-Host "Compiled markdocs cli tool"
+    Write-Host "Generated Chocolatey packages:"
+    Get-ChildItem -Path $ARTIFACTS -Filter *.nupkg -File | %{ Write-Host "  $($_.Name)" }
 }
 
 function build-usage() {
