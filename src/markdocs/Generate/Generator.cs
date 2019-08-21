@@ -77,7 +77,7 @@ namespace ITGlobal.MarkDocs.Tools.Generate
                 }
             }
 
-            Program.PrintReport(report, quiet);
+            Program.PrintReport(report, quiet: quiet);
 
             return 0;
         }

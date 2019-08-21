@@ -1,0 +1,22 @@
+@using ITGlobal.MarkDocs
+@using ITGlobal.MarkDocs.Tools.Serve.Models
+@model IPage
+@{
+    Layout = "~/Serve/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = Model.Title;
+}
+<div class="layout">
+    <div class="sidebar border-right">
+        @(await Html.PartialAsync("~/Serve/Views/Shared/_Sidebar.cshtml", new SidebarModel(Model)))
+    </div>
+    <div class="content">
+        @(await Html.PartialAsync("~/Serve/Views/Shared/_Breadcrumbs.cshtml", Model))
+        <a name="top"></a>
+        <article>
+            <h1 class="pb-1 mb-4 border-bottom">
+                @Model.Title
+            </h1>
+            @Html.Raw(Model.ReadHtmlString())
+        </article>
+    </div>
+</div>

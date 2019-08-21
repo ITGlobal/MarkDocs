@@ -5,7 +5,7 @@ namespace ITGlobal.MarkDocs.Tools
 {
     public static class TerminalOutput
     {
-        public static ITerminalOutput Create(string title, bool quiet)
+        public static ITerminalOutput Create(string title, bool quiet = false)
         {
             if (quiet)
             {

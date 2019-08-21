@@ -1,0 +1,42 @@
+@using ITGlobal.MarkDocs
+@model ITGlobal.MarkDocs.Tools.Serve.Models.SidebarModel
+@functions
+{
+
+    static object MapPageToJson(IPage page)
+    {
+        return new
+        {
+            id = page.Id,
+            title = page.Title,
+            shortTitle = page.Metadata.ShortTitle,
+            isHyperlink = true,
+            pages = page.NestedPages
+                .OrderBy(_ => _.Metadata.Order ?? int.MaxValue)
+                .ThenBy(_ => _.Metadata.ShortTitle)
+                .ThenBy(_ => _.Metadata.Title)
+                .Select(MapPageToJson)
+                .ToArray(),
+        };
+    }
+
+}
+<script>
+    $(function() {
+        var sidebarModel = @Json.Serialize(MapPageToJson(Model.RootPage));
+        createSidebar($('#sidebar-content'), sidebarModel, '@Model.ActivePage?.Id');
+    });
+</script>
+
+<form action="@Url.Action("Resource", "Home", new { path = "" })" method="get" class="inline-search-box mb-2">
+    <div class="input-group">
+        <input type="text" class="form-control border-primary" placeholder="Search..." name="q">
+        <span class="input-group-append">
+            <button type="submit" class="btn btn-outline-primary">
+                <i class="fa fa-search"></i> Go
+            </button>
+        </span>
+    </div>
+</form>
+
+<div id="sidebar-content"></div>

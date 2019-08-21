@@ -1,0 +1,86 @@
+@using System.Text
+@using ITGlobal.MarkDocs.Tools.Serve.Extensions
+@using ITGlobal.MarkDocs.Tools.Serve.Models
+@model ITGlobal.MarkDocs.Tools.Serve.Models.SearchPageModel
+@{
+    ViewBag.Title = "Search";
+}
+
+
+<div class="layout">
+    <div class="sidebar border-right">
+        @(await Html.PartialAsync("~/Serve/Views/Shared/_Sidebar.cshtml", new SidebarModel(Model.Documentation)))
+    </div>
+    <div class="content">
+        <div class="page-header">
+            @if (!string.IsNullOrEmpty(Model.Query))
+            {
+                <h1>Search results for &quot;@Model.Query&quot; </h1>
+            }
+            else
+            {
+                <h1>Search</h1>
+            }
+        </div>
+
+        <form action="@Url.Action("Resource", "Home")" method="get">
+            <div class="input-group">
+                <input type="text" class="form-control border-primary" placeholder="Search..." name="q" value="@Model.Query">
+                <span class="input-group-append">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fa fa-search"></i> Go
+                    </button>
+                </span>
+            </div>
+        </form>
+
+        @if (Model.HasSuggestions)
+        {
+            var str = new StringBuilder();
+            str.Append("Did you mean ");
+            for (var index = 0; index < Model.Suggestions.Count; index++)
+            {
+                var suggestion = Model.Suggestions[index];
+                str.AppendFormat("<a href=\"{0}\">{1}</a>", Url.Action("Resource", "Home", new { q = suggestion }), suggestion);
+
+                if (index != Model.Suggestions.Count - 1)
+                {
+                    str.Append(", ");
+                }
+            }
+            str.Append("?");
+
+            <p>
+                @Html.Raw(str.ToString())
+            </p>
+        }
+
+        @if (Model.HasSearchResults)
+        {
+            if (Model.SearchResults.Count > 0)
+            {
+                <div class="search-results">
+                    @foreach (var result in Model.SearchResults)
+                    {
+                        <a href="@result.Page.GetResourceUrl()">
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">@result.Page.Title</h5>
+                                    <p class="card-text">
+                                        &hellip;@Html.Raw(result.Preview)&hellip;
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>
+                    Nothing is found
+                </p>
+            }
+        }
+    </div>
+</div>

@@ -2,11 +2,15 @@
   "profiles": {
     "markdocs-lint": {
       "commandName": "Project",
-      "commandLineArgs": "lint ../../../../../docs"
+      "commandLineArgs": "lint ../../docs"
     },
     "markdocs-build": {
       "commandName": "Project",
-      "commandLineArgs": "build ../../../../../docs"
+      "commandLineArgs": "build ../../../docs"
+    },
+    "markdocs-serve": {
+      "commandName": "Project",
+      "commandLineArgs": "serve ../../docs"
     }
   }
 }

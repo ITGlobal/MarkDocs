@@ -1,0 +1,1 @@
+dotnet run --no-launch-profile --project ./src/markdocs/markdocs.csproj -- $args

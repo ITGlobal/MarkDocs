@@ -1,0 +1,19 @@
+.navbar {
+    background-color: #f8f9fa !important;
+}
+
+pre {
+    border-color: #eee;
+}
+
+code {
+    color: #003693 !important;
+}
+
+.lum-lightbox {
+    background: rgba(255,255,255,.95);
+}
+
+.layout .sidebar {
+    border: none !important; 
+}

@@ -1,0 +1,110 @@
+@using ITGlobal.MarkDocs
+@using ITGlobal.MarkDocs.Tools.Serve
+@using Microsoft.Extensions.DependencyInjection
+@{
+    var doc = Context.RequestServices.GetRequiredService<IMarkDocService>()
+        .Documentations[0];
+    var theme = Startup.Config.Theme;
+    if (Context.Request.Query.TryGetValue("theme", out var themeStr) &&
+        Enum.TryParse<Theme>(themeStr, true, out var t))
+    {
+        theme = t;
+    }
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    @if (Model is IPage p)
+    {
+
+        <title>@p.Title &middot; @doc.Title</title>
+    }
+    else
+    {
+        <title>@doc.Title</title>
+    }
+    <link rel="sitemap" type="application/xml" title="sitemap" href="@Url.Action("Sitemap", "Home")" />
+    <link rel="stylesheet" href="@Url.Content("~/static/css/luminous-basic.min.css")">
+    <link rel="stylesheet" href="@Url.Content("~/static/css/font-awesome.min.css")">
+    @switch (theme)
+    {
+        case Theme.Dark:
+            <link rel="stylesheet" href="@Url.Content("~/static/theme/dark/bootstrap.min.css")">
+            <link rel="stylesheet" href="@Url.Content("~/static/css/site.css")">
+            <link rel="stylesheet" href="@Url.Content("~/static/theme/dark/override.css")">
+            break;
+        case Theme.Sketch:
+            <link rel="stylesheet" href="@Url.Content("~/static/theme/sketch/bootstrap.min.css")">
+            <link rel="stylesheet" href="@Url.Content("~/static/css/site.css")">
+            <link rel="stylesheet" href="@Url.Content("~/static/theme/sketch/override.css")">
+            break;
+        default:
+            <link rel="stylesheet" href="@Url.Content("~/static/theme/light/bootstrap.min.css")">
+            <link rel="stylesheet" href="@Url.Content("~/static/css/site.css")">
+            <link rel="stylesheet" href="@Url.Content("~/static/theme/light/override.css")">
+            break;
+    }
+
+    <script src="@Url.Content("~/static/js/jquery-3.3.1.min.js")"></script>
+    <script src="@Url.Content("~/static/js/jquery.color.min.js")"></script>
+    <script src="@Url.Content("~/static/js/popper.min.js")"></script>
+    <script src="@Url.Content("~/static/js/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/static/js/bootstrap-treeview.min.js")"></script>
+    <script src="@Url.Content("~/static/js/luminous.min.js")"></script>
+    @switch (theme)
+    {
+        case Theme.Dark:
+            <script src="@Url.Content("~/static/theme/dark/override.js")"></script>
+            break;
+        case Theme.Sketch:
+            <script src="@Url.Content("~/static/theme/sketch/override.js")"></script>
+            break;
+        default:
+            <script src="@Url.Content("~/static/theme/light/override.js")"></script>
+            break;
+    }
+    <script src="@Url.Content("~/static/js/site.js")"></script>
+</head>
+<body>
+    @(await Html.PartialAsync("~/Serve/Views/Shared/_Navbar.cshtml"))
+    <main role="main" class="container-fluid" style="visibility: hidden;">
+        @RenderBody()
+    </main>
+    @if (Startup.Config.EnableDeveloperMode)
+    {
+        <div class="modal fade" id="compilation-report-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Errors and warnings</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        @(await Html.PartialAsync("~/Serve/Views/Shared/_CompilationReport.cshtml", doc.CompilationReport))
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+<script>
+    $(function() {
+        $('.navbar-menu-btn').on('click',
+            function() {
+                $('.layout').toggleClass('sidebar-open');
+            });
+        $('table').each(function() {
+            $(this).addClass('table-responsive');
+        });
+        
+        $('main').css({ visibility: '' });
+    });
+</script>
+</body>
+</html>

@@ -1,12 +1,11 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using ITGlobal.CommandLine;
 using ITGlobal.CommandLine.Parsing;
-using ITGlobal.MarkDocs.Tools.Generate;
-using ITGlobal.MarkDocs.Tools.Lint;
 using Serilog;
 using Serilog.Events;
 
@@ -23,153 +22,172 @@ namespace ITGlobal.MarkDocs.Tools
         public static int Main(string[] args)
         {
             var parser = CliParser.NewTreeParser();
-                parser.ExecutableName("markdocs");
-                parser.HelpText("Markdocs command line tool");
-                parser.SuppressLogo();
+            parser.ExecutableName("markdocs");
+            parser.HelpText("Markdocs command line tool");
+            parser.SuppressLogo();
 
-                var tempDir = parser.Option("temp-dir").HelpText("Path to temp directory");
-                var verbosity = parser.RepeatableSwitch('v', "verbose").HelpText("Enable verbose output");
-                var quiet = parser.Switch('q', "quiet").HelpText("Enable quiet output");
-                var version = parser.Switch("version").HelpText("Display version number");
+            var cacheDir = parser.Option("cache").HelpText("Path to cache directory");
+            var verbosity = parser.RepeatableSwitch('v', "verbose").HelpText("Enable verbose output");
+            var quiet = parser.Switch('q', "quiet").HelpText("Enable quiet output");
+            var version = parser.Switch("version").HelpText("Display version number");
 
-                parser.BeforeExecute(ctx =>
-                {
-                    if (version)
-                    {
-                        Console.Out.WriteLine(Version);
-                        ctx.Break();
-                    }
-
-                    SetupLogger(verbosity, quiet);
-                });
-
-                {
-                    var lintCommand = parser.Command("lint")
-                        .HelpText("Run a linter on a documentation");
-
-                    var pathParameter = lintCommand
-                        .Argument("path")
-                        .DefaultValue(".")
-                        .HelpText("Path to documentation root directory")
-                        .Required();
-
-                    var summary = lintCommand
-                        .Switch('s', "summary")
-                        .HelpText("Display summary");
-
-                    lintCommand.OnExecute(_ =>
-                    {
-                        var path = Path.GetFullPath(pathParameter);
-                        Linter.Run(path, DetectTempDir(tempDir, path), quiet, summary);
-                    });
-                }
-
-                {
-                    var buildCommand = parser.Command("build")
-                        .HelpText("Generate static website from documentation");
-
-                    var pathParameter = buildCommand
-                        .Argument("path")
-                        .DefaultValue(".")
-                        .HelpText("Path to documentation root directory")
-                        .Required();
-                    var targetDirParameter = buildCommand
-                        .Option('o', "output")
-                        .HelpText("Path to output directory");
-                    var templateParameter = buildCommand
-                        .Option('t', "template")
-                        .HelpText("Template name");
-
-                    buildCommand.OnExecute(ctx =>
-                    {
-                        var path = Path.GetFullPath(pathParameter.Value);
-                        var outputPath = targetDirParameter.IsSet
-                            ? targetDirParameter.Value
-                            : Path.Combine(path, "__output__");
-                        var templateName = templateParameter.IsSet
-                            ? templateParameter.Value
-                            : "";
-
-                        var exitCode = Generator.Run(
-                            sourceDir: path,
-                            targetDir: outputPath,
-                            templateName: templateName,
-                            tempDir: DetectTempDir(tempDir, path),
-                            quiet: quiet
-                        );
-                        ctx.Break(exitCode);
-                    });
-                }
-
-            return TerminalErrorHandler.Handle(() =>
+            parser.BeforeExecute(ctx =>
             {
-                
-                return parser.Parse(args).Run();
+                if (version)
+                {
+                    Console.Out.WriteLine(Version);
+                    ctx.Break();
+                }
+
+                SetupLogger(verbosity, quiet);
             });
+
+            LintCommand.Setup(parser, cacheDir, quiet);
+            BuildCommand.Setup(parser, cacheDir, quiet);
+            ServeCommand.Setup(parser, cacheDir, verbosity, quiet);
+
+            return TerminalErrorHandler.Handle(() => parser.Parse(args).Run());
         }
 
-        private static string DetectTempDir(string tempPath, string sourcePath)
+        public static string DetectTempDir(string tempPath, string source = null, string suffix = null)
         {
+            string path;
             if (!string.IsNullOrWhiteSpace(tempPath))
             {
-                return tempPath;
+                path = Path.GetFullPath(tempPath);
+                if (path != tempPath)
+                {
+                    Log.Debug("Cache path \"{Path}\" resolved to \"{FullPath}\"", tempPath, path);
+                }
             }
-
-            string hash;
-            using (var md5 = MD5.Create())
+            else
             {
-                hash=BitConverter.ToString(md5.ComputeHash(Encoding.UTF8.GetBytes(sourcePath)))
-                    .Replace("-", "")
-                    .ToLowerInvariant();
+                path = Path.Combine(Path.GetTempPath(), "markdocs");
+
+                if (!string.IsNullOrWhiteSpace(suffix))
+                {
+                    path = Path.Combine(path, suffix);
+                }
+
+                if (!string.IsNullOrWhiteSpace(source))
+                {
+                    string hash;
+                    using (var md5 = MD5.Create())
+                    {
+                        hash = BitConverter.ToString(md5.ComputeHash(Encoding.UTF8.GetBytes(source)))
+                            .Replace("-", "")
+                            .ToLowerInvariant();
+                    }
+                    path = Path.Combine(path, hash);
+                }
+
+                Log.Warning("Auto-detected cache path \"{Path}\"", path);
             }
 
-            return Path.Combine(Path.GetTempPath(), "markdocs", "wrk", hash);
+            Directory.CreateDirectory(path);
+            return path;
         }
 
-        public static void PrintReport(ICompilationReport report, bool quiet)
+        public static void PrintReport(ICompilationReport report, bool summary = false, bool quiet = false)
         {
-            if (report.Messages.Count == 0)
+            if (quiet)
             {
-                Console.Error.WriteLine("Everything is OK".Green());
+                foreach (var (filename, list) in report.Messages)
+                {
+                    foreach (var error in list)
+                    {
+                        Console.Error.Write(filename);
+                        if (error.LineNumber != null)
+                        {
+                            Console.Error.Write($":{error.LineNumber.Value + 1}");
+                        }
+
+                        Console.Error.Write(": ");
+
+                        switch (error.Type)
+                        {
+                            case CompilationReportMessageType.Warning:
+                                Console.Error.Write("warning: ".Yellow());
+                                break;
+                            case CompilationReportMessageType.Error:
+                                Console.Error.Write("error: ".Red());
+                                break;
+                            default:
+                                Console.Error.Write($"{error.Type:G}: ".Magenta());
+                                break;
+                        }
+
+                        Console.Error.WriteLine(error.Message);
+                    }
+                }
                 return;
             }
 
-            foreach (var (filename, list) in report.Messages)
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("Compilation report".Cyan());
+            Console.Error.WriteLine("==================".DarkCyan());
+            Console.Error.WriteLine();
+
+            if (report.Messages.Count == 0)
             {
-                foreach (var error in list)
+                Console.Error.WriteLine("Everything is OK".Green());
+            }
+            else
+            {
+                foreach (var (filename, list) in report.Messages)
                 {
-                    Console.Error.Write(filename);
-                    if (error.LineNumber != null)
+                    Console.Error.WriteLine($"* ./{filename}".White());
+                    foreach (var error in list)
                     {
-                        Console.Error.Write($":{error.LineNumber.Value + 1}");
+                        Console.Error.Write("  ");
+                        if (error.LineNumber != null)
+                        {
+                            Console.Error.Write($"(at {error.LineNumber.Value + 1}) ".DarkGray());
+                        }
+
+                        switch (error.Type)
+                        {
+                            case CompilationReportMessageType.Warning:
+                                Console.Error.Write("WARNING: ".Yellow());
+                                break;
+                            case CompilationReportMessageType.Error:
+                                Console.Error.Write("ERROR: ".Red());
+                                break;
+                            default:
+                                Console.Error.Write($"{error.Type:G}: ".Magenta());
+                                break;
+                        }
+
+                        Console.Error.WriteLine(error.Message);
                     }
-
-                    Console.Error.Write(": ");
-
-                    switch (error.Type)
-                    {
-                        case CompilationReportMessageType.Warning:
-                            Console.Error.Write("warning: ".Yellow());
-                            break;
-                        case CompilationReportMessageType.Error:
-                            Console.Error.Write("error: ".Red());
-                            break;
-                        default:
-                            Console.Error.Write($"{error.Type:G}: ".Magenta());
-                            break;
-                    }
-
-                    Console.Error.WriteLine(error.Message);
                 }
+            }
+
+            Console.Error.WriteLine();
+
+            if (summary)
+            {
+                var errors = report.Messages.Values.Sum(_ => _.Count(x => x.Type == CompilationReportMessageType.Error)); ;
+                var warnings = report.Messages.Values.Sum(_ => _.Count(x => x.Type == CompilationReportMessageType.Warning));
+
+                Console.Error.WriteLine("Summary".Yellow());
+                Console.Error.WriteLine("-------".DarkYellow());
+                Console.Error.WriteLine($"  {errors} error(s)");
+                Console.Error.WriteLine($"  {warnings} warning(s)");
+                Console.Error.WriteLine();
             }
         }
 
         private static void SetupLogger(int verbosity, bool quiet)
         {
+            const string outputTemplate = "[{Level:u3} {ThreadId}] {Message:lj}{NewLine}{Exception}";
+
             var configuration = new LoggerConfiguration();
             configuration.Enrich.FromLogContext();
+            configuration.Enrich.WithThreadId();
+            configuration.Filter.ByExcluding(ExcludePredicate);
             configuration.WriteTo.LiterateConsole(
-                outputTemplate: "{Message}{NewLine}{Exception}",
+                outputTemplate: outputTemplate,
                 standardErrorFromLevel: LogEventLevel.Verbose
             );
 
@@ -185,12 +203,9 @@ namespace ITGlobal.MarkDocs.Tools
                         configuration.MinimumLevel.Error();
                         break;
                     case 1:
-                        configuration.MinimumLevel.Warning();
-                        break;
-                    case 2:
                         configuration.MinimumLevel.Information();
                         break;
-                    case 3:
+                    case 2:
                         configuration.MinimumLevel.Debug();
                         break;
                     default:
@@ -200,6 +215,22 @@ namespace ITGlobal.MarkDocs.Tools
             }
 
             Log.Logger = configuration.CreateLogger();
+
+            bool ExcludePredicate(LogEvent e)
+            {
+                if (e.Properties.TryGetValue("SourceContext", out var value) &&
+                    value is ScalarValue scalarValue &&
+                    scalarValue.Value is string sourceContext)
+                {
+                    if (sourceContext.StartsWith("Microsoft.") ||
+                        sourceContext.StartsWith("System."))
+                    {
+                        return e.Level <= LogEventLevel.Information;
+                    }
+                }
+
+                return false;
+            }
         }
     }
 }

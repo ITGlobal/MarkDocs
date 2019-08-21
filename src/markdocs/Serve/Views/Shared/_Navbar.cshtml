@@ -1,0 +1,63 @@
+@using ITGlobal.MarkDocs
+@using ITGlobal.MarkDocs.Tools.Serve
+@using Microsoft.Extensions.DependencyInjection
+@{
+    var doc = Context.RequestServices.GetRequiredService<IMarkDocService>()
+        .Documentations[0];
+}
+<nav class="navbar navbar-expand-md fixed-top border-bottom">
+    <button class="navbar-menu-btn" type="button" data-toggle="collapse" data-target="#layout" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    <a class="navbar-brand" href="@Url.Action("Resource", "Home", new {path = ""})">
+        @doc.Title
+    </a>
+
+    @if (Startup.Config.EnableDeveloperMode)
+    {
+        var errors = doc.CompilationReport.Messages.Sum(_ => _.Value.Count(x => x.Type == CompilationReportMessageType.Error));
+        var warnings = doc.CompilationReport.Messages.Sum(_ => _.Value.Count(x => x.Type == CompilationReportMessageType.Warning));
+    <ul class="navbar-nav mr-auto pull-left navbar-searchbox">
+        @if (errors > 0)
+            {
+        <li class="nav-item" title="There are errors">
+            <a class="nav-link text-danger" href="#" data-toggle="modal" data-target="#compilation-report-modal">
+                <i class="fa fa-times-circle"></i> Errors
+            </a>
+        </li>
+            }
+            else if (warnings > 0)
+            {
+        <li class="nav-item" title="No errors but there are some warnings">
+            <a class="nav-link text-warning" href="#" data-toggle="modal" data-target="#compilation-report-modal">
+                <i class="fa fa-exclamation-circle"></i> Warnings
+            </a>
+        </li>
+            }
+            else
+            {
+        <li class="nav-item" title="No errors and warnings">
+            <a class="nav-link text-success" href="#" data-toggle="modal" data-target="#compilation-report-modal">
+                <i class="fa fa-check-circle"></i>
+            </a>
+        </li>
+            }
+    </ul>
+    }
+    else
+    {
+    <ul class="navbar-nav mr-auto navbar-searchbox"></ul>
+    }
+
+    <form class="form-inline pull-right navbar-searchbox" method="get" action="@Url.Action("Resource", "Home")">
+        <div class="input-group">
+            <input type="text" class="form-control 1w-50" placeholder="Search" name="q">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+</nav>

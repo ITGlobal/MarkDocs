@@ -1,0 +1,254 @@
+body {
+    min-height: 100vh;
+    padding-top: 4.5rem;
+}
+
+img {
+    max-width: 100%;
+}
+
+a[data-gallery]:hover > img {
+    outline: #d0927f 2px solid;
+}
+
+[data-caption]::after {
+    content: attr(data-caption);
+    text-align: center;
+    display: block;
+    opacity: 0.7;
+    padding: 0.5em 0;
+}
+
+.layout {
+    position: absolute;
+    left: 0;
+    top: 60px;
+    right: 0;
+    bottom: 0;
+}
+
+    .layout .sidebar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        margin-top: 1em;
+        overflow-y: auto;
+    }
+
+        .layout .sidebar .list-group-item {
+            border: none;
+            padding: 0;
+        }
+
+        .layout .sidebar .treeview .list-group-item {
+            padding-left: 0.5em;
+        }
+
+            .layout .sidebar .treeview .list-group-item:hover a {
+                text-decoration: underline;
+            }
+
+    .layout .content {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin-top: 1em;
+        margin-left: 1em;
+        margin-right: 0;
+        margin-bottom: 0;
+        padding-right: 1em;
+        overflow-y: scroll;
+    }
+
+        .layout .content .alert p {
+            margin: 0;
+        }
+
+pre {
+    padding: 1em;
+    border: 1px solid #eee;
+}
+
+code {
+    color: #003693 !important;
+    word-break: keep-all;
+}
+
+.lum-lightbox {
+    z-index: 2000;
+    background: rgba(255,255,255,.95);
+}
+
+
+.list-group-item {
+    border-radius: 0 !important;
+}
+
+.navbar-menu-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    text-decoration: none;
+    color: #007bff;
+}
+    .navbar-menu-btn:hover, .navbar-menu-btn:focus {
+        color: #0056b3 !important;
+    }
+
+.inline-search-box {
+    display: none;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.search-results a:hover {
+    text-decoration: none;
+}
+
+/* Large devices (desktops, larged than 1200px) */
+@media (min-width: 1200px) {
+    .layout .sidebar { width: 500px; }
+
+    .layout .content { left: 500px; }
+}
+
+/* Large devices (desktops, less than 1200px) */
+@media (max-width: 1200px) {
+    .layout .sidebar {
+        width: 400px;
+    }
+
+    .layout .content {
+        left: 400px;
+    }
+}
+
+/* Medium devices (tablets, less than 992px) */
+@media (max-width: 992px) {
+    .layout .sidebar {
+        width: 300px;
+    }
+
+    .layout .content {
+        left: 300px;
+    }
+}
+
+/* Small devices (landscape phones, less than 768px) */
+@media (max-width: 768px) {
+    .navbar-searchbox {
+        display: none;
+    }
+    .navbar-menu-btn {
+        display: initial;
+    }
+    .inline-search-box {
+        display: flex;
+    }
+
+    .navbar-brand {
+        flex-grow: 1;
+        margin-left: 1em;
+    }
+
+    .breadcrumb {
+        display: none;
+    }
+
+    .layout .sidebar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 50px;
+        bottom: 0;
+        width: initial;
+        border: none;
+        overflow-y: auto;
+    }
+
+            .layout.collapsed .sidebar  {
+                display: none;
+            }
+
+            .layout.collapsed .content {
+                display: block;
+            }
+
+    .layout .sidebar .treeview .list-group-item {
+        padding-left: 1em;
+        padding-right: 1em;
+    }
+
+    .layout .content {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 50px;
+        bottom: 0;
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: 0;
+        padding-left: 1em;
+        padding-right: 1em;
+        overflow-y: auto;
+        width: initial;
+    }
+        
+    /* sidebar open*/
+    .layout.sidebar-open .sidebar {
+        visibility: visible;
+    }
+
+    .layout.sidebar-open .content {
+        visibility: collapse;
+    }
+
+    /* sidebar collapsed*/
+    .layout .sidebar {
+        visibility: hidden;
+    }
+
+    .layout .content {
+        visibility: visible;
+    }
+}
+
+/* Extra small devices (portrait phones, less than 576px) */
+@media (max-width: 576px) {
+}
+
+
+/* Print view */
+@media print {
+    .navbar {
+        display: none;
+    }
+    
+    .layout {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .layout .sidebar {
+        display: none;
+    }
+
+    .layout .content {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: 0;
+        overflow-y: auto;
+    }
+
+    .breadcrumb {
+        display: none;
+    }
+}

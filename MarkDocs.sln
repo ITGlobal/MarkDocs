@@ -30,8 +30,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ITGlobal.MarkDocs.Directory
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ITGlobal.MarkDocs.DiskCache", "src\ITGlobal.MarkDocs.DiskCache\ITGlobal.MarkDocs.DiskCache.csproj", "{82D5BABB-9BE6-4BE7-83BC-B8A84F9B7A7C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "markdocs-site", "src\markdocs-site\markdocs-site.csproj", "{F3100A5B-3310-4993-8824-BC68B16B6573}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,10 +84,6 @@ Global
 		{82D5BABB-9BE6-4BE7-83BC-B8A84F9B7A7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82D5BABB-9BE6-4BE7-83BC-B8A84F9B7A7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82D5BABB-9BE6-4BE7-83BC-B8A84F9B7A7C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F3100A5B-3310-4993-8824-BC68B16B6573}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F3100A5B-3310-4993-8824-BC68B16B6573}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F3100A5B-3310-4993-8824-BC68B16B6573}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F3100A5B-3310-4993-8824-BC68B16B6573}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,7 +101,6 @@ Global
 		{146F27F4-8407-4489-AD27-B498173265C4} = {82B0859E-A87A-46BA-9054-B5BC558C423B}
 		{7EEB65A5-21F7-411F-B9FB-E76CE5A65240} = {2E2F3543-25DB-43BD-A8A9-9691F4D6B957}
 		{82D5BABB-9BE6-4BE7-83BC-B8A84F9B7A7C} = {2E2F3543-25DB-43BD-A8A9-9691F4D6B957}
-		{F3100A5B-3310-4993-8824-BC68B16B6573} = {2E2F3543-25DB-43BD-A8A9-9691F4D6B957}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C4559CD4-0E2F-4D43-9CAA-192FD444E1E1}

@@ -4,7 +4,6 @@ using ITGlobal.MarkDocs.Source;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Resources;
 using System.Threading.Tasks;
 
 namespace ITGlobal.MarkDocs.Impl

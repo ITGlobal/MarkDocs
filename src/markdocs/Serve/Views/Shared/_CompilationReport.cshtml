@@ -1,0 +1,45 @@
+@using ITGlobal.MarkDocs
+@model ITGlobal.MarkDocs.ICompilationReport
+@if (Model.Messages.Count > 0)
+{
+    <dl class="list-unstyled">
+        @foreach (var (key, messages) in Model.Messages)
+        {
+            <dt>
+                <samp>~/@key</samp>:
+            </dt>
+            <dd>
+                <ul>
+                    @foreach (var m in messages)
+                    {
+                        var style = "";
+                        switch (m.Type)
+                        {
+                            case CompilationReportMessageType.Warning:
+                                style = "text-warning";
+                                break;
+                            case CompilationReportMessageType.Error:
+                                style = "text-danger";
+                                break;
+                        }
+
+                        <li class="@style">
+                            @if (m.LineNumber != null)
+                            {
+                                <text>(at line @m.LineNumber.Value)</text>
+                            }
+
+                            @m.Message
+                        </li>
+                    }
+                </ul>
+            </dd>
+        }
+    </dl>
+}
+else
+{
+    <p>
+        No errors founds
+    </p>
+}

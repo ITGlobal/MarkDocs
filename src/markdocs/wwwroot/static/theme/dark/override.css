@@ -1,0 +1,36 @@
+body {
+    color: #f8f9fa !important;
+    background-color: #343a40 !important;
+}
+
+pre {
+    background: #eee;
+    border-color: #000;
+}
+
+code {
+    color: #80a6f3 !important;
+}
+
+.navbar {
+    background-color: #343a40 !important;
+    color: #f8f9fa !important;
+    border-bottom-color: #dee2e6 !important;
+}
+
+
+.modal-content {
+    background-color: #343a40 !important;
+}
+
+.breadcrumb {
+    background-color: #545a60!important;
+}
+
+.breadcrumb-item.active {
+    color: #f8f9fa !important;
+}
+
+table {
+    color: #f8f9fa !important;
+}

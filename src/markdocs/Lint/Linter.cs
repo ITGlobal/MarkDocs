@@ -2,7 +2,6 @@ using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Source;
 using System;
 using System.IO;
-using System.Linq;
 
 namespace ITGlobal.MarkDocs.Tools.Lint
 {
@@ -35,18 +34,7 @@ namespace ITGlobal.MarkDocs.Tools.Lint
                 }
             }
 
-            Program.PrintReport(report, quiet);
-
-            if (summary && !quiet)
-            {
-                var errors = report.Messages.Values.Sum(_ => _.Count(x => x.Type == CompilationReportMessageType.Error)); ;
-                var warnings = report.Messages.Values.Sum(_ => _.Count(x => x.Type == CompilationReportMessageType.Warning));
-
-                Console.Error.WriteLine("Summary");
-                Console.Error.WriteLine("-------");
-                Console.Error.WriteLine($"  {errors} error(s)");
-                Console.Error.WriteLine($"  {warnings} warning(s)");
-            }
+            Program.PrintReport(report, summary, quiet);
         }
 
         public static string GetRelativeResourcePath(IResourceId resource, IResourceId relativeTo)
