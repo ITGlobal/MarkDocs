@@ -16,6 +16,14 @@ Then run:
 markdocs [command]
 ```
 
+## Update
+
+If markdocs CLI tool is already installed, type the following command to update it:
+
+```shell
+dotnet tool update -g ITGlobal.MarkDocs.CommandLineTool
+```
+
 ## Commands
 
 * `markdocs lint` - runs a linter over a directory

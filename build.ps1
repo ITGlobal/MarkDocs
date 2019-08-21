@@ -84,11 +84,7 @@ function build-packages() {
         $VERSION = "0.0.0-dev"
     }
     
-    Get-ChildItem -Filter *.csproj -Path "./src" -Recurse -File | % {
-        if ($_.Name -eq "markdocs-site.csproj") {
-            return
-        }
-    
+    Get-ChildItem -Filter *.csproj -Path "./src" -Recurse -File | % {    
         & dotnet pack --output $ARTIFACTS --no-restore -v q /nologo /p:Version=$VERSION /p:Configuration=$CONFIGURATION $_.FullName
         if ($LASTEXITCODE -ne 0) {
             Write-Host "'dotnet pack' exited with $LASTEXITCODE"
