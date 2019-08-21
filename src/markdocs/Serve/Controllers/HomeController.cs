@@ -65,7 +65,9 @@ namespace ITGlobal.MarkDocs.Tools.Serve.Controllers
                 return File(file.OpenRead(), file.ContentType);
             }
 
-            return NotFound(new { Error = "Not found" });
+            var notFound = View("~/Serve/Views/Home/404.cshtml");
+            notFound.StatusCode = 404;
+            return notFound;
         }
 
         [HttpGet("sitemap.xml")]

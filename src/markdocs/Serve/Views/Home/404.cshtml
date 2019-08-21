@@ -1,0 +1,23 @@
+@using ITGlobal.MarkDocs
+@using ITGlobal.MarkDocs.Tools.Serve.Models
+@using Microsoft.Extensions.DependencyInjection
+@model ITGlobal.MarkDocs.Tools.Serve.Models.SearchPageModel
+@{
+    var doc = Context.RequestServices.GetRequiredService<IMarkDocService>()
+        .Documentations[0];
+    ViewBag.Title = "404";
+}
+
+<div class="layout">
+    <div class="sidebar border-right">
+        @(await Html.PartialAsync("~/Serve/Views/Shared/_Sidebar.cshtml", new SidebarModel(doc)))
+    </div>
+    <div class="content">
+        <div class="jumbotron">
+            <h1>404</h1>
+            <p class="lead">
+                Requested resource was not found
+            </p>
+        </div>
+    </div>
+</div>
