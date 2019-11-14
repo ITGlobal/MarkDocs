@@ -14,7 +14,7 @@
     <ProjectReference Include="..\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.12.1" />
+    <PackageReference Include="AngleSharp" Version="0.13.0" />
     <PackageReference Include="Lucene.Net" Version="4.8.0-beta00006" />
     <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00006" />
     <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00006" />

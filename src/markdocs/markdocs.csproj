@@ -20,11 +20,11 @@
         <PackageReference Include="Microsoft.AspNet.SignalR" Version="2.4.1" />
         <PackageReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
-        <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.0" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
         <PackageReference Include="Serilog.Sinks.Literate" Version="3.0.0" />
         <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
         <PackageReference Include="SerilogAnalyzer" Version="0.15.0" />
-        <PackageReference Include="ITGlobal.CLI" Version="3.0.18" />
+        <PackageReference Include="ITGlobal.CLI" Version="3.0.25" />
     </ItemGroup>
     <ItemGroup>
       <Content Update="wwwroot\**\*">

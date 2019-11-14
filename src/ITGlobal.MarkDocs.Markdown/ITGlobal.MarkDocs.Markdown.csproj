@@ -17,9 +17,9 @@
     <ProjectReference Include="..\ITGlobal.MarkDocs.Core\ITGlobal.MarkDocs.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AngleSharp.Css" Version="0.12.1" />
+    <PackageReference Include="AngleSharp.Css" Version="0.13.0" />
     <PackageReference Include="SharpYaml.NetStandard" Version="1.5.4" />
-    <PackageReference Include="Markdig" Version="0.17.1" />
-    <PackageReference Include="AngleSharp" Version="0.12.1" />
+    <PackageReference Include="Markdig" Version="0.18.0" />
+    <PackageReference Include="AngleSharp" Version="0.13.0" />
   </ItemGroup>
 </Project>
