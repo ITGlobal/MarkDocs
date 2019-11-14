@@ -1,4 +1,4 @@
-﻿using ITGlobal.MarkDocs.Format.Impl;
+using ITGlobal.MarkDocs.Format.Impl;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using System;

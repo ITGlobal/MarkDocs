@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using Markdig.Extensions.JiraLinks;
 
 namespace ITGlobal.MarkDocs.Format
@@ -299,7 +299,20 @@ namespace ITGlobal.MarkDocs.Format
         [NotNull]
         public MarkdownOptions UseAlerts(bool use = true)
         {
-            _useAlerts=use;
+            _useAlerts = use;
+            return this;
+        }
+
+
+        private bool _useHtmlIncludes = true;
+
+        /// <summary>
+        ///     Enable HTML include extension
+        /// </summary>
+        [NotNull]
+        public MarkdownOptions UseHtmlIncludes(bool use = true)
+        {
+            _useHtmlIncludes = use;
             return this;
         }
     }

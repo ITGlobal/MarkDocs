@@ -1,15 +1,22 @@
-﻿using JetBrains.Annotations;
+using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
 using Markdig.Syntax.Inlines;
 
 namespace ITGlobal.MarkDocs.Format.Impl.Extensions.Images
 {
     internal sealed class ImageRendererSelector
     {
-        private readonly IImageRenderer[] _defaultRendererChain;
+        private readonly List<IImageRenderer> _defaultRendererChain;
 
         public ImageRendererSelector(IImageRenderer[] defaultRendererChain)
         {
-            _defaultRendererChain = defaultRendererChain;
+            _defaultRendererChain = defaultRendererChain.ToList();
+        }
+
+        public void Register(IImageRenderer renderer)
+        {
+            _defaultRendererChain.Add(renderer);
         }
 
         [CanBeNull]

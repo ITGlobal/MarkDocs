@@ -1,4 +1,4 @@
-﻿using Markdig;
+using Markdig;
 using Markdig.Extensions.Tables;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -11,6 +11,7 @@ using ITGlobal.MarkDocs.Format.Impl.Extensions.CustomHeading;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.Cut;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.Icons;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.Images;
+using ITGlobal.MarkDocs.Format.Impl.Extensions.IncludeHtml;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.Mathematics;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.TableOfContents;
 
@@ -147,6 +148,14 @@ namespace ITGlobal.MarkDocs.Format
             if (_useAlerts)
             {
                 builder.Extensions.Add(new AlertBlockExtension());
+            }
+
+            if (_useHtmlIncludes)
+            {
+                if (imageRendererSelector != null)
+                {
+                    imageRendererSelector.Register(new HtmlImageRenderer());
+                }
             }
 
             builder.Extensions.Add(new CutBlockExtension());
