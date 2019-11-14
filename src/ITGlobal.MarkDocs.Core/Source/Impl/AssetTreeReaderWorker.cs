@@ -1,4 +1,4 @@
-﻿using ITGlobal.MarkDocs.Format;
+using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Impl;
 using Microsoft.AspNetCore.StaticFiles;
 using System;
@@ -127,7 +127,10 @@ namespace ITGlobal.MarkDocs.Source.Impl
             }
 
             file = PhysicalFile(GetAbsolutePath(path));
-            _files[path] = file;
+            if (file != null)
+            {
+                _files[path] = file;
+            }
 
             return file;
         }

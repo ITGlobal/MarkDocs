@@ -1,4 +1,4 @@
-﻿using Markdig;
+using Markdig;
 using Markdig.Renderers;
 
 namespace ITGlobal.MarkDocs.Format.Impl.Extensions.Icons
@@ -6,6 +6,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.Icons
     internal sealed class IconExtension : IMarkdownExtension
     {
         // TODO add support for fortawesome
+
         public void Setup(MarkdownPipelineBuilder pipeline)
         {
             pipeline.InlineParsers.Insert(0, new IconParser());

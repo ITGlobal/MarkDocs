@@ -1,4 +1,4 @@
-﻿using Markdig;
+using Markdig;
 using Markdig.Extensions.Mathematics;
 using Markdig.Renderers;
 
@@ -21,14 +21,60 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.Mathematics
 
         public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer)
         {
-            var htmlRenderer = renderer as HtmlRenderer;
-            if (htmlRenderer == null)
+            if (renderer is HtmlRenderer htmlRenderer)
             {
-                return;
+                var htmlMathInlineRenderer = htmlRenderer.ObjectRenderers.FindExact<HtmlMathInlineRenderer>();
+                htmlMathInlineRenderer?.TryWriters.Insert(0, TryCustomMathInlineRenderer);
+
+                var htmlMathBlockRenderer = htmlRenderer.ObjectRenderers.FindExact<HtmlMathBlockRenderer>();
+                htmlMathBlockRenderer?.TryWriters.Insert(0, TryCustomMathInlineRenderer);
+            }
+        }
+
+        private static bool TryCustomMathInlineRenderer(HtmlRenderer renderer, MathInline inline)
+        {
+            if (MarkdownPageRenderContext.IsPresent)
+            {
+                var r = inline.GetCustomRenderable();
+                if (r != null)
+                {
+                    var context = MarkdownPageRenderContext.Current;
+                    try
+                    {
+                        r.Render(context, renderer);
+                        return true;
+                    }
+                    catch
+                    {
+                        context.Error("Error while rendering math inline", inline.Line);
+                    }
+                }
             }
 
-            htmlRenderer.ObjectRenderers.ReplaceOrAdd<HtmlMathInlineRenderer>(new CustomMathInlineRenderer());
-            htmlRenderer.ObjectRenderers.ReplaceOrAdd<HtmlMathBlockRenderer>(new CustomMathBlockRenderer());
+            return false;
+        }
+
+        private static bool TryCustomMathInlineRenderer(HtmlRenderer renderer, MathBlock block)
+        {
+            if (MarkdownPageRenderContext.IsPresent)
+            {
+                var r = block.GetCustomRenderable();
+                if (r != null)
+                {
+                    var context = MarkdownPageRenderContext.Current;
+                    try
+                    {
+                        r.Render(context, renderer);
+                        return true;
+                    }
+                    catch
+                    {
+                        context.Error("Error while rendering math block", block.Line);
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

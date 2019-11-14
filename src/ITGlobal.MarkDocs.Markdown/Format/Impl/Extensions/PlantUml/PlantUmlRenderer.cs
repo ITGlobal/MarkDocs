@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Immutable;
 using ITGlobal.MarkDocs.Source;
 using Markdig.Syntax;
 
@@ -6,6 +8,12 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.PlantUml
     internal abstract class PlantUmlRenderer 
     {
         public const string Language = "plantuml";
+
+        public static readonly ImmutableHashSet<string> SupportedFileExtensions =
+            ImmutableHashSet.CreateRange(
+                StringComparer.OrdinalIgnoreCase,
+                new[] {".wsd", ".pu", ".puml", ".plantuml", ".iuml"}
+            );
 
         public IRenderable CreateRenderable(IPageReadContext ctx, MarkdownObject obj, string markup, string filename = null)
         {

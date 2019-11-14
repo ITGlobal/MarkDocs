@@ -1,4 +1,4 @@
-﻿using Markdig;
+using Markdig;
 using Markdig.Renderers;
 using Markdig.Renderers.Html.Inlines;
 using Markdig.Syntax;
@@ -50,13 +50,37 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.Images
 
         public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer)
         {
-            var r = renderer.ObjectRenderers.Find<LinkInlineRenderer>();
-            if (r != null)
+            if (renderer is HtmlRenderer htmlRenderer)
             {
-                renderer.ObjectRenderers.Remove(r);
+                var inlineRenderer = htmlRenderer.ObjectRenderers.FindExact<LinkInlineRenderer>();
+                inlineRenderer?.TryWriters.Insert(0, TryCustomLinkInlineRenderer);
+            }
+        }
+
+        private static bool TryCustomLinkInlineRenderer(HtmlRenderer renderer, LinkInline link)
+        {
+            if (!MarkdownPageRenderContext.IsPresent)
+            {
+                return false; 
             }
 
-            renderer.ObjectRenderers.Add(new CustomLinkInlineRenderer());
+            var context = MarkdownPageRenderContext.Current;
+
+            var r = link.GetCustomRenderable();
+            if (r != null)
+            {
+                try
+                {
+                    r.Render(context, renderer);
+                    return true;
+                }
+                catch
+                {
+                    context.Error("Error while rendering link inline", link.Line);
+                }
+            }
+
+            return false; 
         }
     }
 }

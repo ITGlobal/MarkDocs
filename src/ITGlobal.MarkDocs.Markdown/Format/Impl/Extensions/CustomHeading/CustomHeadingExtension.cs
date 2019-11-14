@@ -1,6 +1,8 @@
-﻿using Markdig;
+using System.Linq;
+using Markdig;
 using Markdig.Renderers;
 using Markdig.Renderers.Html;
+using Markdig.Syntax;
 
 namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CustomHeading
 {
@@ -17,9 +19,32 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CustomHeading
 
         public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer)
         {
-            var i = renderer.ObjectRenderers.FindIndex(_ => _ is HeadingRenderer);
-            renderer.ObjectRenderers.RemoveAt(i);
-            renderer.ObjectRenderers.Insert(i, new CustomHeadingRenderer(_dontRenderFirstHeading));
+            if (renderer is HtmlRenderer htmlRenderer)
+            {
+                var inlineRenderer = htmlRenderer.ObjectRenderers.FindExact<HeadingRenderer>();
+                inlineRenderer?.TryWriters.Insert(0, TryCustomHeadingRenderer);
+            }
+        }
+
+        private bool TryCustomHeadingRenderer(HtmlRenderer renderer, HeadingBlock block)
+        {
+            if (_dontRenderFirstHeading)
+            {
+                var document = block.GetDocument();
+                if (document?.OfType<HeadingBlock>()
+                        .Where((b, i) => b == block && i == 0)
+                        .FirstOrDefault() != null)
+                {
+                    return true;
+                }
+            }
+            
+            if (block.IsNoRender())
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

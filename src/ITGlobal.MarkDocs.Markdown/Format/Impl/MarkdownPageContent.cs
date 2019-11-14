@@ -266,7 +266,7 @@ namespace ITGlobal.MarkDocs.Format.Impl
             return null;
         }
 
-        private static string NormalizeResourcePath(IPageReadContext ctx, string resourceUrl)
+        public static string NormalizeResourcePath(IPageReadContext ctx, string resourceUrl)
         {
             var normalizedUrl = NormalizeResourcePath(ctx.Page.Id, resourceUrl, ctx.IsBranchPage || ctx.IsIndexPage);
             return normalizedUrl;

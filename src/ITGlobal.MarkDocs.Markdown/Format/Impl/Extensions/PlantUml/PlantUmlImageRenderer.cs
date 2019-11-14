@@ -16,25 +16,31 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.PlantUml
 
         public IRenderable TryCreateRenderable(IPageReadContext ctx, LinkInline obj)
         {
-            var url = new Uri(obj.Url, UriKind.RelativeOrAbsolute);
-            if (url.IsAbsoluteUri)
+            var u = new Uri(obj.Url, UriKind.RelativeOrAbsolute);
+            if (u.IsAbsoluteUri)
             {
                 return null;
             }
 
+            var url = obj.Url;
+            url = MarkdownPageContent.NormalizeResourcePath(ctx, url);
+            
             var ext = Path.GetExtension(obj.Url);
-            if (!string.Equals(ext, ".plantuml", StringComparison.OrdinalIgnoreCase))
+            if(!PlantUmlRenderer.SupportedFileExtensions.Contains(ext))
             {
                 return null;
             }
 
-            if (!ctx.TryResolveFileResourcePath(obj.Url, out var path))
+            if (!ctx.TryResolveFileResourcePath(url, out var path))
             {
                 ctx.Error($"Unable to find file \"{obj.Url}\"", obj.Line);
                 return null;
             }
 
-            var filename = $"{obj.Url}.png";
+            var filename = Path.Combine(
+                Path.GetDirectoryName(url),
+                Path.ChangeExtension(Path.GetFileName(url), ".png")
+            );
 
             var markup = File.ReadAllText(path, Encoding.UTF8);
             return _renderer.CreateRenderable(ctx, obj, markup, filename);
