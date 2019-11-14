@@ -1,17 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.Text;
 using AngleSharp;
 using AngleSharp.Html;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
-using ITGlobal.MarkDocs.Format.Impl.Extensions.PlantUml;
-using ITGlobal.MarkDocs.Format.Impl.Extensions.TableOfContents;
-using ITGlobal.MarkDocs.Source;
-using Markdig;
-using Markdig.Renderers;
 using Markdig.Syntax.Inlines;
 
 namespace ITGlobal.MarkDocs.Format.Impl.Extensions.IncludeHtml
@@ -80,62 +73,6 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.IncludeHtml
             html = parser.ParseDocument(markup);
             markup = html.Body.InnerHtml;
             return markup;
-        }
-    }
-
-    internal sealed class HtmlAssetContent : IGeneratedAssetContent
-    {
-        private readonly string _markup;
-
-        public HtmlAssetContent(string markup)
-        {
-            _markup = markup;
-        }
-
-        public string ContentType => "text/html";
-
-        public string FormatFileName(string name)
-        {
-            return $"html/{name}.png";
-        }
-
-        public void Write(Stream stream)
-        {
-            using (var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-            {
-                writer.WriteLine(_markup);
-            }
-        }
-    }
-
-    internal sealed class HtmlRenderable : IRenderable
-    {
-        private readonly GeneratedFileAsset _asset;
-
-        public HtmlRenderable(GeneratedFileAsset asset)
-        {
-            _asset = asset;
-        }
-
-
-        public void Render(IPageRenderContext ctx, HtmlRenderer renderer)
-        {
-            var storedAsset = ctx.Store(_asset);
-
-            using (var stream = storedAsset.OpenRead())
-            using (var reader = new StreamReader(stream, Encoding.UTF8))
-            {
-                while (true)
-                {
-                    var line = reader.ReadLine();
-                    if (line == null)
-                    {
-                        break;
-                    }
-
-                    renderer.WriteLine(line);
-                }
-            }
         }
     }
 }
