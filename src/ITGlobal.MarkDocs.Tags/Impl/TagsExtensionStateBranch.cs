@@ -15,20 +15,20 @@ namespace ITGlobal.MarkDocs.Tags.Impl
 
             Pages = pagesBuilder.ToImmutable();
             Tags = Pages.SelectMany(_ => _.Value.Tags).Distinct().ToImmutableArray();
-
-            static void Add(ImmutableDictionary<string, PageTagNode>.Builder pagesBuilder, IPage page)
-            {
-                pagesBuilder.Add(page.Id, new PageTagNode(page, page.Metadata.Tags));
-
-                foreach (var nestedPage in page.NestedPages)
-                {
-                    Add(pagesBuilder, nestedPage);
-                }
-            }
         }
 
         public ImmutableArray<string> Tags { get; }
         public ImmutableDictionary<string, PageTagNode> Pages { get; }
+
+        private static void Add(ImmutableDictionary<string, PageTagNode>.Builder pagesBuilder, IPage page)
+        {
+            pagesBuilder.Add(page.Id, new PageTagNode(page, page.Metadata.Tags));
+
+            foreach (var nestedPage in page.NestedPages)
+            {
+                Add(pagesBuilder, nestedPage);
+            }
+        }
 
     }
 }
