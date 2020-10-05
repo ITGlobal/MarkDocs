@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using ITGlobal.MarkDocs.Extensions;
 
@@ -10,6 +11,7 @@ namespace ITGlobal.MarkDocs.Tags.Impl
     /// </summary>
     internal sealed class TagsExtension : ITagService, IExtension
     {
+
         #region fields
 
         private static readonly string[] EmptyTags = new string[0];
@@ -37,7 +39,7 @@ namespace ITGlobal.MarkDocs.Tags.Impl
             lock (_stateLock)
             {
                 var branch = _state.GetBranch(documentation);
-                return branch?.Tags ?? Array.Empty<string>();
+                return (IReadOnlyList<string>) branch?.Tags ?? Array.Empty<string>();
             }
         }
 
@@ -55,9 +57,9 @@ namespace ITGlobal.MarkDocs.Tags.Impl
             lock (_stateLock)
             {
                 var branch = _state.GetBranch(page.Documentation);
-                if (branch != null && branch.PageTags.TryGetValue(page, out var tags))
+                if (branch != null && branch.Pages.TryGetValue(page.Id, out var node))
                 {
-                    return tags;
+                    return node.Tags;
                 }
 
                 return Array.Empty<string>();
@@ -78,18 +80,63 @@ namespace ITGlobal.MarkDocs.Tags.Impl
         /// </returns>
         public IReadOnlyList<IPage> GetPagesByTag(IDocumentation documentation, string tag)
         {
-            tag = NormalizeTag(tag);
+            return GetPagesByTags(documentation, includeTags: new[] {tag});
+        }
 
+        /// <summary>
+        ///     Gets a list of pages with tags
+        /// </summary>
+        /// <param name="documentation">
+        ///     Documentation
+        /// </param>
+        /// <param name="includeTags">
+        ///     Include only pages with specified tags
+        /// </param>
+        /// <param name="excludeTags">
+        ///     Exclude pages with specified tags
+        /// </param>
+        /// <returns>
+        ///     List of pages
+        /// </returns>
+        public IReadOnlyList<IPage> GetPagesByTags(
+            IDocumentation documentation,
+            string[] includeTags = null,
+            string[] excludeTags = null)
+        {
+            includeTags = NormalizeTags(includeTags);
+            excludeTags = NormalizeTags(excludeTags);
+
+            TagsExtensionStateBranch branch;
             lock (_stateLock)
             {
-                var branch = _state.GetBranch(documentation);
-                if (branch != null && branch.PageIndex.TryGetValue(tag, out var pages))
-                {
-                    return pages;
-                }
+                branch = _state.GetBranch(documentation);
+            }
 
+            if (branch == null)
+            {
                 return Array.Empty<IPage>();
             }
+
+            var query = branch.Pages.AsEnumerable();
+
+            if (includeTags != null && includeTags.Length > 0)
+            {
+                foreach (var tag in includeTags)
+                {
+                    query = query.Where(_ => _.Value.HasTag(tag));
+                }
+            }
+
+            if (excludeTags != null && excludeTags.Length > 0)
+            {
+                foreach (var tag in excludeTags)
+                {
+                    query = query.Where(_ => !_.Value.HasTag(tag));
+                }
+            }
+
+            var pages = query.Select(_ => _.Value.Page).ToList();
+            return pages;
         }
 
         #endregion
@@ -198,6 +245,17 @@ namespace ITGlobal.MarkDocs.Tags.Impl
             return builder.ToString();
         }
 
+        internal static string[] NormalizeTags(string[] tags)
+        {
+            if (tags == null || tags.Length == 0)
+            {
+                return Array.Empty<string>();
+            }
+
+            return tags.Select(NormalizeTag).ToArray();
+        }
+
         #endregion
+
     }
 }

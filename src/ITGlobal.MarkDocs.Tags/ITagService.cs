@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using System.Collections.Generic;
 
 namespace ITGlobal.MarkDocs.Tags
@@ -9,6 +9,7 @@ namespace ITGlobal.MarkDocs.Tags
     [PublicAPI]
     public interface ITagService
     {
+
         /// <summary>
         ///     Gets a list of all known tags
         /// </summary>
@@ -47,5 +48,28 @@ namespace ITGlobal.MarkDocs.Tags
         /// </returns>
         [NotNull]
         IReadOnlyList<IPage> GetPagesByTag([NotNull] IDocumentation documentation, [NotNull] string tag);
+
+        /// <summary>
+        ///     Gets a list of pages with tags
+        /// </summary>
+        /// <param name="documentation">
+        ///     Documentation
+        /// </param>
+        /// <param name="includeTags">
+        ///     Include only pages with specified tags
+        /// </param>
+        /// <param name="excludeTags">
+        ///     Exclude pages with specified tags
+        /// </param>
+        /// <returns>
+        ///     List of pages
+        /// </returns>
+        [NotNull]
+        IReadOnlyList<IPage> GetPagesByTags(
+            [NotNull] IDocumentation documentation,
+            [CanBeNull] string[] includeTags = null,
+            [CanBeNull] string[] excludeTags = null
+        );
+
     }
 }

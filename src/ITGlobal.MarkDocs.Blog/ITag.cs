@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Blog
 {
@@ -7,23 +6,14 @@ namespace ITGlobal.MarkDocs.Blog
     ///     Post tag with count
     /// </summary>
     [PublicAPI]
-    public interface ITag
+    public interface ITag : IBlogPostPagedList
     {
+
         /// <summary>
         ///     Tag name
         /// </summary>
         [NotNull]
         string Name { get; }
 
-        /// <summary>
-        ///     Page count
-        /// </summary>
-        int Count { get; }
-
-        /// <summary>
-        ///     Gets a blog posts paged list
-        /// </summary>
-        [NotNull]
-        IReadOnlyList<IBlogPost> List(int page, int pageSize = BlogEngineConstants.PageSize);
     }
 }

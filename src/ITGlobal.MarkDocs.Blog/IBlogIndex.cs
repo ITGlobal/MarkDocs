@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using System.Collections.Generic;
 
 namespace ITGlobal.MarkDocs.Blog
@@ -33,10 +33,28 @@ namespace ITGlobal.MarkDocs.Blog
         IReadOnlyList<ITag> Tags { get; }
 
         /// <summary>
-        ///     Gets pages by tag
+        ///     Gets tag by its name
         /// </summary>
         [NotNull]
         ITag Tag([NotNull] string name);
+
+        /// <summary>
+        ///     Gets pages by tag
+        /// </summary>
+        [NotNull]
+        IBlogPostPagedList WithTag([NotNull] string name);
+
+        /// <summary>
+        ///     Gets pages by tags
+        /// </summary>
+        [NotNull]
+        IBlogPostPagedList Query(string[] includeTags = null, string[] excludeTags = null);
+
+        /// <summary>
+        ///     Gets pages without tag
+        /// </summary>
+        [NotNull]
+        IBlogPostPagedList WithoutTag([NotNull] string name);
 
         /// <summary>
         ///     Gets a blog posts paged list

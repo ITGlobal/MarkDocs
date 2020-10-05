@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using ITGlobal.MarkDocs.Tags.Impl;
 using JetBrains.Annotations;
 
@@ -10,6 +10,7 @@ namespace ITGlobal.MarkDocs.Tags
     [PublicAPI]
     public static class TagsExtensionMethods
     {
+
         /// <summary>
         ///     Gets an instance of tags extension
         /// </summary>
@@ -59,7 +60,7 @@ namespace ITGlobal.MarkDocs.Tags
         }
 
         /// <summary>
-        ///     Gets a list of normalized page tags
+        ///     Gets a list of pages with tag
         /// </summary>
         /// <param name="documentation">
         ///     Documentation
@@ -71,10 +72,38 @@ namespace ITGlobal.MarkDocs.Tags
         ///     List of pages
         /// </returns>
         [NotNull]
-        public static IReadOnlyList<IPage> GetPagesByTag([NotNull] this IDocumentation documentation, [NotNull] string tag)
+        public static IReadOnlyList<IPage> GetPagesByTag(
+            [NotNull] this IDocumentation documentation,
+            [NotNull] string tag)
         {
             var extension = documentation.GetTagService();
             return extension.GetPagesByTag(documentation, tag);
         }
+
+        /// <summary>
+        ///     Gets a list of pages with tags
+        /// </summary>
+        /// <param name="documentation">
+        ///     Documentation
+        /// </param>
+        /// <param name="includeTags">
+        ///     Include only pages with specified tags
+        /// </param>
+        /// <param name="excludeTags">
+        ///     Exclude pages with specified tags
+        /// </param>
+        /// <returns>
+        ///     List of pages
+        /// </returns>
+        [NotNull]
+        public static IReadOnlyList<IPage> GetPagesByTags(
+            [NotNull] this IDocumentation documentation,
+            [CanBeNull] string[] includeTags = null,
+            [CanBeNull] string[] excludeTags = null)
+        {
+            var extension = documentation.GetTagService();
+            return extension.GetPagesByTags(documentation, includeTags, excludeTags);
+        }
+
     }
 }

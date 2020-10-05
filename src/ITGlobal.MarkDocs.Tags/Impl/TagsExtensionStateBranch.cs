@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -6,67 +6,29 @@ namespace ITGlobal.MarkDocs.Tags.Impl
 {
     internal sealed class TagsExtensionStateBranch
     {
+
         public TagsExtensionStateBranch(IDocumentation documentation)
         {
-            var tags = new HashSet<string>();
-            var pageTags = new Dictionary<IPage, HashSet<string>>();
-            var pageIndex = new Dictionary<string, HashSet<IPage>>();
+            var pagesBuilder = ImmutableDictionary.CreateBuilder<string, PageTagNode>(StringComparer.OrdinalIgnoreCase);
 
-            Add(pageTags, pageIndex, tags, documentation.RootPage);
+            Add(pagesBuilder, documentation.RootPage);
 
-            Tags = tags.ToArray();
-            PageTags = pageTags.ToImmutableDictionary(_ => _.Key, _ => _.Value.ToArray());
-            PageIndex = pageIndex.ToImmutableDictionary(_ => _.Key, _ => _.Value.ToArray());
-        }
+            Pages = pagesBuilder.ToImmutable();
+            Tags = Pages.SelectMany(_ => _.Value.Tags).Distinct().ToImmutableArray();
 
-        public string[] Tags { get; }
-        public ImmutableDictionary<IPage, string[]> PageTags { get; }
-        public ImmutableDictionary<string, IPage[]> PageIndex { get; }
-
-        private static void Add(
-            Dictionary<IPage, HashSet<string>> pageTags,
-            Dictionary<string, HashSet<IPage>> pageIndex,
-            HashSet<string> tags,
-            IPage page)
-        {
-            if (page.Metadata.Tags != null)
+            static void Add(ImmutableDictionary<string, PageTagNode>.Builder pagesBuilder, IPage page)
             {
-                foreach (var tag in page.Metadata.Tags)
+                pagesBuilder.Add(page.Id, new PageTagNode(page, page.Metadata.Tags));
+
+                foreach (var nestedPage in page.NestedPages)
                 {
-                    Add(pageTags, pageIndex, tags, page, tag);
+                    Add(pagesBuilder, nestedPage);
                 }
             }
-
-            foreach (var nestedPage in page.NestedPages)
-            {
-                Add(pageTags, pageIndex, tags, nestedPage);
-            }
         }
 
-        private static void Add(
-            Dictionary<IPage, HashSet<string>> pageTags,
-            Dictionary<string, HashSet<IPage>> pageIndex,
-            HashSet<string> tags,
-            IPage page,
-            string tag)
-        {
-            tags.Add(tag);
+        public ImmutableArray<string> Tags { get; }
+        public ImmutableDictionary<string, PageTagNode> Pages { get; }
 
-            if (!pageTags.TryGetValue(page, out var list))
-            {
-                list = new HashSet<string>();
-                pageTags.Add(page, list);
-            }
-            list.Add(tag);
-
-            if (!pageIndex.TryGetValue(tag, out var pages))
-            {
-                pages = new HashSet<IPage>();
-                pageIndex.Add(tag, pages);
-            }
-            pages.Add(page);
-
-
-        }
     }
 }

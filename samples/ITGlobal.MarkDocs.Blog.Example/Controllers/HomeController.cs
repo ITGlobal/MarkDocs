@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ITGlobal.MarkDocs.Blog.Example.Models;
 using Microsoft.AspNetCore.Mvc;
 

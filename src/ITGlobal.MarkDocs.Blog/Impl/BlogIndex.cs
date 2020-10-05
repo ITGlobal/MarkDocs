@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ITGlobal.MarkDocs.Source;
@@ -8,8 +8,12 @@ namespace ITGlobal.MarkDocs.Blog.Impl
 {
     internal sealed class BlogIndex : IBlogIndex
     {
+
+        private readonly IDocumentation _documentation;
+
         private readonly Dictionary<int, IBlogIndexYear> _byYear
             = new Dictionary<int, IBlogIndexYear>();
+
         private readonly Dictionary<string, ITag> _tags
             = new Dictionary<string, ITag>(StringComparer.OrdinalIgnoreCase);
 
@@ -17,6 +21,8 @@ namespace ITGlobal.MarkDocs.Blog.Impl
 
         public BlogIndex(IBlogEngine engine, IDocumentation documentation, ICompilationReportBuilder report)
         {
+            _documentation = documentation;
+
             // Collect resources
             foreach (var attachment in documentation.Files.Values)
             {
@@ -101,9 +107,11 @@ namespace ITGlobal.MarkDocs.Blog.Impl
                 .ToList();
         }
 
-        public Dictionary<string, IBlogResource> Resources { get; } = new Dictionary<string, IBlogResource>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, IBlogResource> Resources { get; } =
+            new Dictionary<string, IBlogResource>(StringComparer.OrdinalIgnoreCase);
 
-        public Dictionary<string, BlogPost> Posts { get; } = new Dictionary<string, BlogPost>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, BlogPost> Posts { get; } =
+            new Dictionary<string, BlogPost>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         ///     Gets a blog post index by year
@@ -116,6 +124,7 @@ namespace ITGlobal.MarkDocs.Blog.Impl
                 {
                     return new EmptyBlogIndexYear(year);
                 }
+
                 return value;
             }
         }
@@ -149,9 +158,49 @@ namespace ITGlobal.MarkDocs.Blog.Impl
         }
 
         /// <summary>
+        ///     Gets pages by tags
+        /// </summary>
+        public IBlogPostPagedList Query(string[] includeTags = null, string[] excludeTags = null)
+        {
+            var pages = _documentation.GetPagesByTags(includeTags, excludeTags);
+            var posts = new BlogPostPagedList(
+                pages
+                    .Select(_ => SelectPost(_.Id))
+                    .Where(_ => _ != null)
+                    .OrderByDescending(_ => _.Date)
+                    .ThenByDescending(_ => _.Slug)
+                    .ThenByDescending(_ => _.ContentId)
+            );
+            return posts;
+
+            BlogPost SelectPost(string id)
+            {
+                Posts.TryGetValue(id, out var post);
+                return post;
+            }
+        }
+
+        /// <summary>
+        ///     Gets pages by tag
+        /// </summary>
+        public IBlogPostPagedList WithTag(string name)
+        {
+            return Query(includeTags: new[] {name});
+        }
+
+        /// <summary>
+        ///     Gets pages without tag
+        /// </summary>
+        public IBlogPostPagedList WithoutTag(string name)
+        {
+            return Query(excludeTags: new[] {name});
+        }
+
+        /// <summary>
         ///     Gets a blog posts paged list
         /// </summary>
         public IReadOnlyList<IBlogPost> List(int page, int pageSize = BlogEngineConstants.PageSize)
             => _postsList.Skip(page * pageSize).Take(pageSize).ToArray();
+
     }
 }
