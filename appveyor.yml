@@ -1,7 +1,7 @@
 version: 0.0.{build}-{branch}
 pull_requests:
   do_not_increment_build_number: true
-image: Visual Studio 2017
+image: Visual Studio 2019
 configuration: Release
 build:
   verbosity: minimal
@@ -16,7 +16,7 @@ environment:
   CHOCO_API_KEY:
     secure: DLPmZhl7Zr4qqU3JIzGsA4opRPGjNZZkH/MSkOQKbL8iYyf7+sSFmG418+QjeUy2
   NUGET_API_KEY:
-    secure: r5vF3QENzP28+dU6gvmD7Sqbdt5Ti43yhuSye3O7TJxKT+6vuponJ7tVwkGkotH7
+    secure: dVa/C5tQ/ggSNnYXq0BT14sZeM0PVeRfe7oKBwWBGKGbxLIGYEeQOTSJmbYPbzrS
   CHOCO_PRIVATE_URL:
     secure: PbtRYek+AtjgpV7a2nkfX0UzwpAcZhP+xUU9eA3hXo4982NzrZV6/LmvBmANEwFszUupJpKJoeA1FPPJKx6sZA==
   CHOCO_PRIVATE_API_KEY:
