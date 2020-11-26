@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
@@ -24,6 +24,7 @@ namespace ITGlobal.MarkDocs.Blog
             }
 
             public ISourceInfo SourceInfo => _engine.SourceInfo;
+            public long StateVersion => _engine.StateVersion;
             public ICompilationReport CompilationReport => _engine.CompilationReport;
             public IBlogIndex Index => _engine.Index;
 

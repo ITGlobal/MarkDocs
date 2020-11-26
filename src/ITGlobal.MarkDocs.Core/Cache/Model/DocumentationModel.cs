@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using JetBrains.Annotations;
@@ -12,6 +12,7 @@ namespace ITGlobal.MarkDocs.Cache.Model
     [PublicAPI]
     public sealed class DocumentationModel
     {
+
         /// <summary>
         ///     Documentation ID
         /// </summary>
@@ -74,5 +75,6 @@ namespace ITGlobal.MarkDocs.Cache.Model
             var json = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(path, json, Encoding.UTF8);
         }
+
     }
 }

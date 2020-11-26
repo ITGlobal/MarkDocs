@@ -35,6 +35,11 @@ namespace ITGlobal.MarkDocs
         ISourceInfo SourceInfo { get; }
 
         /// <summary>
+        ///     Internal state version
+        /// </summary>
+        long StateVersion { get; }
+
+        /// <summary>
         ///     Root page
         /// </summary>
         [NotNull]

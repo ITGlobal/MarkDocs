@@ -10,6 +10,7 @@ namespace ITGlobal.MarkDocs.Impl
 {
     internal sealed class MarkDocService : IMarkDocService
     {
+
         private readonly IMarkDocsLog _log;
         private readonly ICacheProvider _cache;
         private readonly ISourceTreeProvider _sourceTreeProvider;
@@ -84,7 +85,7 @@ namespace ITGlobal.MarkDocs.Impl
                     var documentations = new List<IDocumentation>();
                     foreach (var (model, cacheReader) in models)
                     {
-                        var documentation = new Documentation(this, cacheReader, model);
+                        var documentation = new Documentation(this, cacheReader, model, stateVersion: 0);
                         documentations.Add(documentation);
                     }
 
@@ -144,7 +145,9 @@ namespace ITGlobal.MarkDocs.Impl
             return _extensions.GetExtension<TExtension>();
         }
 
-        public void Dispose() { }
+        public void Dispose()
+        {
+        }
 
         private void Synchronize(bool fullResync)
         {
@@ -198,7 +201,12 @@ namespace ITGlobal.MarkDocs.Impl
                 var tree = sourceTree.ReadAssetTree(reportBuilder);
 
                 listener.ProcessingAssets(tree);
-                using (var transaction = _cache.BeginTransaction(sourceTree, tree.SourceInfo, listener, forceCacheClear))
+                using (var transaction = _cache.BeginTransaction(
+                    sourceTree,
+                    tree.SourceInfo,
+                    listener,
+                    forceCacheClear
+                ))
                 {
                     var compiler = new DocumentationCompiler(transaction, reportBuilder, _log);
                     var model = compiler.Compile(tree);
@@ -206,7 +214,16 @@ namespace ITGlobal.MarkDocs.Impl
                     listener.Committing();
                     var reader = transaction.Commit();
 
-                    var documentation = new Documentation(this, reader, model);
+                    var stateVersion = 0L;
+                    lock (_stateLock)
+                    {
+                        if (_state.ById.TryGetValue(sourceTree.Id, out var d))
+                        {
+                            stateVersion = d.StateVersion + 1;
+                        }
+                    }
+
+                    var documentation = new Documentation(this, reader, model, stateVersion);
 
                     IDisposable disposable = null;
                     try
@@ -252,5 +269,6 @@ namespace ITGlobal.MarkDocs.Impl
                 _log.Error(ex, $"Unable to handle SourceTreeChangeEvent");
             }
         }
+
     }
 }

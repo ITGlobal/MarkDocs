@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using ITGlobal.MarkDocs.Cache;
@@ -9,6 +9,7 @@ namespace ITGlobal.MarkDocs.Impl
 {
     internal sealed class Documentation : IDocumentation
     {
+
         #region fields
 
         private static readonly PageModel DefaultRootPageModel = new PageModel
@@ -35,7 +36,8 @@ namespace ITGlobal.MarkDocs.Impl
         public Documentation(
             IMarkDocService service,
             ICacheReader cache,
-            DocumentationModel model)
+            DocumentationModel model,
+            long stateVersion)
         {
             Service = service;
             _model = model;
@@ -60,10 +62,12 @@ namespace ITGlobal.MarkDocs.Impl
                 var file = new FileResource(this, cache, m);
                 files[file.Id] = file;
             }
+
             Files = files.ToImmutable();
 
             SourceInfo = new SourceInfo(model.Info);
             CompilationReport = new CompilationReport(model.CompilationReport);
+            StateVersion = stateVersion;
         }
 
         #endregion
@@ -89,6 +93,11 @@ namespace ITGlobal.MarkDocs.Impl
         ///     Documentation version
         /// </summary>
         public ISourceInfo SourceInfo { get; }
+
+        /// <summary>
+        ///     Internal state version
+        /// </summary>
+        public long StateVersion { get; }
 
         /// <summary>
         ///     Root page
@@ -153,5 +162,6 @@ namespace ITGlobal.MarkDocs.Impl
         }
 
         #endregion
+
     }
 }

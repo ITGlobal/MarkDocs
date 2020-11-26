@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
@@ -16,6 +16,11 @@ namespace ITGlobal.MarkDocs.Blog
         /// </summary>
         [NotNull]
         ISourceInfo SourceInfo { get; }
+
+        /// <summary>
+        ///     Internal state version
+        /// </summary>
+        long StateVersion { get; }
 
         /// <summary>
         ///     Provides errors and warning for blog

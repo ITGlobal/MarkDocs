@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using ITGlobal.MarkDocs.Extensions;
-using ITGlobal.MarkDocs.Impl;
 using ITGlobal.MarkDocs.Source;
 
 namespace ITGlobal.MarkDocs.Blog.Impl
@@ -43,6 +42,11 @@ namespace ITGlobal.MarkDocs.Blog.Impl
         ///     Blog version
         /// </summary>
         public ISourceInfo SourceInfo => State.SourceInfo;
+
+        /// <summary>
+        ///     Internal state version
+        /// </summary>
+        public long StateVersion => State.StateVersion;
 
         /// <summary>
         ///     Provides errors and warning for blog

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -185,6 +185,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
                                 Name = remote.Name,
                                 Path = Guid.NewGuid().ToString("N")
                             };
+                            contentDescriptor.Items.Add(id, item);
                         }
 
                         sourceTree = new GitSourceTree(

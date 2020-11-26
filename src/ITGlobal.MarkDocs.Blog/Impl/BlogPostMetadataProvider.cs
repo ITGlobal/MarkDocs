@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using ITGlobal.MarkDocs.Source;
@@ -82,7 +82,11 @@ namespace ITGlobal.MarkDocs.Blog.Impl
                     slug = page.Metadata.GetString("slug");
                     if (string.IsNullOrEmpty(slug))
                     {
-                        slug = parts.Length > 3 ? parts[3] : "";
+                        slug = page.Metadata.GetString("permalink");
+                        if (string.IsNullOrEmpty(slug))
+                        {
+                            slug = parts.Length > 3 ? parts[3] : "";
+                        }
                     }
 
                     var dateStr = page.Metadata.GetString("date");

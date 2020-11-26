@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using ITGlobal.MarkDocs.Impl;
 using ITGlobal.MarkDocs.Search;
@@ -19,6 +19,8 @@ namespace ITGlobal.MarkDocs.Blog.Impl
         }
 
         public ISourceInfo SourceInfo => _documentation.SourceInfo;
+
+        public long StateVersion => _documentation.StateVersion;
 
         public ICompilationReport CompilationReport { get; }
 

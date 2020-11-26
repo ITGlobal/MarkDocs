@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ITGlobal.MarkDocs.Blog.Impl
@@ -46,6 +46,9 @@ namespace ITGlobal.MarkDocs.Blog.Impl
         /// </summary>
         public IReadOnlyDictionary<int, IBlogIndexMonth> Months => _byMonth;
 
+        /// <summary>
+        ///     Gets a blog posts paged list
+        /// </summary>
         public IReadOnlyList<IBlogPost> List(int page, int pageSize = BlogEngineConstants.PageSize)
         {
             var query = Months

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using ITGlobal.MarkDocs.Source;
 using ITGlobal.MarkDocs.Tags;
@@ -11,13 +12,11 @@ namespace ITGlobal.MarkDocs.Blog.Impl
 
         private readonly IDocumentation _documentation;
 
-        private readonly Dictionary<int, IBlogIndexYear> _byYear
-            = new Dictionary<int, IBlogIndexYear>();
+        private readonly ImmutableDictionary<int, IBlogIndexYear> _byYear;
 
-        private readonly Dictionary<string, ITag> _tags
-            = new Dictionary<string, ITag>(StringComparer.OrdinalIgnoreCase);
+        private readonly ImmutableDictionary<string, ITag> _tags;
 
-        private readonly List<IBlogPost> _postsList;
+        private readonly ImmutableList<IBlogPost> _postsList;
 
         public BlogIndex(IBlogEngine engine, IDocumentation documentation, ICompilationReportBuilder report)
         {
@@ -36,6 +35,7 @@ namespace ITGlobal.MarkDocs.Blog.Impl
             }
 
             // Collect posts
+            var byYear = new Dictionary<int, IBlogIndexYear>();
             foreach (var page in documentation.RootPage.NestedPages)
             {
                 if (!BlogPostMetadataProvider.TryParse(page, report, out var date, out var slug))
@@ -53,15 +53,17 @@ namespace ITGlobal.MarkDocs.Blog.Impl
                 Resources.Add(post.Id, post);
                 Posts.Add(post.Id, post);
 
-                if (!_byYear.TryGetValue(post.Date.Year, out var yearIndex))
+                if (!byYear.TryGetValue(post.Date.Year, out var yearIndex))
                 {
                     yearIndex = new BlogIndexYear(post.Date.Year);
-                    _byYear.Add(post.Date.Year, yearIndex);
+                    byYear.Add(post.Date.Year, yearIndex);
                 }
 
                 ((BlogIndexYear) yearIndex).Add(post);
             }
 
+            _byYear = byYear.ToImmutableDictionary();
+            
             // Collect permalinks
             foreach (var post in Posts.Values)
             {
@@ -87,16 +89,13 @@ namespace ITGlobal.MarkDocs.Blog.Impl
                 .OrderByDescending(_ => _.Count)
                 .ThenBy(_ => _.Name)
                 .ToArray();
+            var tags = new Dictionary<string, ITag>(StringComparer.OrdinalIgnoreCase);
             foreach (var tag in Tags)
             {
-                _tags[tag.Name] = tag;
+                tags[tag.Name] = tag;
             }
 
-            BlogPost SelectPost(string id)
-            {
-                Posts.TryGetValue(id, out var post);
-                return post;
-            }
+            _tags = tags.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase);
 
             // Build flat post list
             _postsList = Posts.Values
@@ -104,7 +103,19 @@ namespace ITGlobal.MarkDocs.Blog.Impl
                 .ThenByDescending(_ => _.Slug)
                 .ThenByDescending(_ => _.ContentId)
                 .Cast<IBlogPost>()
-                .ToList();
+                .ToImmutableList();
+
+            var DAY = this[2020][11][26];
+            if (DAY.Count == 0)
+            {
+
+            }
+
+            BlogPost SelectPost(string id)
+            {
+                Posts.TryGetValue(id, out var post);
+                return post;
+            }
         }
 
         public Dictionary<string, IBlogResource> Resources { get; } =

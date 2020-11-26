@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 
@@ -6,6 +6,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
 {
     internal sealed class GitSourceTree : ISourceTree
     {
+
         private readonly GitSourceTreeProvider _provider;
         private readonly IMarkDocsLog _log;
         private readonly IAssetTreeReader _reader;
@@ -24,7 +25,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
             string id,
             string branchOrTagName,
             string directoryPath
-            )
+        )
         {
             _provider = provider;
             _log = log;
@@ -68,12 +69,18 @@ namespace ITGlobal.MarkDocs.Source.Impl
                 _sourceInfo = sourceInfo;
             }
 
-            _log.Info($"Working copy {BranchOrTagName} is up to date");
+            _log.Info($"Working copy {BranchOrTagName} is now up to date ({sourceInfo.LastChangeId})");
         }
 
         public bool Refresh(string currentHash)
         {
-            if (_sourceInfo.LastChangeId == currentHash)
+            GitSourceInfo sourceInfo;
+            lock (_sourceInfoLock)
+            {
+                sourceInfo = _sourceInfo;
+            }
+
+            if (sourceInfo.LastChangeId == currentHash)
             {
                 return false;
             }
@@ -90,7 +97,9 @@ namespace ITGlobal.MarkDocs.Source.Impl
             }
             else if (!_git.IsRepository(DirectoryPath))
             {
-                _log.Warning($"Directory \"{DirectoryPath}\" already exists but it's not a working copy. It'll be recreated.");
+                _log.Warning(
+                    $"Directory \"{DirectoryPath}\" already exists but it's not a working copy. It'll be recreated."
+                );
                 Directory.Delete(DirectoryPath, true);
 
                 CheckoutNewWorkingCopy();
@@ -172,5 +181,6 @@ namespace ITGlobal.MarkDocs.Source.Impl
             _git.Checkout(DirectoryPath, BranchOrTagName);
             _git.Pull(DirectoryPath);
         }
+
     }
 }
