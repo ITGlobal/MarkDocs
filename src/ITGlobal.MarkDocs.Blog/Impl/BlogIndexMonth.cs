@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -73,6 +73,11 @@ namespace ITGlobal.MarkDocs.Blog.Impl
 
         public void Add(BlogPost post)
         {
+            if (post.Date.Day == 26)
+            {
+
+            }
+
             Count++;
             if (!_byDay.TryGetValue(post.Date.Day, out var index))
             {

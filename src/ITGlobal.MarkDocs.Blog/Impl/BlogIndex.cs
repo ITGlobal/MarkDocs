@@ -63,7 +63,7 @@ namespace ITGlobal.MarkDocs.Blog.Impl
             }
 
             _byYear = byYear.ToImmutableDictionary();
-            
+
             // Collect permalinks
             foreach (var post in Posts.Values)
             {
@@ -104,12 +104,6 @@ namespace ITGlobal.MarkDocs.Blog.Impl
                 .ThenByDescending(_ => _.ContentId)
                 .Cast<IBlogPost>()
                 .ToImmutableList();
-
-            var DAY = this[2020][11][26];
-            if (DAY.Count == 0)
-            {
-
-            }
 
             BlogPost SelectPost(string id)
             {
