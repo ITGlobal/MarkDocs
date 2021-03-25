@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Text;
 using ITGlobal.MarkDocs.Source;
 using Markdig.Renderers;
@@ -13,7 +13,6 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.IncludeHtml
         {
             _asset = asset;
         }
-
 
         public void Render(IPageRenderContext ctx, HtmlRenderer renderer)
         {

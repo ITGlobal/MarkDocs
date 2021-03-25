@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using Markdig.Syntax;
 
 namespace ITGlobal.MarkDocs.Format

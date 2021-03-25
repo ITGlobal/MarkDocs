@@ -1,25 +1,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ITGlobal.MarkDocs.Format.Impl.Extensions.Images;
+using ITGlobal.MarkDocs.Format.Impl.Extensions.Html;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ITGlobal.MarkDocs.Format
 {
     /// <summary>
-    ///     Configures image rendering
+    ///     Configures HTML block rendering
     /// </summary>
     [PublicAPI]
-    public sealed class MarkdownImageRenderingOptions
+    public sealed class MarkdownHtmlBlockRenderingOptions
     {
         private readonly List<Action<IServiceCollection>> _customRegistrations
             = new List<Action<IServiceCollection>>();
 
-        private readonly List<Func<IServiceProvider, IImageRenderer>> _defaultImplementations
-            = new List<Func<IServiceProvider, IImageRenderer>>();
+        private readonly List<Func<IServiceProvider, IHtmlBlockRenderer>> _defaultImplementations
+            = new List<Func<IServiceProvider, IHtmlBlockRenderer>>();
 
-        internal MarkdownImageRenderingOptions(MarkdownOptions options)
+        internal MarkdownHtmlBlockRenderingOptions(MarkdownOptions options)
         {
             RootOptions = options;
         }
@@ -27,21 +27,21 @@ namespace ITGlobal.MarkDocs.Format
         internal MarkdownOptions RootOptions { get; }
 
         /// <summary>
-        ///     Adds an image renderer implementation
+        ///     Adds an HTML block renderer implementation
         /// </summary>
         [NotNull]
-        public MarkdownOptions Use([NotNull] Func<IServiceProvider, IImageRenderer> factory)
+        public MarkdownOptions Use([NotNull] Func<IServiceProvider, IHtmlBlockRenderer> factory)
         {
             _defaultImplementations.Add(factory);
             return RootOptions;
         }
 
         /// <summary>
-        ///     Adds an image renderer implementation
+        ///     Adds an HTML block renderer implementation
         /// </summary>
         [NotNull]
         public MarkdownOptions Use<T>()
-            where T : class, IImageRenderer
+            where T : class, IHtmlBlockRenderer
         {
             _customRegistrations.Add(_ => _.AddSingleton<T>());
             _defaultImplementations.Add(_ => _.GetRequiredService<T>());
@@ -63,13 +63,13 @@ namespace ITGlobal.MarkDocs.Format
             _customRegistrations.Add(action);
         }
 
-        private ImageRendererSelector CreateSelector(IServiceProvider services)
+        private HtmlBlockRendererSelector CreateSelector(IServiceProvider services)
         {
             var defaultRendererChain = _defaultImplementations
                 .Select(f => f(services))
                 .ToArray();
 
-            return new ImageRendererSelector(defaultRendererChain);
+            return new HtmlBlockRendererSelector(defaultRendererChain);
         }
     }
 }

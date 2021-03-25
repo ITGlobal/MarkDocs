@@ -11,7 +11,6 @@ using ITGlobal.MarkDocs.Format.Impl;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.ChildrenList;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.CustomBlockRendering;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.LaTeX;
-using ITGlobal.MarkDocs.Format.Impl.Extensions.Mathematics;
 
 namespace ITGlobal.MarkDocs.Format
 {
@@ -21,7 +20,8 @@ namespace ITGlobal.MarkDocs.Format
     [PublicAPI]
     public sealed partial class MarkdownOptions
     {
-        private readonly List<Action<IServiceCollection>> _customRegistrations 
+
+        private readonly List<Action<IServiceCollection>> _customRegistrations
             = new List<Action<IServiceCollection>>();
 
         internal MarkdownOptions Register(Action<IServiceCollection> action)
@@ -37,8 +37,9 @@ namespace ITGlobal.MarkDocs.Format
         {
             CodeBlocks = new MarkdownCodeBlockRenderingOptions(this);
             Images = new MarkdownImageRenderingOptions(this);
+            HtmlBlocks = new MarkdownHtmlBlockRenderingOptions(this);
         }
-        
+
         #region Code Blocks
 
         /// <summary>
@@ -49,13 +50,23 @@ namespace ITGlobal.MarkDocs.Format
 
         #endregion
 
-        #region Code Blocks
+        #region Images
 
         /// <summary>
         ///     Image rendering options
         /// </summary>
         [NotNull]
         public MarkdownImageRenderingOptions Images { get; }
+
+        #endregion
+
+        #region HTML Blocks
+
+        /// <summary>
+        ///     HTML block rendering options
+        /// </summary>
+        [NotNull]
+        public MarkdownHtmlBlockRenderingOptions HtmlBlocks { get; }
 
         #endregion
 
@@ -125,7 +136,7 @@ namespace ITGlobal.MarkDocs.Format
         #region ChildrenListRenderer
 
         private Func<IServiceProvider, IChildrenListRenderer> _childrenListRendererFactory
-            = _=>_.GetRequiredService<DefaultChildrenListRenderer>();
+            = _ => _.GetRequiredService<DefaultChildrenListRenderer>();
 
         /// <summary>
         ///     Sets children-list renderer implementation
@@ -165,11 +176,13 @@ namespace ITGlobal.MarkDocs.Format
         public MarkdownOptions OverrideRendering<T>([NotNull] Action<HtmlRenderer, T> func)
             where T : MarkdownObject
         {
-            OverrideRendering<T>((renderer, block) =>
-            {
-                func(renderer, block);
-                return true;
-            });
+            OverrideRendering<T>(
+                (renderer, block) =>
+                {
+                    func(renderer, block);
+                    return true;
+                }
+            );
             return this;
         }
 
@@ -180,17 +193,20 @@ namespace ITGlobal.MarkDocs.Format
         public MarkdownOptions OverrideRendering<T>([NotNull] Func<HtmlRenderer, T, bool> func)
             where T : MarkdownObject
         {
-            _htmlRendererOverrides.Add(htmlRenderer =>
-            {
-                if (htmlRenderer.ObjectRenderers.FirstOrDefault(_ => _ is HtmlObjectRenderer<T>) is HtmlObjectRenderer<T> existing)
+            _htmlRendererOverrides.Add(
+                htmlRenderer =>
                 {
-                    existing.TryWriters.Add((renderer, block) => func(renderer, block));
+                    if (htmlRenderer.ObjectRenderers.FirstOrDefault(_ => _ is HtmlObjectRenderer<T>) is
+                        HtmlObjectRenderer<T> existing)
+                    {
+                        existing.TryWriters.Add((renderer, block) => func(renderer, block));
+                    }
+                    else
+                    {
+                        htmlRenderer.ObjectRenderers.Add(new HtmlObjectRendererAdapter<T>(func));
+                    }
                 }
-                else
-                {
-                    htmlRenderer.ObjectRenderers.Add(new HtmlObjectRendererAdapter<T>(func));
-                }
-            });
+            );
 
             return this;
         }
@@ -227,11 +243,12 @@ namespace ITGlobal.MarkDocs.Format
 
             CodeBlocks.RegisterServices(services);
             Images.RegisterServices(services);
+            HtmlBlocks.RegisterServices(services);
 
             services.AddSingleton<DefaultChildrenListRenderer>();
         }
 
         #endregion
-    }
 
-}   
+    }
+}

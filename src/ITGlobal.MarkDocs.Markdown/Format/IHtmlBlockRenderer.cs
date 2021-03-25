@@ -1,11 +1,10 @@
 using JetBrains.Annotations;
-using Markdig.Syntax.Inlines;
 
 namespace ITGlobal.MarkDocs.Format
 {
     /// <summary>
-    ///     Renders images
+    ///     Renders HTML blocks
     /// </summary>
     [PublicAPI]
-    public interface IImageRenderer : IRenderer<LinkInline> { }
+    public interface IHtmlBlockRenderer : IRenderer<ParsedHtmlBlock> { }
 }

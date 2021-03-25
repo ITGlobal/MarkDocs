@@ -9,6 +9,7 @@ using ITGlobal.MarkDocs.Format.Impl.Extensions.CodeBlockRenderers;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.CustomBlockRendering;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.CustomHeading;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.Cut;
+using ITGlobal.MarkDocs.Format.Impl.Extensions.Html;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.Icons;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.Images;
 using ITGlobal.MarkDocs.Format.Impl.Extensions.IncludeHtml;
@@ -19,6 +20,7 @@ namespace ITGlobal.MarkDocs.Format
 {
     partial class MarkdownOptions
     {
+
         internal MarkdownPipeline CreateMarkdownPipeline(IServiceProvider serviceProvider)
         {
             var builder = new MarkdownPipelineBuilder();
@@ -27,34 +29,42 @@ namespace ITGlobal.MarkDocs.Format
             {
                 builder.UseAbbreviations();
             }
+
             if (_useAutoIdentifiers)
             {
                 builder.UseAutoIdentifiers();
             }
+
             if (_useCitations)
             {
                 builder.UseCitations();
             }
+
             if (_useCustomContainers)
             {
                 builder.UseCustomContainers();
             }
+
             if (_useDefinitionLists)
             {
                 builder.UseDefinitionLists();
             }
+
             if (_useEmphasisExtras)
             {
                 builder.UseEmphasisExtras();
             }
+
             if (_useGridTables)
             {
                 builder.UseGridTables();
             }
+
             if (_useHtmlAttributes)
             {
                 builder.UseGenericAttributes();
             }
+
             if (_useFigures)
             {
                 builder.UseFigures();
@@ -64,34 +74,42 @@ namespace ITGlobal.MarkDocs.Format
             {
                 builder.UseFooters();
             }
+
             if (_useFootnotes)
             {
                 builder.UseFootnotes();
             }
+
             if (_useMediaLinks)
             {
                 builder.UseMediaLinks();
             }
+
             if (_usePipeTables)
             {
-                builder.UsePipeTables(new PipeTableOptions { RequireHeaderSeparator = true });
+                builder.UsePipeTables(new PipeTableOptions {RequireHeaderSeparator = true});
             }
+
             if (_useListExtras)
             {
                 builder.UseListExtras();
             }
+
             if (_useTaskLists)
             {
                 builder.UseTaskLists();
             }
+
             if (_useBootstrap)
             {
                 builder.UseBootstrap();
             }
+
             if (_useEmojiAndSmiley)
             {
                 builder.UseEmojiAndSmiley();
             }
+
             if (_useSmartyPants)
             {
                 builder.UseSmartyPants();
@@ -138,6 +156,14 @@ namespace ITGlobal.MarkDocs.Format
                 builder.Extensions.Add(new ImageRenderingExtension(imageRendererSelector));
             }
 
+            var htmlBlockRendererSelector = serviceProvider.GetService<HtmlBlockRendererSelector>();
+            if (htmlBlockRendererSelector != null)
+            {
+                builder.Extensions.Add(
+                    new HtmlRenderingExtension(htmlBlockRendererSelector)
+                );
+            }
+
             builder.Extensions.AddIfNotAlready(new CustomHeadingExtension(_dontRenderFirstHeading));
 
             if (_useAdmonition)
@@ -164,8 +190,9 @@ namespace ITGlobal.MarkDocs.Format
             {
                 builder.Extensions.Add(new CustomBlockRenderingExtension(_htmlRendererOverrides));
             }
-            
+
             return builder.Build();
         }
+
     }
 }
