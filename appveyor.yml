@@ -17,20 +17,20 @@ environment:
   CHOCO_API_KEY:
     secure: DLPmZhl7Zr4qqU3JIzGsA4opRPGjNZZkH/MSkOQKbL8iYyf7+sSFmG418+QjeUy2
   NUGET_API_KEY:
-    secure: r5vF3QENzP28+dU6gvmD7Sqbdt5Ti43yhuSye3O7TJxKT+6vuponJ7tVwkGkotH7
+    secure: DbIM3c1ql3w0hU3WYPgUwkU+rBI/tFQG0oClw8sMu1ow8LQ0lQGYNFtiZfKk59tx
   CHOCO_PRIVATE_URL:
     secure: PbtRYek+AtjgpV7a2nkfX0UzwpAcZhP+xUU9eA3hXo4982NzrZV6/LmvBmANEwFszUupJpKJoeA1FPPJKx6sZA==
   CHOCO_PRIVATE_API_KEY:
     secure: +otm426DP2sxI+6uwbY9OKDwwo9GHQOmNjk1AcDgL0nroXmr0YQs7Z8A7Xy6hVPm
-deploy:
-- provider: NuGet
-  api_key:
-    secure: r5vF3QENzP28+dU6gvmD7Sqbdt5Ti43yhuSye3O7TJxKT+6vuponJ7tVwkGkotH7
-  skip_symbols: false
-  on:
-    appveyor_repo_tag: true
-# deploy_script:
-# - ps: '& ./push.ps1 all'
+#deploy:
+#- provider: NuGet
+#  api_key:
+#    secure: DbIM3c1ql3w0hU3WYPgUwkU+rBI/tFQG0oClw8sMu1ow8LQ0lQGYNFtiZfKk59tx
+#  skip_symbols: false
+#  on:
+#    appveyor_repo_tag: true
+deploy_script:
+- ps: '& ./push.ps1 all'
 notifications:
 - provider: Slack
   incoming_webhook: a7TE9Xu2mdPphDJSk5r/BQn+2npcVDiJIrzR8tYselHQvWmSleO8NGdGVaLAxVw6yhVyzQh2IT9rEDXYssazCgdoW96THTdfjK2X2e0iLzk=
