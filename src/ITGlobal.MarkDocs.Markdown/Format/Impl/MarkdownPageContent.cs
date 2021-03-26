@@ -1,7 +1,6 @@
 using ITGlobal.MarkDocs.Format.Impl.Extensions.Cut;
 using ITGlobal.MarkDocs.Format.Impl.Metadata;
 using ITGlobal.MarkDocs.Source;
-using JetBrains.Annotations;
 using Markdig;
 using Markdig.Renderers;
 using Markdig.Syntax;
@@ -10,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
 
 namespace ITGlobal.MarkDocs.Format.Impl
 {
@@ -19,10 +17,12 @@ namespace ITGlobal.MarkDocs.Format.Impl
     /// </summary>
     internal sealed class MarkdownPageContent : IPageContent
     {
+
         #region nested types
 
         private readonly struct ValidateAnchorQueueItem
         {
+
             public ValidateAnchorQueueItem(string pageId, string hash, LinkInline link)
             {
                 PageId = pageId;
@@ -40,6 +40,7 @@ namespace ITGlobal.MarkDocs.Format.Impl
                 hash = Hash;
                 link = Link;
             }
+
         }
 
         #endregion
@@ -104,28 +105,9 @@ namespace ITGlobal.MarkDocs.Format.Impl
                     validateAnchorsQueue,
                     metadata,
                     anchors,
-                    cutBlock != null ? cutBlockIndex : (int?)null
+                    cutBlock != null ? cutBlockIndex : (int?) null
                 );
             }
-        }
-
-        private static MarkdownDocument GetPreviewAst(MarkdownDocument ast, MarkdownPipeline pipeline, string markup)
-        {
-            var (block, index) = ast
-                .Select((b, i) => (block: b, index: i))
-                .FirstOrDefault(_ => _.block is CutBlock);
-            if (block == null)
-            {
-                return null;
-            }
-
-            var previewAst = Markdown.Parse(markup, pipeline);
-            while (previewAst.Count > index)
-            {
-                previewAst.RemoveAt(previewAst.Count - 1);
-            }
-
-            return previewAst;
         }
 
         #endregion
@@ -145,7 +127,10 @@ namespace ITGlobal.MarkDocs.Format.Impl
 
         #region url resolution
 
-        private static void RewriteLinkUrls(IPageReadContext ctx, MarkdownDocument ast, out Queue<ValidateAnchorQueueItem> validateAnchorsQueue)
+        private static void RewriteLinkUrls(
+            IPageReadContext ctx,
+            MarkdownDocument ast,
+            out Queue<ValidateAnchorQueueItem> validateAnchorsQueue)
         {
             validateAnchorsQueue = new Queue<ValidateAnchorQueueItem>();
             foreach (var link in ast.Descendants().OfType<LinkInline>())
@@ -155,169 +140,18 @@ namespace ITGlobal.MarkDocs.Format.Impl
                     continue;
                 }
 
-                var url = ResolveLinkUrl(ctx, link, validateAnchorsQueue);
+                var (url, anchor) = ctx.ResolveResourceUrl(link.Url, link.Line);
                 if (url != null)
                 {
                     link.Url = url;
                     link.SetIsRewrittenLink();
                 }
-            }
-        }
 
-        [CanBeNull]
-        private static string ResolveLinkUrl(IPageReadContext ctx, LinkInline link, Queue<ValidateAnchorQueueItem> validateAnchorsQueue)
-        {
-            var url = link.Url;
-            if (url.Length > 0 && url[0] == '#')
-            {
-                validateAnchorsQueue.Enqueue(new ValidateAnchorQueueItem(ctx.Page.Id, url.Substring(1), link));
-                return url;
-            }
-
-            if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uri))
-            {
-                return null;
-            }
-
-            if (uri.IsAbsoluteUri)
-            {
-                return null;
-            }
-
-            string hash = null;
-            var i = url.IndexOf('#');
-            if (i >= 0)
-            {
-                hash = url.Substring(i + 1);
-                url = url.Substring(0, i);
-            }
-
-            var isIndexFileLink = false;
-            var filename = Path.GetFileName(url);
-            foreach (var name in MarkdownFormat.IndexFileNames)
-            {
-                if (filename == name)
+                if (anchor != null)
                 {
-                    url = Path.GetDirectoryName(url);
-                    isIndexFileLink = true;
-                    break;
+                    validateAnchorsQueue.Enqueue(new ValidateAnchorQueueItem(ctx.Page.Id, anchor, link));
                 }
             }
-
-            // Remove .md extension if specified
-            if (!isIndexFileLink)
-            {
-                var ext = Path.GetExtension(url);
-                if (MarkdownFormat.Extensions.Contains(ext))
-                {
-                    url = Path.ChangeExtension(url, null);
-                }
-            }
-
-            try
-            {
-                if (!url.StartsWith("/") && !url.StartsWith("\\"))
-                {
-                    url = NormalizeResourcePath(ctx, url);
-                }
-            }
-            catch (InvalidOperationException)
-            {
-                ctx.Error($"URL \"{url}\" is not a valid relative reference", link.Line);
-                return null;
-            }
-
-            if (ctx.TryResolvePageResource(url, out var pageId, out var pageUrl))
-            {
-                if (!string.IsNullOrEmpty(hash))
-                {
-                    validateAnchorsQueue.Enqueue(new ValidateAnchorQueueItem(pageId, hash, link));
-
-                    if (pageId == ctx.Page.Id && link.Url != $"#{hash}")
-                    {
-                        var text = link.GetText();
-                        ctx.Warning(
-                            $"Link [{text}]({url}#{hash}) can be replaced with [{text}](#{hash})",
-                            link.Line
-                        );
-                    }
-
-                    pageUrl = $"{pageUrl}#{hash}";
-                    return pageUrl;
-                }
-
-                return pageUrl;
-            }
-
-            if (ctx.TryResolveFileResource(url, out _, out var fileUrl))
-            {
-                if (!string.IsNullOrEmpty(hash))
-                {
-                    ctx.Error(
-                        $"URL \"{url}#{link}\" points to a file but it has a hash",
-                        link.Line
-                    );
-                }
-
-                return fileUrl;
-            }
-
-            ctx.Error($"Invalid hyperlink \"{url}\"", link.Line);
-            return null;
-        }
-
-        public static string NormalizeResourcePath(IPageReadContext ctx, string resourceUrl)
-        {
-            var normalizedUrl = NormalizeResourcePath(ctx.Page.Id, resourceUrl, ctx.IsBranchPage || ctx.IsIndexPage);
-            return normalizedUrl;
-        }
-
-        private static string NormalizeResourcePath(string basePath, string resourceUrl, bool isIndexPage)
-        {
-            var basePathSegments = basePath.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
-            var basePathLen = basePathSegments.Length;
-
-            if (!isIndexPage)
-            {
-                basePathLen--;
-            }
-
-            var resourcePathSegments = resourceUrl.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
-            var resourcePathLen = 0;
-            for (var i = 0; i < resourcePathSegments.Length; i++)
-            {
-                if (resourcePathSegments[i] == "..")
-                {
-                    basePathLen--;
-                    if (basePathLen < 0)
-                    {
-                        throw new InvalidOperationException("Invalid relative resource path");
-                    }
-                }
-                else
-                {
-                    resourcePathLen++;
-                }
-            }
-
-            var normalizedUrlSegments = new string[basePathLen + resourcePathLen];
-            var index = 0;
-            for (var i = 0; i < basePathLen; i++)
-            {
-                normalizedUrlSegments[index] = basePathSegments[i];
-                index++;
-            }
-            for (var i = 0; i < resourcePathSegments.Length; i++)
-            {
-                if (resourcePathSegments[i] != "..")
-                {
-                    normalizedUrlSegments[index] = resourcePathSegments[i];
-                    index++;
-                }
-            }
-
-            var normalizedUrl = "/" + string.Join("/", normalizedUrlSegments);
-            return normalizedUrl;
         }
 
         #endregion
@@ -331,14 +165,6 @@ namespace ITGlobal.MarkDocs.Format.Impl
         {
             using (MarkdownPageRenderContext.Use(ctx))
             {
-                // Validate anchor links links
-                while (_validateAnchorsQueue.Count > 0)
-                {
-                    var (pageId, hash, link) = _validateAnchorsQueue.Dequeue();
-                    ValidateAnchorLink(ctx, link, pageId, hash);
-                }
-
-                // Render HTML
                 string html;
                 using (var writer = new StringWriter())
                 {
@@ -366,14 +192,6 @@ namespace ITGlobal.MarkDocs.Format.Impl
 
             using (MarkdownPageRenderContext.Use(ctx))
             {
-                // Validate anchor links links
-                while (_validateAnchorsQueue.Count > 0)
-                {
-                    var (pageId, hash, link) = _validateAnchorsQueue.Dequeue();
-                    ValidateAnchorLink(ctx, link, pageId, hash);
-                }
-
-                // Render HTML
                 string html;
                 using (var writer = new StringWriter())
                 {
@@ -383,6 +201,7 @@ namespace ITGlobal.MarkDocs.Format.Impl
                     {
                         renderer.Render(_ast[i]);
                     }
+
                     writer.Flush();
 
                     html = writer.ToString();
@@ -392,36 +211,26 @@ namespace ITGlobal.MarkDocs.Format.Impl
             }
         }
 
-        private string Render(IPageRenderContext ctx, MarkdownDocument ast)
+        /// <summary>
+        ///     Runs page content validation
+        /// </summary>
+        public void Validate(IPageValidateContext ctx, AssetTree assetTree)
         {
-            using (MarkdownPageRenderContext.Use(ctx))
+            while (_validateAnchorsQueue.Count > 0)
             {
-                // Validate anchor links links
-                while (_validateAnchorsQueue.Count > 0)
-                {
-                    var (pageId, hash, link) = _validateAnchorsQueue.Dequeue();
-                    ValidateAnchorLink(ctx, link, pageId, hash);
-                }
-
-                // Render HTML
-                string html;
-                using (var writer = new StringWriter())
-                {
-                    var renderer = new HtmlRenderer(writer);
-                    _pipeline.Setup(renderer);
-                    renderer.Render(ast);
-                    writer.Flush();
-
-                    html = writer.ToString();
-                }
-
-                return html;
+                var (pageId, hash, link) = _validateAnchorsQueue.Dequeue();
+                ValidateAnchorLink(ctx, assetTree, link, pageId, hash);
             }
         }
 
-        private void ValidateAnchorLink(IPageRenderContext ctx, LinkInline link, string url, string hash)
+        private void ValidateAnchorLink(
+            IPageValidateContext ctx,
+            AssetTree assetTree,
+            LinkInline link,
+            string url,
+            string hash)
         {
-            var page = ctx.AssetTree.TryGetAsset(url) as PageAsset;
+            var page = assetTree.TryGetAsset(url) as PageAsset;
             if (page == null)
             {
                 ctx.Error($"Invalid hyperlink \"{link.Url}\"", link.Line);
@@ -447,5 +256,6 @@ namespace ITGlobal.MarkDocs.Format.Impl
         }
 
         #endregion
+
     }
 }

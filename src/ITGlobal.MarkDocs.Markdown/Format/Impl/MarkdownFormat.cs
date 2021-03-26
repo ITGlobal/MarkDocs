@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -14,6 +14,7 @@ namespace ITGlobal.MarkDocs.Format.Impl
     /// </summary>
     internal sealed class MarkdownFormat : IFormat
     {
+
         #region fields
 
         private readonly IMarkDocsLog _log;
@@ -22,13 +23,14 @@ namespace ITGlobal.MarkDocs.Format.Impl
         private readonly MarkDocsEventListener _listener;
         private readonly MarkdownPipeline _pipeline;
 
-        internal static readonly HashSet<string> Extensions = new HashSet<string>(StringComparer.CurrentCultureIgnoreCase)
-        {
-            ".md",
-            ".markdown"
-        };
+        internal static readonly HashSet<string> Extensions =
+            new HashSet<string>(StringComparer.CurrentCultureIgnoreCase)
+            {
+                ".md",
+                ".markdown"
+            };
 
-        internal static readonly string[] IndexFileNames = { "index.md", "README.md" };
+        internal static readonly string[] IndexFileNames = {"index.md", "README.md"};
 
         #endregion
 
@@ -60,7 +62,7 @@ namespace ITGlobal.MarkDocs.Format.Impl
         /// <summary>
         ///     Get a list of page file filters
         /// </summary>
-        public string[] FileFilters { get; } = { "*.md", "*.markdown" };
+        public string[] FileFilters { get; } = {"*.md", "*.markdown"};
 
         /// <summary>
         ///     Get a list of index page file filters
@@ -73,6 +75,11 @@ namespace ITGlobal.MarkDocs.Format.Impl
         public Encoding SourceEncoding => Encoding.UTF8;
 
         /// <summary>
+        ///     Supported extensions
+        /// </summary>
+        ISet<string> IFormat.Extensions => Extensions;
+
+        /// <summary>
         ///     Parses content of file <paramref name="filename"/>
         /// </summary>
         public (IPageContent, PageMetadata) Read(IPageReadContext ctx, string filename)
@@ -83,5 +90,6 @@ namespace ITGlobal.MarkDocs.Format.Impl
         }
 
         #endregion
+
     }
 }
