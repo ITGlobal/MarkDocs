@@ -1,4 +1,4 @@
-﻿using ITGlobal.MarkDocs.Cache;
+using ITGlobal.MarkDocs.Cache;
 using ITGlobal.MarkDocs.Cache.Model;
 using System.IO;
 
@@ -20,7 +20,7 @@ namespace ITGlobal.MarkDocs.Impl
         public string Id => _model.Id;
         public IDocumentation Documentation { get; }
         public string RelativePath => _model.RelativePath;
-        public ResourceType Type => ResourceType.Page;
+        public ResourceType Type => ResourceType.PagePreview;
         public IPage Page { get; }
 
         public Stream OpenRead() => _cache.Read(this);

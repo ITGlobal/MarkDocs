@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net.Http;
 using ITGlobal.MarkDocs.Source;
@@ -37,7 +37,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.LaTeX
             }
             catch (HttpRequestException e)
             {
-                MarkdownPageRenderContext.Current?.Error($"Failed to render math markup. {e.Message}", _lineNumber);
+                MarkdownPageRenderContext.CurrentNullable?.Error($"Failed to render math markup. {e.Message}", _lineNumber);
             }
         }
     }

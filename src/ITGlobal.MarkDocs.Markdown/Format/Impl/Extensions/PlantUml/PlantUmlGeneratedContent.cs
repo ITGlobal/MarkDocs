@@ -33,7 +33,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.PlantUml
             }
             catch (HttpRequestException e)
             {
-                MarkdownPageRenderContext.Current?.Error($"Failed to render PlantUML markup. {e.Message}", _lineNumber);
+                MarkdownPageRenderContext.CurrentNullable?.Error($"Failed to render PlantUML markup. {e.Message}", _lineNumber);
             }
         }
     }
