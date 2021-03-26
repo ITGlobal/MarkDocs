@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../common.props" />
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>MarkDocs.Markdown</AssemblyTitle>
     <AssemblyName>ITGlobal.MarkDocs.Markdown</AssemblyName>
@@ -18,7 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AngleSharp.Css" Version="0.14.2" />
-    <PackageReference Include="SharpYaml.NetStandard" Version="1.5.4" />
+    <PackageReference Include="SharpYaml" Version="1.6.6" />
     <PackageReference Include="Markdig" Version="0.24.0" />
     <PackageReference Include="AngleSharp" Version="0.14.0" />
   </ItemGroup>

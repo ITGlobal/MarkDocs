@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -26,19 +25,20 @@ namespace ITGlobal.MarkDocs.Tools.Serve
         [UsedImplicitly]
         public override void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            var mvc = services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddMarkDocs(Config.Configure);
             services.AddResponseCaching();
             services.AddResponseCompression();
+
+#if DEBUG
+            mvc.AddRazorRuntimeCompilation();
+#endif
 
             services.Configure<RazorViewEngineOptions>(o =>
             {
                 o.ViewLocationFormats.Clear();
                 o.ViewLocationFormats.Add("/Serve/Views/{1}/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Serve/Views/Shared/{0}" + RazorViewEngine.ViewExtension);
-#if DEBUG
-                o.AllowRecompilingViewsOnFileChange = true;
-#endif
             });
 
             
@@ -70,11 +70,19 @@ namespace ITGlobal.MarkDocs.Tools.Serve
             app.UseResponseCaching();
             app.UseResponseCompression();
             app.UseStaticFiles();
-            if (Config.EnableDeveloperMode)
+            app.UseEndpoints(routes =>
             {
-                app.UseConnections(_ => { _.MapConnectionHandler<DevConnectionHandler>("/__dev"); });
-            }
-            app.UseMvc();
+                routes.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                if (Config.EnableDeveloperMode)
+                {
+                    routes.MapConnectionHandler<DevConnectionHandler>("/__dev");
+                }
+
+                routes.MapFallbackToController("App", "App");
+            });
 
             // Trigger documentation initialization
             lifetime.ApplicationStarted
@@ -95,10 +103,5 @@ namespace ITGlobal.MarkDocs.Tools.Serve
                     }
                 }));
         }
-    }
-
-    public sealed class DevHub : Hub
-    {
-
     }
 }
