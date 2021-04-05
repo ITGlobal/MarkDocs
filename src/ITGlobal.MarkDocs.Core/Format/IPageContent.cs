@@ -1,4 +1,4 @@
-﻿using ITGlobal.MarkDocs.Source;
+using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Format
@@ -9,6 +9,7 @@ namespace ITGlobal.MarkDocs.Format
     [PublicAPI]
     public interface IPageContent
     {
+
         /// <summary>
         ///     Anchors
         /// </summary>
@@ -31,5 +32,11 @@ namespace ITGlobal.MarkDocs.Format
         /// </summary>
         [NotNull]
         string RenderPreview([NotNull] IPageRenderContext ctx);
+
+        /// <summary>
+        ///     Runs page content validation
+        /// </summary>
+        void Validate([NotNull] IPageValidateContext ctx, [NotNull] AssetTree assetTree);
+
     }
 }

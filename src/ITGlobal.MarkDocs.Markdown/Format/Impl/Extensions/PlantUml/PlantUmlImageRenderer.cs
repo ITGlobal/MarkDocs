@@ -23,7 +23,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.PlantUml
             }
 
             var url = obj.Url;
-            url = MarkdownPageContent.NormalizeResourcePath(ctx, url);
+            url = ctx.NormalizeResourceUrl(url);
             
             var ext = Path.GetExtension(obj.Url);
             if(!PlantUmlRenderer.SupportedFileExtensions.Contains(ext))

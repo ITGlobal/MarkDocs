@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -74,12 +74,37 @@ namespace ITGlobal.MarkDocs.Blog.Impl
         public AssetTree ReadAssetTree()
         {
             Log.Debug($"Scanning directory \"{RootDirectory}\"...");
-            var shallowAssets = ScanDirectoryFiles(RootDirectory).Select(LeafPage).ToList();
+            var filepathes = ScanDirectoryFiles(RootDirectory).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
             Log.Debug($"Reading assets from \"{RootDirectory}\"...");
-            var pages = shallowAssets.Select(asset => asset.ReadAsset(this)).Where(_ => _ != null).ToArray();
+            foreach (var shallowPage in  LoadShallowPages())
+            {
+                _pages[shallowPage.Id] = shallowPage;
+            }
+
+            var pages = LoadFullPages(_pages.Values).ToArray();
+            foreach (var page in pages)
+            {
+                filepathes.Remove(page.AbsolutePath);
+                
+            }
 
             // Make a list of referenced files
+            foreach (var (_, asset) in _files)
+            {
+                if(asset is PhysicalFileAsset fileAsset)
+                {
+                    filepathes.Remove(fileAsset.AbsolutePath);
+                }
+            }
+
+            foreach (var path in filepathes)
+            {
+                var id = GetRelativePath(path);
+                ResourceId.Normalize(ref id);
+                ResolveFileAsset(id);
+            }
+            
             var files = _files.Values.Where(_ => _ != null).OrderBy(_ => _.Id).ToArray();
 
             // Assemble an asset tree
@@ -98,7 +123,38 @@ namespace ITGlobal.MarkDocs.Blog.Impl
                 ),
                 files
             );
+
+            tree.Validate(new PageValidateContext(this));
+
             return tree;
+
+            IEnumerable<ShallowPageAsset> LoadShallowPages()
+            {
+                foreach (var file in filepathes)
+                {
+                    var ext = Path.GetExtension(file);
+                    if (Format.Extensions.Contains(ext))
+                    {
+                        var shallowPage = LeafPage(file);
+                        if (shallowPage != null)
+                        {
+                            yield return shallowPage;
+                        }
+                    }
+                }
+            }
+
+            IEnumerable<PageAsset> LoadFullPages(IEnumerable<ShallowPageAsset> shallowPages)
+            {
+                foreach (var shallowPage in shallowPages)
+                {
+                    var page = shallowPage.ReadAsset(this);
+                    if (page != null)
+                    {
+                        yield return page;
+                    }
+                }
+            }
         }
 
         public PageMetadata GetMetadata(string filename, bool isIndexFile)
@@ -148,7 +204,24 @@ namespace ITGlobal.MarkDocs.Blog.Impl
         private LeafShallowPageAsset LeafPage(string path)
         {
             var id = GetRelativePath(path);
-            id = Path.Combine(Path.GetDirectoryName(id), Path.GetFileNameWithoutExtension(id));
+
+            var filename = Path.GetFileName(id);
+            var isIndexFile = false;
+            foreach (var indexFileName in Format.IndexFileNames)
+            {
+                if (string.Equals(indexFileName, filename, StringComparison.OrdinalIgnoreCase))
+                {
+                    isIndexFile = true;
+                    break;
+                }
+            }
+
+            id = Path.GetDirectoryName(id);
+            if (!isIndexFile)
+            {
+                id = Path.Combine(id, Path.GetFileNameWithoutExtension(path));
+            }
+            
             ResourceId.Normalize(ref id);
 
             if (!_contentHashProvider.TryGetContentHash(path, out var contentHash))
@@ -253,9 +326,11 @@ namespace ITGlobal.MarkDocs.Blog.Impl
                             continue;
                         }
                         
-                        var files = from filter in _includeFiles
-                            from filename in Directory.EnumerateFiles(dayDir, filter)
-                            select filename;
+                        //var files = from filter in _includeFiles
+                        //    from filename in Directory.EnumerateFiles(dayDir, filter)
+                        //    select filename;
+                        var files = from filename in Directory.EnumerateFiles(dayDir, "*")
+                                    select filename;
 
                         foreach (var filename in files)
                         {

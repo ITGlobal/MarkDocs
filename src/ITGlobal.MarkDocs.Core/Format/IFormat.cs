@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Collections.Generic;
+using System.Text;
 using ITGlobal.MarkDocs.Source;
 using JetBrains.Annotations;
 
@@ -10,6 +11,7 @@ namespace ITGlobal.MarkDocs.Format
     [PublicAPI]
     public interface IFormat
     {
+
         /// <summary>
         ///     Get a list of page file filters
         /// </summary>
@@ -29,8 +31,15 @@ namespace ITGlobal.MarkDocs.Format
         Encoding SourceEncoding { get; }
 
         /// <summary>
+        ///     Supported extensions
+        /// </summary>
+        [NotNull]
+        ISet<string> Extensions { get; }
+
+        /// <summary>
         ///     Parses content of file <paramref name="filename"/>
         /// </summary>
         (IPageContent, PageMetadata) Read([NotNull] IPageReadContext ctx, [NotNull] string filename);
+
     }
 }

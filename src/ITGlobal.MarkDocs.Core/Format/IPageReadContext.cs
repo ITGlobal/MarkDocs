@@ -81,7 +81,7 @@ namespace ITGlobal.MarkDocs.Format
             out GeneratedFileAsset asset,
             out string url
         );
-
+        
         /// <summary>
         ///     Adds a warning to compilation report
         /// </summary>
@@ -91,5 +91,18 @@ namespace ITGlobal.MarkDocs.Format
         ///     Adds an error to compilation report
         /// </summary>
         void Error(string message, int? lineNumber = null);
+
+        /// <summary>
+        ///     Resolves content resource URL
+        /// </summary>
+        [NotNull]
+        ResolveResourceUrlResult ResolveResourceUrl([NotNull] string url, int? lineNumber = null);
+
+        /// <summary>
+        ///     Normalizes resource URL
+        /// </summary>
+        [NotNull]
+        string NormalizeResourceUrl([NotNull] string resourceUrl);
+
     }
 }

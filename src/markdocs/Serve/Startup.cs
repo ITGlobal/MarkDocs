@@ -27,7 +27,7 @@ namespace ITGlobal.MarkDocs.Tools.Serve
         [UsedImplicitly]
         public override void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
+            var mvc = services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Latest)
                 .AddRazorRuntimeCompilation();
             services.AddMarkDocs(Config.Configure);
@@ -75,17 +75,17 @@ namespace ITGlobal.MarkDocs.Tools.Serve
             app.UseStaticFiles();
 
             app.UseRouting();
-            app.UseEndpoints(
-                endpoints =>
-                {
-                    endpoints.MapControllers();
+            app.UseEndpoints(routes =>
+            {
+                routes.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-                    if (Config.EnableDeveloperMode)
-                    {
-                        endpoints.MapConnectionHandler<DevConnectionHandler>("/api/dev-notify");
-                    }
+                if (Config.EnableDeveloperMode)
+                {
+                    routes.MapConnectionHandler<DevConnectionHandler>("/api/dev-notify");
                 }
-            );
+            });
 
             // Trigger documentation initialization
             lifetime.ApplicationStarted
@@ -112,6 +112,5 @@ namespace ITGlobal.MarkDocs.Tools.Serve
                     )
                 );
         }
-
     }
 }

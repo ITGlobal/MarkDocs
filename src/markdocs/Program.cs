@@ -186,7 +186,7 @@ namespace ITGlobal.MarkDocs.Tools
             configuration.Enrich.FromLogContext();
             configuration.Enrich.WithThreadId();
             configuration.Filter.ByExcluding(ExcludePredicate);
-            configuration.WriteTo.LiterateConsole(
+            configuration.WriteTo.Console(
                 outputTemplate: outputTemplate,
                 standardErrorFromLevel: LogEventLevel.Verbose
             );

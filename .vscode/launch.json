@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}\\samples\\ITGlobal.MarkDocs.Example\\bin\\Debug\\netcoreapp1.1\\MarkDocs.Example.dll",
+            "program": "${workspaceRoot}\\samples\\ITGlobal.MarkDocs.Example\\bin\\Debug\\net5.0\\MarkDocs.Example.dll",
             "args": [],
             "cwd": "${workspaceRoot}",
             "externalConsole": false,

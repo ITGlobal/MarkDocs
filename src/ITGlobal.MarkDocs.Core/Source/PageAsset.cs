@@ -1,4 +1,4 @@
-﻿using ITGlobal.MarkDocs.Format;
+using ITGlobal.MarkDocs.Format;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Source

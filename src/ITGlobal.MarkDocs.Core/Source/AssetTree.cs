@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using ITGlobal.MarkDocs.Format;
+using ITGlobal.MarkDocs.Source.Impl;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Source
@@ -30,7 +32,7 @@ namespace ITGlobal.MarkDocs.Source
             RootDirectory = rootDirectory;
             SourceInfo = sourceInfo;
             RootPage = rootPage;
-            Files = files.ToImmutableDictionary(_=>_.Id);
+            Files = files.ToImmutableDictionary(_ => _.Id);
 
             var pages = ImmutableDictionary.CreateBuilder<string, PageAsset>();
             Walk(rootPage);
@@ -117,5 +119,42 @@ namespace ITGlobal.MarkDocs.Source
             _parentPages.TryGetValue(id, out var parentPage);
             return parentPage;
         }
+
+        /// <summary>
+        ///     Runs page content validation
+        /// </summary>
+        internal void Validate(PageValidateContext ctx)
+        {
+            foreach (var (_, pageAsset) in Pages)
+            {
+                ctx.Page = pageAsset;
+                pageAsset.Content.Validate(ctx, this);
+            }
+        }
+    }
+
+    internal sealed class PageValidateContext : IPageValidateContext
+    {   
+        private readonly IShallowPageAssetReader _worker;
+
+        public PageValidateContext(IShallowPageAssetReader worker)
+        {
+            _worker = worker;
+        }
+        
+        public PageAsset Page { get; set; }
+
+        IResourceId IPageValidateContext.Page => Page;
+
+        void IPageValidateContext.Warning(string message, int? lineNumber)
+        {
+            _worker.Report.Warning(Page.AbsolutePath, message, lineNumber);
+        }
+
+        void IPageValidateContext.Error(string message, int? lineNumber)
+        {
+            _worker.Report.Error(Page.AbsolutePath, message, lineNumber);
+        }
+
     }
 }

@@ -94,6 +94,9 @@ namespace ITGlobal.MarkDocs.Source.Impl
                 rootPage,
                 files
             );
+
+            tree.Validate(new PageValidateContext(this));
+
             return tree;
         }
 

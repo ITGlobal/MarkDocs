@@ -1,6 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using ITGlobal.MarkDocs.Impl;
 using ITGlobal.MarkDocs.Source;
 using ITGlobal.MarkDocs.Tags;
 
@@ -11,6 +13,7 @@ namespace ITGlobal.MarkDocs.Blog.Impl
     /// </summary>
     internal sealed class BlogPost : IBlogPost
     {
+
         public BlogPost(
             IBlogEngine engine,
             IPage page,
@@ -36,30 +39,44 @@ namespace ITGlobal.MarkDocs.Blog.Impl
 
             // Evaluate tags
             Tags = page.GetPageTags();
-            
+
             // Get title image
             var titleImageId = page.Metadata.GetString("title_image") ?? page.Metadata.GetString("image");
             if (titleImageId != null)
             {
-                if (resources.TryGetValue(titleImageId, out var titleImage))
+                IBlogResource titleImage = null;
+                foreach (var fullTitleImageId in EnumerateResourceIdCandidates(titleImageId))
+                {
+                    if (resources.TryGetValue(fullTitleImageId, out var id))
+                    {
+                        titleImage = id;
+                        break;
+                    }
+                }
+
+                if (titleImage != null)
                 {
                     TitleImage = titleImage;
                 }
                 else
                 {
-                    var fullTitleImageId = Path.Combine(Path.GetDirectoryName(page.RelativePath), titleImageId);
-                    fullTitleImageId = "/" + fullTitleImageId;
-                    fullTitleImageId = fullTitleImageId.Replace("\\", "/");
-
-                    if (resources.TryGetValue(fullTitleImageId, out titleImage))
-                    {
-                        TitleImage = titleImage;
-                    }
-                    else
-                    {
-                        report.Error(page.RelativePath, $"Bad title image reference: \"{titleImageId}\"");
-                    }
+                    report.Error(page.RelativePath, $"Bad title image reference: \"{titleImageId}\"");
                 }
+            }
+
+            IEnumerable<string> EnumerateResourceIdCandidates(string id)
+            {
+                var fullId1 = id;
+                ResourceId.Normalize(ref fullId1);
+                yield return fullId1;
+
+                var fullId2 = Path.Combine(page.RelativePath, id);
+                ResourceId.Normalize(ref fullId2);
+                yield return fullId2;
+
+                var fullId3 = Path.Combine(Path.GetDirectoryName(page.RelativePath), id);
+                ResourceId.Normalize(ref fullId3);
+                yield return fullId3;
             }
         }
 
@@ -139,8 +156,8 @@ namespace ITGlobal.MarkDocs.Blog.Impl
         /// <summary>
         ///     true if blog post has a preview
         /// </summary>
-        public bool HasPreview => Page.Preview!=null;
-        
+        public bool HasPreview => Page.Preview != null;
+
         /// <summary>
         ///     Reads blog post rendered HTML
         /// </summary>
@@ -156,5 +173,6 @@ namespace ITGlobal.MarkDocs.Blog.Impl
         ///     Read-only stream
         /// </returns>
         public Stream ReadPreviewHtml() => Page.Preview.OpenRead();
+
     }
 }
