@@ -145,10 +145,6 @@ The following text will be rendered as a citation ""Citation text"". And this is
 
 ***
 
-## [Custom containers](/markup/containers.md)
-
-***
-
 ## Custom emphasis
 
 :::col-md-6

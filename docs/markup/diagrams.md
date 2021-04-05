@@ -52,13 +52,13 @@ Use the following markup to embed [PlantUML](http://plantuml.com/) diagrams from
 
 :::col-md-6
 
-    ![](/images/example.plantuml)
+    ![](../images/example.plantuml)
 
 :::
 
 :::col-md-6
 
-![](/images/example.plantuml)
+![](../images/example.plantuml)
 
 :::
 

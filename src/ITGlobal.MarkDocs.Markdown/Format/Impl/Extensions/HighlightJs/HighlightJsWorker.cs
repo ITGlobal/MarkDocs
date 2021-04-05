@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -56,6 +56,7 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.HighlightJs
                     }
 
                     DeployResource(options.TempDirectory, "package.json");
+                    DeployResource(options.TempDirectory, "package-lock.json");
                     var listJs = DeployResource(options.TempDirectory, "hljs-list-langs.js");
                     _renderJs = DeployResource(options.TempDirectory, "hljs-render.js");
                     _npm.Install(options.TempDirectory);

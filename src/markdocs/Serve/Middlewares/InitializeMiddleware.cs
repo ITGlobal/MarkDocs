@@ -2,9 +2,9 @@ using System;
 using System.Threading.Tasks;
 using ITGlobal.CommandLine;
 using JetBrains.Annotations;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace ITGlobal.MarkDocs.Tools.Serve.Middlewares
@@ -77,7 +77,7 @@ namespace ITGlobal.MarkDocs.Tools.Serve.Middlewares
             {
                 Log.Error(e, "Unable to initialize documentation");
                 Environment.ExitCode = -1;
-                var lifetime = _services.GetRequiredService<IApplicationLifetime>();
+                var lifetime = _services.GetRequiredService<IHostApplicationLifetime>();
                 lifetime.StopApplication();
 
                 throw;

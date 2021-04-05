@@ -1,11 +1,11 @@
 {
-  "name": "server_highlight_js_syntax_colorizer",
-  "version": "1.0.0",
-  "description": "none",
-  "dependencies": {
-    "highlightjs": "^ 9.10.0"
-  },
-  "author": "none",
-  "repository": "none",
-  "license": "MIT"
+    "name": "server_highlight_js_syntax_colorizer",
+    "version": "1.0.0",
+    "description": "none",
+    "dependencies": {
+        "highlight.js": "^ 10.7.0"
+    },
+    "author": "none",
+    "repository": "none",
+    "license": "MIT"
 }

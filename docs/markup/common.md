@@ -328,7 +328,7 @@ Or you can use absolute links: [Open root page](/)
     You'll need to place definitions somewhere (they won't be visible):
 
     [markdown-term]: https://google.com
-    [1]: ../markup/text
+    [1]: ../markup/icons.md
 
 :::
 
@@ -345,7 +345,7 @@ See [1]
 You'll need to place definitions somewhere (they won't be visible):
 
 [markdown-term]: https://google.com
-[1]: ../markup/emphasis
+[1]: ../markup/icons.md
 
 :::
 

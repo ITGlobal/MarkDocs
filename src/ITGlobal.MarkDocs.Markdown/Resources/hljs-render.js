@@ -1,4 +1,4 @@
-﻿var hljs = require('highlightjs');
+var hljs = require('highlight.js');
 var fs = require('fs');
 
 var EOF = 0x1A;
@@ -36,5 +36,5 @@ while (shouldRead) {
 
 var inputJson = new Buffer(buffer).toString('utf8');
 var request = JSON.parse(inputJson);
-var output = hljs.highlight(request.language, request.sourceCode, true);
+var output = hljs.highlight(request.sourceCode, { language: request.language, ignoreIllegals: true });
 console.log(JSON.stringify(output.value));

@@ -12,7 +12,7 @@ Page property block
 
 Add the following markup in the beginning of the page markup to define page properties:
 
-```markdown
+```yaml
 
 ---
 property1: Value of property 1
@@ -43,7 +43,7 @@ Known properties
 
 For example, this very page has the following properties:
 
-```markdown
+```yaml
 ---
 title: Page properties
 order: 1

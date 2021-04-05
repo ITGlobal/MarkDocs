@@ -1,7 +1,5 @@
 using System;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -34,7 +32,7 @@ namespace ITGlobal.MarkDocs.Tools.Serve
             {
                 host.Start();
 
-                var service = host.Services.GetService<IHostingEnvironment>();
+                var service = host.Services.GetRequiredService<IWebHostEnvironment>();
 
                 Log.Debug("Hosting environment: {0}", service.EnvironmentName);
                 Log.Debug("Content root path: {0}", service.ContentRootPath);
