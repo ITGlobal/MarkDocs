@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Source
@@ -78,11 +78,11 @@ namespace ITGlobal.MarkDocs.Source
         ///     Actual URL with credentials
         /// </summary>
         internal string Url { get; private set; }
-        
+
         /// <summary>
         ///     Enable periodical remote polling
         /// </summary>
-        public bool EnablePolling { get; set; }
+        public bool EnablePolling { get; set; } = true;
 
         /// <summary>
         ///     Remote polling timer interval

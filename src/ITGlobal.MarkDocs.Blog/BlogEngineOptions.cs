@@ -1,4 +1,4 @@
-﻿using ITGlobal.MarkDocs.Blog.Impl;
+using ITGlobal.MarkDocs.Blog.Impl;
 using ITGlobal.MarkDocs.Cache;
 using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Search;
@@ -100,7 +100,8 @@ namespace ITGlobal.MarkDocs.Blog
                 options.FetchUrl = opts.FetchUrl;
                 options.UserName = opts.UserName;
                 options.Password = opts.Password;
-                options.EnablePolling = true;
+                options.EnablePolling = opts.EnablePolling;
+                options.PollingInterval = opts.PollingInterval;
                 options.Directory = Path.Combine(_dataDirectory, "source");
                 options.Tags.Use = false;
                 options.Branches.Use = true;

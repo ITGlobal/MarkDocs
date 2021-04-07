@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+using System;
+using JetBrains.Annotations;
 
 namespace ITGlobal.MarkDocs.Blog
 {
@@ -31,5 +32,15 @@ namespace ITGlobal.MarkDocs.Blog
         /// </summary>
         [NotNull]
         public string Branch { get; set; } = "master";
+
+        /// <summary>
+        ///     Enable periodical remote polling
+        /// </summary>
+        public bool EnablePolling { get; set; } = true;
+
+        /// <summary>
+        ///     Remote polling timer interval
+        /// </summary>
+        public TimeSpan PollingInterval { get; set; } = TimeSpan.FromMinutes(5);
     }
 }
