@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -8,10 +8,12 @@ namespace ITGlobal.MarkDocs.Source.Impl
 {
     internal sealed class StaticDirectorySourceTreeProvider : ISourceTreeProvider, IDisposable
     {
+
         private readonly StaticDirectorySourceTreeOptions _options;
         private readonly IAssetTreeReader _reader;
 
         private readonly object _sourceTreesLock = new object();
+
         private ImmutableDictionary<string, StaticDirectorySourceTree> _sourceTrees
             = ImmutableDictionary<string, StaticDirectorySourceTree>.Empty;
 
@@ -61,6 +63,11 @@ namespace ITGlobal.MarkDocs.Source.Impl
                 if (Directory.Exists(directory))
                 {
                     var id = Path.GetFileName(directory).ToLowerInvariant();
+                    if (string.IsNullOrEmpty(id))
+                    {
+                        id = Path.GetFileName(Path.GetDirectoryName(directory))!.ToLowerInvariant();
+                    }
+
                     toBeDeleted.Remove(id);
 
                     if (sourceTrees.TryGetValue(id, out var tree))
@@ -110,5 +117,6 @@ namespace ITGlobal.MarkDocs.Source.Impl
                 _sourceTrees = _sourceTrees.Clear();
             }
         }
+
     }
 }
