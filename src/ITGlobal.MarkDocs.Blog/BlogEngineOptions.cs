@@ -139,5 +139,15 @@ namespace ITGlobal.MarkDocs.Blog
             configure(_markdownOptions);
             return this;
         }
+
+        /// <summary>
+        ///     Configures underlying MarkDocs engine
+        /// </summary>
+        [NotNull]
+        public BlogEngineOptions ConfigureMarkDocs([NotNull] Action<MarkDocsOptions> configure)
+        {
+            configure(_builder);
+            return this;
+        }
     }
 }

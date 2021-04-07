@@ -188,7 +188,7 @@ namespace ITGlobal.MarkDocs.Format
 
             if (_htmlRendererOverrides.Count > 0)
             {
-                builder.Extensions.Add(new CustomBlockRenderingExtension(_htmlRendererOverrides));
+                builder.Extensions.Add(new CustomBlockRenderingExtension(serviceProvider, _htmlRendererOverrides));
             }
 
             return builder.Build();

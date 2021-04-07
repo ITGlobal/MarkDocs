@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Markdig;
 using Markdig.Renderers;
@@ -7,10 +7,15 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CustomBlockRendering
 {
     internal sealed class CustomBlockRenderingExtension : IMarkdownExtension
     {
-        private readonly List<Action<HtmlRenderer>> _htmlRendererOverrides;
 
-        public CustomBlockRenderingExtension(List<Action<HtmlRenderer>> htmlRendererOverrides)
+        private readonly IServiceProvider _serviceProvider;
+        private readonly List<Action<IServiceProvider, HtmlRenderer>> _htmlRendererOverrides;
+
+        public CustomBlockRenderingExtension(
+            IServiceProvider serviceProvider,
+            List<Action<IServiceProvider, HtmlRenderer>> htmlRendererOverrides)
         {
+            _serviceProvider = serviceProvider;
             _htmlRendererOverrides = htmlRendererOverrides;
         }
 
@@ -27,8 +32,9 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.CustomBlockRendering
 
             foreach (var func in _htmlRendererOverrides)
             {
-                func(htmlRenderer);
+                func(_serviceProvider, htmlRenderer);
             }
         }
+
     }
 }

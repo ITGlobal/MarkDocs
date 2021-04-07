@@ -167,7 +167,8 @@ namespace ITGlobal.MarkDocs.Format
 
         #region OverrideRendering
 
-        private readonly List<Action<HtmlRenderer>> _htmlRendererOverrides = new List<Action<HtmlRenderer>>();
+        private readonly List<Action<IServiceProvider, HtmlRenderer>> _htmlRendererOverrides =
+            new List<Action<IServiceProvider, HtmlRenderer>>();
 
         /// <summary>
         ///     Sets custom rendering function for <typeparamref name="T"/>
@@ -190,25 +191,39 @@ namespace ITGlobal.MarkDocs.Format
         ///     Sets custom rendering function for <typeparamref name="T"/>
         /// </summary>
         [NotNull]
-        public MarkdownOptions OverrideRendering<T>([NotNull] Func<HtmlRenderer, T, bool> func)
+        public MarkdownOptions OverrideRendering<T>([NotNull] Func<IServiceProvider, HtmlRenderer, T, bool> func)
             where T : MarkdownObject
         {
             _htmlRendererOverrides.Add(
-                htmlRenderer =>
+                (serviceProvider, htmlRenderer) =>
                 {
                     if (htmlRenderer.ObjectRenderers.FirstOrDefault(_ => _ is HtmlObjectRenderer<T>) is
                         HtmlObjectRenderer<T> existing)
                     {
-                        existing.TryWriters.Add((renderer, block) => func(renderer, block));
+                        existing.TryWriters.Add((renderer, block) => func(serviceProvider, renderer, block));
                     }
                     else
                     {
-                        htmlRenderer.ObjectRenderers.Add(new HtmlObjectRendererAdapter<T>(func));
+                        htmlRenderer.ObjectRenderers.Add(
+                            new HtmlObjectRendererAdapter<T>(
+                                (h, block) => func(serviceProvider, h, block)
+                            )
+                        );
                     }
                 }
             );
 
             return this;
+        }
+
+        /// <summary>
+        ///     Sets custom rendering function for <typeparamref name="T"/>
+        /// </summary>
+        [NotNull]
+        public MarkdownOptions OverrideRendering<T>([NotNull] Func<HtmlRenderer, T, bool> func)
+            where T : MarkdownObject
+        {
+            return OverrideRendering<T>((_, htmlRenderer, block) => func(htmlRenderer, block));
         }
 
         #endregion
