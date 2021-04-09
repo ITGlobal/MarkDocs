@@ -8,10 +8,13 @@ namespace ITGlobal.MarkDocs.Blog.Impl
 {
     internal sealed class BlogEngineImpl : IBlogEngine
     {
+
         private readonly IMarkDocService _markDocs;
         private readonly IMarkDocsLog _log;
 
+        private readonly object _stateLock = new object();
         private BlogEngineState _state;
+        private bool _isDisposed;
 
         public BlogEngineImpl(IMarkDocService service, IMarkDocsLog log, EventConnector eventConnector)
         {
@@ -19,25 +22,55 @@ namespace ITGlobal.MarkDocs.Blog.Impl
             _log = log;
             eventConnector.Engine = this;
 
-            Update(service.Documentations[0]);
+            if (service.Documentations.Count > 0)
+            {
+                if (service.Documentations.Count > 1)
+                {
+                    _log.Error($"More than one source found. Choosing \"{service.Documentations[0].Id}\" arbitrarily");
+                }
+
+                Update(service.Documentations[0]);
+            }
         }
 
         private BlogEngineState State
         {
             get
             {
-                return Interlocked.CompareExchange(ref _state, null, null);
+                lock (_stateLock)
+                {
+                    while (_state == null && !_isDisposed)
+                    {
+                        Monitor.Wait(_stateLock);
+                    }
+
+                    if (_isDisposed)
+                    {
+                        throw new ObjectDisposedException(nameof(BlogEngineImpl));
+                    }
+
+                    return _state;
+                }
             }
             set
             {
-                Interlocked.Exchange(ref _state, value);
+                lock (_stateLock)
+                {
+                    if (_isDisposed)
+                    {
+                        throw new ObjectDisposedException(nameof(BlogEngineImpl));
+                    }
+
+                    _state = value;
+                    Monitor.PulseAll(_stateLock);
+                }
 
                 _log.Info($"Blog data updated to version \"{value.SourceInfo.LastChangeId}\"");
             }
         }
 
         #region IBlogEngine
-        
+
         /// <summary>
         ///     Blog version
         /// </summary>
@@ -100,6 +133,12 @@ namespace ITGlobal.MarkDocs.Blog.Impl
         /// <inheritdoc />
         void IDisposable.Dispose()
         {
+            lock (_stateLock)
+            {
+                _isDisposed = true;
+                Monitor.PulseAll(_stateLock);
+            }
+
             _markDocs.Dispose();
         }
 
@@ -113,6 +152,7 @@ namespace ITGlobal.MarkDocs.Blog.Impl
             if (state.List.Length > 1)
             {
                 report.Error($"More than one source found. Choosing \"{state.List[0].Id}\" arbitrarily");
+                _log.Error($"More than one source found. Choosing \"{state.List[0].Id}\" arbitrarily");
             }
 
             State = new BlogEngineState(this, state.List[0], report);
@@ -125,5 +165,6 @@ namespace ITGlobal.MarkDocs.Blog.Impl
         }
 
         #endregion
+
     }
 }

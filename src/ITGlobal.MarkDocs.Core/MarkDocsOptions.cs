@@ -1,4 +1,4 @@
-﻿using ITGlobal.MarkDocs.Cache;
+using ITGlobal.MarkDocs.Cache;
 using ITGlobal.MarkDocs.Extensions;
 using ITGlobal.MarkDocs.Format;
 using ITGlobal.MarkDocs.Impl;
@@ -19,7 +19,11 @@ namespace ITGlobal.MarkDocs
     [PublicAPI]
     public sealed class MarkDocsOptions
     {
+
         private readonly IServiceCollection _services;
+
+        private readonly List<Action<IServiceCollection>> _configureServicesActions =
+            new List<Action<IServiceCollection>>();
 
         internal MarkDocsOptions(IServiceCollection services)
         {
@@ -148,7 +152,7 @@ namespace ITGlobal.MarkDocs
         [NotNull]
         internal MarkDocsOptions ConfigureServices([NotNull] Action<IServiceCollection> action)
         {
-            action(_services);
+            _configureServicesActions.Add(action);
             return this;
         }
 
@@ -174,8 +178,13 @@ namespace ITGlobal.MarkDocs
                 throw new Exception("No cache service has been configured");
             }
 
+            foreach (var action in _configureServicesActions)
+            {
+                action(_services);
+            }
+
             _services.AddSingleton<IMarkDocService, MarkDocService>();
-            if (ConfigureCustomAssetTreeReader!= null)
+            if (ConfigureCustomAssetTreeReader != null)
             {
                 ConfigureCustomAssetTreeReader(_services);
             }
@@ -210,5 +219,6 @@ namespace ITGlobal.MarkDocs
                 }
             }
         }
+
     }
 }

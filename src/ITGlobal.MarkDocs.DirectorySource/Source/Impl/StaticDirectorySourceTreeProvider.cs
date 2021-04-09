@@ -22,7 +22,7 @@ namespace ITGlobal.MarkDocs.Source.Impl
             _options = options;
             _reader = reader;
 
-            Refresh();
+            Refresh(throwIfDirectoryIsMissing: true);
         }
 
         public string[] IgnorePatterns => null;
@@ -48,6 +48,11 @@ namespace ITGlobal.MarkDocs.Source.Impl
         }
 
         public void Refresh()
+        {
+            Refresh(throwIfDirectoryIsMissing: false);
+        }
+
+        private void Refresh(bool throwIfDirectoryIsMissing)
         {
             var hasAnyChanges = false;
             ImmutableDictionary<string, StaticDirectorySourceTree> sourceTrees;
@@ -80,6 +85,13 @@ namespace ITGlobal.MarkDocs.Source.Impl
                     sourceTrees = sourceTrees.SetItem(id, tree);
 
                     hasAnyChanges = true;
+                }
+                else
+                {
+                    if (throwIfDirectoryIsMissing)
+                    {
+                        throw new Exception($"Source directory \"{directory}\" doesn't exist");
+                    }
                 }
             }
 

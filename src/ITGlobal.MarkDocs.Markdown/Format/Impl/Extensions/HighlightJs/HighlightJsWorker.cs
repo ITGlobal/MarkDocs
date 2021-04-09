@@ -38,7 +38,6 @@ namespace ITGlobal.MarkDocs.Format.Impl.Extensions.HighlightJs
 
             Task.Run(Initialize);
 
-
             void Initialize()
             {
                 try
